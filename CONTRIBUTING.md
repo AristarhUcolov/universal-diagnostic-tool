@@ -77,6 +77,21 @@ go vet ./...
 - Интерфейс доступен только с этого компьютера и защищён ключом сеанса —
   пусть так и остаётся.
 
+## Поддержать деньгами
+
+Программа бесплатная и останется такой. Если она вам помогла и хочется
+отблагодарить деньгами — это оплачивает время на разработку, адаптеры для
+проверки и испытания на настоящих машинах:
+
+| | |
+|---|---|
+| **Ko-fi** — разово или ежемесячно, картой из любой страны | [ko-fi.com/AristarhUcolov](https://ko-fi.com/AristarhUcolov) |
+| **Buy Me a Coffee** — быстрый платёж картой | [buymeacoffee.com/aristarh.ucolov](https://buymeacoffee.com/aristarh.ucolov) |
+| **DonationAlerts** — удобно из России и стран СНГ | [donationalerts.com/c/aristarh_ucolov](https://www.donationalerts.com/c/aristarh_ucolov) |
+
+Те же ссылки — в программе (раздел **«♥ Поддержать»**) и за кнопкой
+**Sponsor** на странице репозитория.
+
 ## Чего проект не примет
 
 Программирование ключей и иммобилайзеров, обход противоугонных систем,
@@ -164,6 +179,21 @@ Worth knowing about the structure:
   `internal/server/web`; all text lives in `i18n.js` in both languages.
 - The interface is reachable only from this computer and protected by a
   session key — keep it that way.
+
+## Support with money
+
+The program is free and will stay free. If it helped you and you want to say
+thanks with money, it pays for development time, adapters for testing and
+trials on real cars:
+
+| | |
+|---|---|
+| **Ko-fi** — one-off or monthly, by card from any country | [ko-fi.com/AristarhUcolov](https://ko-fi.com/AristarhUcolov) |
+| **Buy Me a Coffee** — a quick card payment | [buymeacoffee.com/aristarh.ucolov](https://buymeacoffee.com/aristarh.ucolov) |
+| **DonationAlerts** — convenient from Russia and the CIS | [donationalerts.com/c/aristarh_ucolov](https://www.donationalerts.com/c/aristarh_ucolov) |
+
+The same links are in the program (the **"♥ Support"** section) and behind
+the **Sponsor** button on the repository page.
 
 ## What the project will not accept
 

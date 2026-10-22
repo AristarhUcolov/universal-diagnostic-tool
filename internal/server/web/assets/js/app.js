@@ -12,8 +12,9 @@ import * as bus from './pages/bus.js';
 import * as journal from './pages/journal.js';
 import * as reference from './pages/reference.js';
 import * as settingsPage from './pages/settings.js';
+import * as support from './pages/support.js';
 
-const pages = { connect, dashboard, dtc: dtcPage, live, info, tests, terminal, bus, journal, reference, settings: settingsPage };
+const pages = { connect, dashboard, dtc: dtcPage, live, info, tests, terminal, bus, journal, reference, settings: settingsPage, support };
 const needsConnection = new Set(['dashboard', 'dtc', 'live', 'info', 'tests', 'terminal']);
 
 // store is the shared state of the interface.
@@ -80,9 +81,7 @@ function updateHeader() {
     if (a.dataset.page === 'bus') a.classList.toggle('disabled', !s.canBus);
   });
   const foot = document.getElementById('side-foot');
-  clear(foot).append(
-    el('div', 'v' + (s.version || document.querySelector('meta[name="udt-version"]').content)),
-    el('a.support-link', { href: '#/settings?support' }, '♥ ' + t('support.link')));
+  foot.textContent = 'v' + (s.version || document.querySelector('meta[name="udt-version"]').content);
 }
 
 let cleanup = null;

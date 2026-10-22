@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, setLang, count } from '../i18n.js';
-import { el, clear, toast, busy, copyText, supportLinks } from '../ui.js';
+import { el, clear, toast, busy, copyText } from '../ui.js';
 import { store, saveSettings, subscribe } from '../app.js';
 
 export function render(view) {
@@ -32,7 +32,6 @@ export function render(view) {
       [['logs', 'Logs'], ['recordings', 'Recordings'], ['reports', 'Reports'], ['definitions', 'Definitions'], ['', 'Config']].map(([k, label]) => el('button', {
         onclick: () => api.post('/api/open-folder', { kind: k }).catch(e => toast(e.message, 'bad')),
       }, t('set.folder' + label))))),
-    supportCard(),
     aboutCard());
 
   function paintBridge() {
@@ -56,9 +55,6 @@ export function render(view) {
     }
   }
   paintBridge();
-  if (location.hash.includes('support')) {
-    requestAnimationFrame(() => document.getElementById('support').scrollIntoView({ block: 'start', behavior: 'smooth' }));
-  }
   return subscribe('status', paintBridge);
 }
 
@@ -67,11 +63,6 @@ function lanCard() {
   return el('div.card', el('h2', t('set.lan')),
     url ? el('div.row', el('code', url), el('button.small', { onclick: () => copyText(url) }, t('common.copy')))
       : el('p.secondary', t('set.lanHint'), ' ', el('code', 'http://<IP>:8080/#t=…')));
-}
-
-function supportCard() {
-  return el('div#support.card', el('h2', t('support.title')), el('p.secondary', t('support.lead')),
-    el('div.row', supportLinks.map(l => el('a.btn', { href: l.url, target: '_blank', rel: 'noopener' }, l.name))));
 }
 
 function aboutCard() {
@@ -84,5 +75,6 @@ function aboutCard() {
     el('div', t('about.definitions')), el('div', String(i.definitions)),
     el('div', t('about.dtc')), el('div', Object.entries(i.dtcFamilies || {}).map(([f, n]) => `${f}: ${n}`).join(', ')),
     el('div', t('about.license')), el('div', 'AGPL-3.0'),
+    el('div', t('support.title')), el('div', el('a', { href: '#/support' }, '♥ ' + t('nav.support'))),
     el('div', t('about.source')), el('div', el('a', { href: 'https://github.com/AristarhUcolov/universal-diagnostic-tool', target: '_blank', rel: 'noopener' }, 'github.com/AristarhUcolov/universal-diagnostic-tool'))));
 }

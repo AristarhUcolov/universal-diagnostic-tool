@@ -39,6 +39,8 @@ jobs:
           GOOS=linux   GOARCH=arm GOARM=7 go build -trimpath -ldflags "-s -w $V" -o dist/udt-linux-armv7 ./cmd/udt
           GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags "-s -w $V" -o dist/udt-macos-arm64 ./cmd/udt
           GOOS=darwin  GOARCH=amd64 go build -trimpath -ldflags "-s -w $V" -o dist/udt-macos-amd64 ./cmd/udt
+          # Контрольные суммы — чтобы скачанный файл можно было проверить.
+          cd dist && sha256sum * > SHA256SUMS.txt
 
       - name: Релиз
         env:

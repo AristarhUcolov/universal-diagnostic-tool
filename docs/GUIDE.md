@@ -13,7 +13,7 @@
 [С телефона](#с-телефона-или-планшета) ·
 [Командная строка](#командная-строка) ·
 [Если не связывается](#если-не-связывается) ·
-[Безопасность](#безопасность)
+[Безопасность](#безопасность) · [Поддержать проект](#поддержать-проект)
 
 ---
 
@@ -206,6 +206,13 @@ udt live -adapter sim -sim gaz-mikas -params twat,freq,uacc
   ссылка с ключом. Включайте это только в своей сети.
 - Стирание ошибок, проверка механизмов и терминал меняют состояние блока.
   Делайте это на неподвижной машине.
+
+## Поддержать проект
+
+Раздел **«♥ Поддержать»** в боковом меню: ссылки на Ko-fi, Buy Me a Coffee и
+DonationAlerts и способы помочь без денег — проверить программу на своей
+машине, прислать журнал, сверить описание блока. Программа бесплатная и
+останется такой.
 
 ---
 ---
@@ -404,3 +411,10 @@ adapter, car, year, control unit and the journal file.
   the car. Use it only on your own network.
 - Clearing codes, output tests and the terminal change the unit's state. Do
   them with the vehicle stationary.
+
+## Support the project
+
+The **"♥ Support"** section of the sidebar: links to Ko-fi, Buy Me a Coffee
+and DonationAlerts, and ways to help without money — test the program on your
+car, send a journal, check a control unit description. The program is free
+and will stay free.

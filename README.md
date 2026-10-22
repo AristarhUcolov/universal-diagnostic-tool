@@ -249,8 +249,8 @@ internal/server       веб-интерфейс (встроен в програ�
 | **Buy Me a Coffee** — быстрый платёж картой | [buymeacoffee.com/aristarh.ucolov](https://buymeacoffee.com/aristarh.ucolov) |
 | **DonationAlerts** — удобно из России и стран СНГ | [donationalerts.com/c/aristarh_ucolov](https://www.donationalerts.com/c/aristarh_ucolov) |
 
-Те же ссылки — в программе (**Настройки → Поддержать проект** и ссылка внизу
-боковой панели) и за кнопкой **Sponsor** на странице репозитория.
+Те же ссылки — в программе, раздел **«♥ Поддержать»** в боковом меню, и за
+кнопкой **Sponsor** на странице репозитория.
 
 **Помочь без денег** — не менее ценно: проверить программу со своим адаптером
 и автомобилем, прислать журнал сеанса, сверить описание блока с руководством
@@ -520,9 +520,8 @@ trials on real cars.
 | **Buy Me a Coffee** — a quick card payment | [buymeacoffee.com/aristarh.ucolov](https://buymeacoffee.com/aristarh.ucolov) |
 | **DonationAlerts** — convenient from Russia and the CIS | [donationalerts.com/c/aristarh_ucolov](https://www.donationalerts.com/c/aristarh_ucolov) |
 
-The same links are in the program (**Settings → Support the project** and the
-link at the bottom of the sidebar) and behind the **Sponsor** button on the
-repository page.
+The same links are in the program — the **"♥ Support"** section of the
+sidebar — and behind the **Sponsor** button on the repository page.
 
 **Helping without money** is just as valuable: try the program with your
 adapter and car, send a session journal, check a control unit description

@@ -15,6 +15,7 @@
   --accent: #2a78d6;
   --accent-ink: #ffffff;
   --accent-soft: #cde2fb;
+  --heart: #e5484d;
   --series-1: #2a78d6;
   --series-1-wash: rgba(42, 120, 214, 0.10);
   --good: #0ca30c;
@@ -42,6 +43,7 @@
     --accent: #3987e5;
     --accent-ink: #ffffff;
     --accent-soft: #184f95;
+    --heart: #ff6369;
     --series-1: #3987e5;
     --series-1-wash: rgba(57, 135, 229, 0.12);
     --good-ink: #4fd14f;
@@ -50,6 +52,7 @@
   }
 }
 :root[data-theme="dark"] {
+  --heart: #ff6369;
   color-scheme: dark;
   --bg: #121211;
   --surface-1: #1a1a19;
@@ -111,10 +114,10 @@ nav a {
 nav a:hover { background: var(--surface-2); color: var(--text-primary); }
 nav a.active { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
 nav a.disabled { opacity: .45; }
+nav a.nav-support { margin-top: 6px; }
+nav a.nav-support .ico { color: var(--heart); font-size: 16px; }
 nav .ico { width: 20px; text-align: center; }
 .side-foot { margin-top: auto; padding: 12px 16px; }
-.side-foot .support-link { display: block; margin-top: 4px; color: var(--text-secondary); text-decoration: none; }
-.side-foot .support-link:hover { color: var(--accent); }
 
 .main { display: flex; flex-direction: column; min-width: 0; }
 .top {
@@ -156,6 +159,14 @@ button, .btn {
 button:hover { background: var(--surface-3); }
 a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 a.btn:hover { background: var(--surface-3); }
+a.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+a.btn.primary:hover { background: var(--accent); filter: brightness(1.08); }
+.support-lead { max-width: 760px; margin-bottom: 16px; }
+.grid.donate { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-bottom: 14px; }
+.donate-card { border-top: 4px solid var(--accent); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.donate-card h2 { margin: 0; }
+.donate-card p { margin: 0; flex: 1; }
+.support-list { margin: 0 0 12px; padding-left: 20px; line-height: 1.7; }
 button:disabled { opacity: .5; cursor: default; }
 button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
 button.primary:hover { filter: brightness(1.08); }

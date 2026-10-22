@@ -9,9 +9,9 @@ Element.prototype.append = function (...nodes) {
 
 // Where the program can be supported.
 export const supportLinks = [
-  { name: 'Ko-fi', url: 'https://ko-fi.com/AristarhUcolov' },
-  { name: 'Buy Me a Coffee', url: 'https://buymeacoffee.com/aristarh.ucolov' },
-  { name: 'DonationAlerts', url: 'https://www.donationalerts.com/c/aristarh_ucolov' },
+  { name: 'Ko-fi', url: 'https://ko-fi.com/AristarhUcolov', label: 'ko-fi.com/AristarhUcolov', key: 'support.kofi', color: '#ff5e5b' },
+  { name: 'Buy Me a Coffee', url: 'https://buymeacoffee.com/aristarh.ucolov', label: 'buymeacoffee.com/aristarh.ucolov', key: 'support.bmc', color: '#ffdd00' },
+  { name: 'DonationAlerts', url: 'https://www.donationalerts.com/c/aristarh_ucolov', label: 'donationalerts.com/c/aristarh_ucolov', key: 'support.da', color: '#f57d07' },
 ];
 
 // el builds DOM elements: el('div.card', {onclick}, child, 'text', ...).
