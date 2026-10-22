@@ -125,6 +125,24 @@ func Open(ctx context.Context, line kline.Line, cfg Config, log journal.Logger) 
 	return l, nil
 }
 
+// Reinit repeats the initialisation. A control unit forgets the session
+// when it restarts (ecuReset, a voltage drop), and answers again only
+// after a new wake-up.
+func (l *Link) Reinit(ctx context.Context) error {
+	switch l.cfg.Init {
+	case InitFast:
+		return l.fastInit(ctx)
+	case InitSlow:
+		r, err := kline.SlowInit(l.line, l.cfg.InitAddr, true, l.log)
+		if err != nil {
+			return fmt.Errorf("%w: %v", ErrInit, err)
+		}
+		l.applyKeyBytes(r.KB1, r.KB2)
+		l.lastIO = time.Now()
+	}
+	return nil
+}
+
 func (l *Link) fastInit(ctx context.Context) error {
 	// TIdle: the bus must have been quiet before the wake-up pattern.
 	timing.Sleep(60 * time.Millisecond)

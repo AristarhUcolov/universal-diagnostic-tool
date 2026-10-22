@@ -1,6 +1,6 @@
 import { api, events } from './api.js';
 import { setLang, lang, t, tr } from './i18n.js';
-import { el, clear, toast } from './ui.js';
+import { el, clear, toast, errText } from './ui.js';
 import * as connect from './pages/connect.js';
 import * as dashboard from './pages/dashboard.js';
 import * as dtcPage from './pages/dtc.js';
@@ -13,9 +13,10 @@ import * as journal from './pages/journal.js';
 import * as reference from './pages/reference.js';
 import * as settingsPage from './pages/settings.js';
 import * as support from './pages/support.js';
+import * as checks from './pages/checks.js';
 
-const pages = { connect, dashboard, dtc: dtcPage, live, info, tests, terminal, bus, journal, reference, settings: settingsPage, support };
-const needsConnection = new Set(['dashboard', 'dtc', 'live', 'info', 'tests', 'terminal']);
+const pages = { connect, dashboard, dtc: dtcPage, live, info, tests, checks, terminal, bus, journal, reference, settings: settingsPage, support };
+const needsConnection = new Set(['dashboard', 'dtc', 'live', 'info', 'tests', 'checks', 'terminal']);
 
 // store is the shared state of the interface.
 export const store = {
@@ -191,7 +192,7 @@ function startEvents() {
       }
     },
     live: ev => {
-      if (ev.text && !ev.values) { store.liveError = ev.text; emit('live', ev); return; }
+      if (ev.text && !ev.values) { store.liveError = errText({ message: ev.text, code: ev.code }); emit('live', ev); return; }
       store.liveError = '';
       const now = Date.now();
       for (const v of ev.values || []) {

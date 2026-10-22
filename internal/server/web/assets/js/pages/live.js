@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr, unitName } from '../i18n.js';
-import { el, clear, toast, busy, fmt, convert } from '../ui.js';
+import { el, clear, toast, busy, fmt, convert, errText } from '../ui.js';
 import { StripChart } from '../charts.js';
 import { store, subscribe, currentECU } from '../app.js';
 import { ecuSelect, ecuPath, hasCap, keyParams, groupName } from './common.js';
@@ -14,6 +14,7 @@ export function render(view) {
   let rawTimer = null;
 
   const listBox = el('div.param-list');
+  const presets = el('div.row.presets');
   const filter = el('input', { placeholder: t('live.filter'), style: { width: '100%' } });
   const startBtn = el('button.primary');
   const interval = el('select',
@@ -30,7 +31,7 @@ export function render(view) {
     el('h1', t('live.title')),
     ecuSelect(() => { stop().then(load); }),
     el('div.live-layout',
-      el('div.card', el('h2', t('live.params')), filter, listBox),
+      el('div.card', el('h2', t('live.params')), presets, filter, listBox),
       el('div',
         el('div.card', el('div.row', startBtn, el('label.field', t('live.interval'), interval), recBtn, recInfo), errBox),
         el('div', { style: { margin: '12px 0' } }, tabs),
@@ -187,7 +188,7 @@ export function render(view) {
         info.textContent = `${r.bytes.length} bytes · ${new Date(r.time).toLocaleTimeString()}`;
         prev = r.bytes;
       } catch (e) {
-        info.textContent = e.message;
+        info.textContent = errText(e);
       }
     }
     rawTimer = setInterval(() => { if (auto.checked && content.isConnected) readRaw(); }, 700);
@@ -200,12 +201,30 @@ export function render(view) {
       selected = new Set(r.selected && r.selected.length ? r.selected : keyParams(params).map(p => p.id));
     } catch (e) {
       params = [];
-      toast(e.message, 'bad');
+      toast(errText(e), 'bad');
     }
+    paintPresets();
     paintList();
     paintTabs();
     paintContent();
     paintControls();
+  }
+
+  // paintPresets offers ready-made selections for common jobs.
+  function paintPresets() {
+    clear(presets);
+    const sets = [
+      ['live.pKey', keyParams(params).map(p => p.id)],
+      ['live.pIdle', params.filter(p => p.group === 'idle' || ['0C', '05'].includes(p.obd)).map(p => p.id)],
+      ['live.pMix', params.filter(p => ['fuel', 'o2'].includes(p.group) || ['0C', '10'].includes(p.obd)).map(p => p.id)],
+    ];
+    for (const [key, ids] of sets) {
+      if (ids.length < 2) continue;
+      presets.append(el('button.small', { onclick: () => { selected = new Set(ids); paintList(); paintContent(); } }, t(key)));
+    }
+    if (presets.childNodes.length) {
+      presets.append(el('button.small.ghost', { onclick: () => { selected = new Set(); paintList(); paintContent(); } }, t('live.pNone')));
+    }
   }
 
   load();

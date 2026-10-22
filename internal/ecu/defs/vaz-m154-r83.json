@@ -54,14 +54,14 @@
   ],
   "actuators": [
     {"id": "inj", "name": {"en": "Injectors (pulse)", "ru": "Форсунки (импульс)"}, "kind": "pulse", "on": "30 01 06 01", "off": "30 01 00", "max": 300,
-      "warning": {"en": "Each pulse sprays fuel into the cylinders. Engine stopped, ignition on.", "ru": "Каждый импульс впрыскивает топливо в цилиндры. Двигатель заглушен, зажигание включено."}},
-    {"id": "coil14", "name": {"en": "Ignition coil, cylinders 1 and 4 (pulse)", "ru": "Катушка зажигания цил. 1 и 4 (импульс)"}, "kind": "pulse", "on": "30 05 06 01", "off": "30 05 00", "max": 200},
-    {"id": "coil23", "name": {"en": "Ignition coil, cylinders 2 and 3 (pulse)", "ru": "Катушка зажигания цил. 2 и 3 (импульс)"}, "kind": "pulse", "on": "30 06 06 01", "off": "30 06 00", "max": 200},
-    {"id": "pump", "name": {"en": "Fuel pump relay", "ru": "Реле бензонасоса"}, "kind": "toggle", "on": "30 09 06 01", "off": "30 09 00"},
-    {"id": "fan", "name": {"en": "Cooling fan relay", "ru": "Реле вентилятора охлаждения"}, "kind": "toggle", "on": "30 0A 06 01", "off": "30 0A 00"},
+      "warning": {"en": "Each pulse sprays fuel into the cylinders. Engine stopped, ignition on.", "ru": "Каждый импульс впрыскивает топливо в цилиндры. Двигатель заглушен, зажигание включено."}, "condition": "engine_off"},
+    {"id": "coil14", "name": {"en": "Ignition coil, cylinders 1 and 4 (pulse)", "ru": "Катушка зажигания цил. 1 и 4 (импульс)"}, "kind": "pulse", "on": "30 05 06 01", "off": "30 05 00", "max": 200, "warning": {"en": "High voltage on the plug leads.", "ru": "Высокое напряжение на проводах свечей."}, "condition": "engine_off"},
+    {"id": "coil23", "name": {"en": "Ignition coil, cylinders 2 and 3 (pulse)", "ru": "Катушка зажигания цил. 2 и 3 (импульс)"}, "kind": "pulse", "on": "30 06 06 01", "off": "30 06 00", "max": 200, "warning": {"en": "High voltage on the plug leads.", "ru": "Высокое напряжение на проводах свечей."}, "condition": "engine_off"},
+    {"id": "pump", "name": {"en": "Fuel pump relay", "ru": "Реле бензонасоса"}, "kind": "toggle", "on": "30 09 06 01", "off": "30 09 00", "warning": {"en": "Make sure no fuel line is open.", "ru": "Убедитесь, что топливные шланги подсоединены."}, "timeout_s": 30},
+    {"id": "fan", "name": {"en": "Cooling fan relay", "ru": "Реле вентилятора охлаждения"}, "kind": "toggle", "on": "30 0A 06 01", "off": "30 0A 00", "warning": {"en": "Keep hands away from the fan.", "ru": "Не держите руки у вентилятора."}},
     {"id": "ac", "name": {"en": "A/C relay", "ru": "Реле кондиционера"}, "kind": "toggle", "on": "30 0B 06 01", "off": "30 0B 00"},
     {"id": "mil", "name": {"en": "Check-engine lamp", "ru": "Лампа неисправности"}, "kind": "toggle", "on": "30 0C 06 01", "off": "30 0C 00"},
     {"id": "iac_pos", "name": {"en": "Idle air control position", "ru": "Положение РХХ"}, "kind": "value", "set": "30 41 07 {v}", "off": "30 41 00", "min": 0, "max": 255, "unit": "steps"},
-    {"id": "idle_rpm", "name": {"en": "Idle speed set point", "ru": "Обороты холостого хода"}, "kind": "value", "set": "30 42 07 {v/10}", "off": "30 42 00", "min": 600, "max": 1600, "unit": "rpm"}
+    {"id": "idle_rpm", "name": {"en": "Idle speed set point", "ru": "Обороты холостого хода"}, "kind": "value", "set": "30 42 07 {v/10}", "off": "30 42 00", "min": 600, "max": 1600, "unit": "rpm", "warning": {"en": "The engine must be running and warm.", "ru": "Двигатель должен работать и быть прогретым."}, "condition": "engine_running"}
   ]
 }

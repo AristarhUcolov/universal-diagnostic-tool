@@ -160,6 +160,10 @@ func (n *KWPNode) tryFrame(bus *KBus) {
 			bus.sleep(n.P2 + 5*time.Millisecond)
 		}
 		bus.emit(n.frame(src, a), n.Baud)
+		if len(a) > 0 && a[0] == 0x51 {
+			// ecuReset: the unit restarts and waits for a new wake-up.
+			n.awake = false
+		}
 	}
 }
 
@@ -300,7 +304,9 @@ func (n *LegacyNode) handle(req []byte) []byte {
 		faults := n.Engine.Faults()
 		out := []byte{byte(len(faults))}
 		for _, f := range faults {
-			out = append(out, f.Mikas, 0xE0)
+			// A real Микас-5.47 separates codes with 0x40 (the protocol
+			// description says 0xE0).
+			out = append(out, f.Mikas, 0x40)
 		}
 		return out
 	case c == legacy.CmdWriteParam && len(req) >= 3:
@@ -394,9 +400,9 @@ func mikasParam(code byte, s State, e *Engine) []byte {
 	case 0x3F:
 		return u16le(s.InjMs * 125)
 	case 0x21:
-		return u16le(s.MAFkgh * 100)
+		return u16le(s.MAFkgh * 10)
 	case 0x59:
-		return u16le(s.MAFkgh * 98)
+		return []byte{u8(s.MAFkgh * 9.8)}
 	case 0x40:
 		return u16le(s.FuelLh * 10)
 	case 0x08:

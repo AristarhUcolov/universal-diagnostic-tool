@@ -52,6 +52,8 @@ func (a *VAZApp) Handle(req []byte, t Transport, functional bool) [][]byte {
 		}
 		return [][]byte{{0x50, req[1]}}
 	case 0x11:
+		a.io = map[byte]byte{}
+		a.Engine.ResetOverrides()
 		return [][]byte{{0x51}}
 	case 0x14:
 		a.Engine.ClearFaults()
@@ -330,6 +332,9 @@ func (a *VAZApp) ioControl(req []byte, s State) [][]byte {
 		switch param {
 		case 0x00:
 			delete(a.io, lid)
+			if lid == 0x0A {
+				a.Engine.SetFan(false)
+			}
 			return [][]byte{{0x70, lid, 0x00}}
 		case 0x01:
 			return [][]byte{{0x70, lid, 0x01, a.io[lid]}}
@@ -338,6 +343,9 @@ func (a *VAZApp) ioControl(req []byte, s State) [][]byte {
 				return nrc(0x30, 0x12)
 			}
 			a.io[lid] = req[3]
+			if lid == 0x0A {
+				a.Engine.SetFan(req[3] != 0)
+			}
 			return [][]byte{{0x70, lid, 0x06, req[3]}}
 		}
 		return nrc(0x30, 0x12)
@@ -345,12 +353,22 @@ func (a *VAZApp) ioControl(req []byte, s State) [][]byte {
 		switch param {
 		case 0x00:
 			delete(a.io, lid)
+			if lid == 0x41 {
+				a.Engine.SetIACTarget(0)
+			} else {
+				a.Engine.SetIdleTarget(0)
+			}
 			return [][]byte{{0x70, lid, 0x00}}
 		case 0x07:
 			if len(req) < 4 {
 				return nrc(0x30, 0x12)
 			}
 			a.io[lid] = req[3]
+			if lid == 0x41 {
+				a.Engine.SetIACTarget(float64(req[3]))
+			} else {
+				a.Engine.SetIdleTarget(float64(req[3]) * 10)
+			}
 			return [][]byte{{0x70, lid, 0x07, u8(s.DesiredIACSteps), u8(s.IACSteps), u8(s.RPM / 10), req[3]}}
 		}
 		return nrc(0x30, 0x12)

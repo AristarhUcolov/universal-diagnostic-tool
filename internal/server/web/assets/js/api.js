@@ -18,7 +18,7 @@ function readToken() {
 export const token = readToken();
 
 export class APIError extends Error {
-  constructor(msg, status) { super(msg); this.status = status; }
+  constructor(msg, status, code) { super(msg); this.status = status; this.code = code || ''; }
 }
 
 async function call(method, path, body) {
@@ -36,7 +36,7 @@ async function call(method, path, body) {
   const ct = res.headers.get('Content-Type') || '';
   const data = ct.includes('application/json') ? await res.json() : await res.text();
   if (!res.ok) {
-    throw new APIError((data && data.error) || String(data) || res.statusText, res.status);
+    throw new APIError((data && data.error) || String(data) || res.statusText, res.status, data && data.code);
   }
   return data;
 }

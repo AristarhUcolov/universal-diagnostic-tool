@@ -86,13 +86,24 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
   описаний: SAE J2012, ВАЗ/ГАЗ/УАЗ KWP2000, Микас, VAG) на русском и
   английском; статусы (активна, подтверждена, ожидает, лампа MIL); стоп-кадр
   OBD-II; отчёт для печати.
+- **Как исправить** — у каждого кода: что делает узел, признаки, причины от
+  простых к дорогим, как проверить и насколько это срочно («опасно ехать»,
+  «устранить скоро», «можно отложить»). 33 раздела справочника по ремонту на
+  русском и английском — в разделе «Ошибки», в отчёте и без подключения.
 - **Параметры в реальном времени** — таблица с минимумом и максимумом,
-  графики (у каждого параметра своя ось), запись в CSV и «сырые записи» с
+  графики (у каждого параметра своя ось), готовые наборы («Основные»,
+  «Холостой ход», «Смесь и топливо»), запись в CSV и «сырые записи» с
   подсветкой меняющихся байтов — чтобы изучать новые блоки.
 - **Обзор** — главные значения плитками с цветом по порогам, готовность
-  мониторов OBD-II, напряжение бортсети.
-- **Исполнительные механизмы** — форсунки, бензонасос, вентилятор и т.п.,
-  если описание блока их знает; с предупреждениями.
+  мониторов OBD-II, напряжение бортсети, быстрые действия.
+- **Сервис** — перезагрузка блока управления (связь восстанавливается
+  сама); проверка форсунок, катушек, бензонасоса, вентилятора, клапанов;
+  регулировка оборотов холостого хода и положения РДВ с живыми оборотами
+  рядом. Программа не запустит тест, если двигатель не в нужном состоянии,
+  и сама вернёт блоку всё включённое по таймеру.
+- **Проверки** — пошаговые проверки с оценкой «норма / не норма»:
+  аккумулятор и генератор, прогрев и термостат, холостой ход, датчик
+  кислорода, датчик положения дросселя.
 - **Терминал** — любой запрос в hex и сырой ответ: KWP2000, UDS, OBD-II,
   Микас, KW1281.
 - **Монитор шины CAN** — все кадры, период, расшифровка J1939; отправка
@@ -105,8 +116,10 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
 - **С телефона или планшета** — интерфейс открывается в браузере любого
   устройства в той же сети.
 - **Командная строка** — `udt scan`, `udt dtc`, `udt live`, `udt raw`,
-  `udt bridge`, `udt lookup` для скриптов и слабых ноутбуков.
+  `udt reset`, `udt bridge`, `udt lookup` для скриптов и слабых ноутбуков.
 - **RU / EN**, тёмная и светлая тема, метрические и имперские единицы.
+
+![Ошибки с советами по ремонту](docs/img/dtc.png)
 
 ![Параметры в реальном времени](docs/img/live-charts.png)
 
@@ -169,10 +182,14 @@ OBD-II из его параметров и кодов.
 
 - **Что проверено.** Каждый протокол и каждый тип адаптера проверяется
   автотестами на встроенном симуляторе; форматы взяты из опубликованных
-  спецификаций, а записанный ответ настоящего блока Январь-7.2 разбирается в
-  тестах. **На реальных адаптерах и автомобилях программа пока не
-  испытывалась** — особенно J2534, RP1210, PCAN, Kvaser, DoIP. Если у вас
-  есть адаптер и машина, проверьте и напишите в
+  спецификаций. **На настоящей машине** программа проверена с ГАЗ-3110
+  (ЗМЗ-406, Микас-5.47) через кабель VAG KKL 409.1 на FTDI и переходник
+  12-pin: паспорт блока, ошибки и параметры двигателя. Эта проверка нашла
+  три расхождения с опубликованным описанием протокола Микас — они
+  исправлены, а кадры настоящего блока вошли в автотесты вместе с ответом
+  Январь-7.2. Стирание ошибок Микас, сервисные функции на настоящем блоке и
+  другие адаптеры — особенно J2534, RP1210, PCAN, Kvaser, DoIP — ещё не
+  испытывались. Если у вас есть адаптер и машина, проверьте и напишите в
   [issues](https://github.com/AristarhUcolov/universal-diagnostic-tool/issues),
   приложив файл журнала. Это самая ценная помощь проекту.
 - **Описания блоков честно помечены:** «проверено» — по официальной
@@ -213,6 +230,7 @@ internal/elm327       драйвер ELM327/STN и эмулятор для мо�
 internal/slcan, pcan, kvaser, socketcan, j2534, rp1210   CAN-адаптеры и драйверы
 internal/ecu          описания блоков (JSON), формулы, обработчики
 internal/dtc          база кодов неисправностей
+internal/repair       справочник по ремонту: советы к кодам (JSON)
 internal/sim          симулятор: модель двигателя, виртуальные шины K-Line и CAN
 internal/vehicle      подключение и автоопределение, опрос, запись, монитор
 internal/bridge       мост ELM327 для приложений
@@ -357,13 +375,23 @@ diagnostics (DoIP).
   (656 entries: SAE J2012, VAZ/GAZ/UAZ KWP2000, Микас, VAG) in English and
   Russian; status (active, confirmed, pending, MIL); OBD-II freeze frame;
   printable report.
+- **How to fix** — for every code: what the part does, symptoms, causes from
+  cheap to expensive, how to check them and how urgent it is ("driving on is
+  risky", "repair soon", "can wait"). 33 sections of repair advice in English
+  and Russian — on the codes page, in the report and offline.
 - **Live data** — a table with minimum and maximum, charts (one axis per
-  parameter), CSV recording and "raw records" that highlight changing bytes —
-  for exploring new control units.
+  parameter), ready-made sets ("Key values", "Idle", "Mixture and fuel"), CSV
+  recording and "raw records" that highlight changing bytes — for exploring
+  new control units.
 - **Overview** — key values as tiles coloured by thresholds, OBD-II monitor
-  readiness, battery voltage.
-- **Output tests** — injectors, fuel pump, fan and so on, where the control
-  unit description knows them; with warnings.
+  readiness, battery voltage, quick actions.
+- **Service** — restart the control unit (communication comes back by
+  itself); test injectors, coils, fuel pump, fan and valves; set the idle
+  speed and the idle air valve with the live engine speed next to it. A test
+  does not start unless the engine is in the state it needs, and anything
+  left on is handed back to the unit by a timer.
+- **Checks** — step-by-step checks with a pass or fail verdict: battery and
+  charging, warm-up and thermostat, idle, oxygen sensor, throttle sensor.
 - **Terminal** — any request in hex and the raw answer: KWP2000, UDS, OBD-II,
   Микас, KW1281.
 - **CAN bus monitor** — every frame, its period, J1939 decoding; sending
@@ -376,8 +404,10 @@ diagnostics (DoIP).
 - **From a phone or tablet** — the interface opens in the browser of any
   device on the same network.
 - **Command line** — `udt scan`, `udt dtc`, `udt live`, `udt raw`,
-  `udt bridge`, `udt lookup` for scripts and slow laptops.
+  `udt reset`, `udt bridge`, `udt lookup` for scripts and slow laptops.
 - **EN / RU**, dark and light theme, metric and imperial units.
+
+![Trouble codes with repair advice](docs/img/dtc-en.png)
 
 ## Adapters
 
@@ -439,10 +469,15 @@ appear on a CAN bus without a hardware gateway. Details:
 
 - **What is tested.** Every protocol and every adapter type is covered by
   automated tests against the built-in simulator; the formats come from
-  published specifications, and a recorded answer of a real Январь-7.2 unit
-  is decoded in the tests. **The program has not yet been tried on real
-  adapters and cars** — especially J2534, RP1210, PCAN, Kvaser, DoIP. If you
-  have an adapter and a car, please try it and report in
+  published specifications. **On a real car** the program has been checked
+  with a GAZ-3110 (ZMZ-406, Микас-5.47) through a VAG KKL 409.1 FTDI cable
+  and a 12-pin adapter: the unit's passport, trouble codes and engine
+  values. That check found three differences from the published Микас
+  protocol description; they are fixed, and the real unit's frames are now
+  in the automated tests next to a recorded Январь-7.2 answer. Clearing
+  Микас codes, the service functions on a real unit and other adapters —
+  especially J2534, RP1210, PCAN, Kvaser, DoIP — have not been tried yet. If
+  you have an adapter and a car, please try it and report in
   [issues](https://github.com/AristarhUcolov/universal-diagnostic-tool/issues)
   with the journal file attached. That is the most valuable help there is.
 - **Control unit descriptions are labelled honestly:** "verified" — from an
@@ -483,6 +518,7 @@ internal/elm327       ELM327/STN driver and the emulator used by the bridge
 internal/slcan, pcan, kvaser, socketcan, j2534, rp1210   CAN adapters and drivers
 internal/ecu          control unit descriptions (JSON), formulas, handlers
 internal/dtc          trouble code database
+internal/repair       repair advice linked to trouble codes (JSON)
 internal/sim          simulator: engine model, virtual K-Line and CAN buses
 internal/vehicle      connecting and auto-detection, polling, recording, monitor
 internal/bridge       ELM327 bridge for apps

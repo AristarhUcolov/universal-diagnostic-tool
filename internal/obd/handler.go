@@ -121,15 +121,19 @@ func (h *Handler) Identify(ctx context.Context) ([]ecu.InfoItem, error) {
 		}
 	}
 	if data, err := h.c.ReadPIDs(ctx, []byte{0x1C, 0x51}); err == nil {
+		// The first unit that reports a value speaks for the car (the
+		// engine controller has the lowest address).
+		std, fuel := false, false
 		for _, src := range sortedKeys(data) {
-			if d, ok := data[src][0x1C]; ok && len(d) >= 1 {
+			if d, ok := data[src][0x1C]; ok && len(d) >= 1 && !std {
 				add("standard", i18n.T("OBD standard", "Стандарт OBD"), obdStandard(d[0]))
+				std = true
 			}
-			if d, ok := data[src][0x51]; ok && len(d) >= 1 {
+			if d, ok := data[src][0x51]; ok && len(d) >= 1 && !fuel {
 				t := fuelType(d[0])
 				add("fuel", i18n.T("Fuel type", "Тип топлива"), t.Get("en")+" / "+t.Get("ru"))
+				fuel = true
 			}
-			break
 		}
 	}
 	return items, nil

@@ -228,7 +228,9 @@ func (s *Session) tryLegacy(ctx context.Context, line kline.Line, step stepFunc)
 	if def == nil {
 		def = ecu.Builtin().MatchLegacy(v)
 	}
-	s.addECU(ecu.NewLegacyHandler(link, def, v, line.Name()))
+	lh := ecu.NewLegacyHandler(link, def, v, line.Name())
+	lh.Log = s.log
+	s.addECU(lh)
 	return nil
 }
 

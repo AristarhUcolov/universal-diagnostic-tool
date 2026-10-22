@@ -95,6 +95,20 @@ func (d *Device) Open(ctx context.Context, spec Spec) (*Channel, error) {
 	return c, nil
 }
 
+// Reinit makes the adapter initialise the vehicle bus again, for
+// example after the control unit restarted.
+func (c *Channel) Reinit(ctx context.Context) error {
+	if _, err := c.d.Cmd(ctx, "ATPC", 2*time.Second); err != nil && !errors.Is(err, ErrUnknownCommand) {
+		return fmt.Errorf("elm327: protocol close: %w", err)
+	}
+	if c.spec.FastInit {
+		if _, err := c.d.Cmd(ctx, "ATFI", 6*time.Second); err != nil && !errors.Is(err, ErrUnknownCommand) {
+			return fmt.Errorf("elm327: fast init: %w", err)
+		}
+	}
+	return nil
+}
+
 // Protocol returns the protocol number in use.
 func (c *Channel) Protocol() byte { return c.proto }
 

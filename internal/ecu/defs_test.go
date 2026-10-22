@@ -57,11 +57,27 @@ func TestDefinitionData(t *testing.T) {
 				}
 			}
 		}
+		rpm := false // conditions are checked against the engine speed
+		for _, b := range d.Blocks {
+			for _, p := range b.Params {
+				rpm = rpm || p.OBD == "0C"
+			}
+		}
 		for _, a := range d.Actuators {
 			where := d.ID + " actuator " + a.ID
+			if a.Condition != "" && !rpm {
+				t.Errorf("%s: condition %s, but no parameter maps to OBD 0C (engine speed)", where, a.Condition)
+			}
 			both(where, a.Name)
 			if !kinds[a.Kind] {
 				t.Errorf("%s: kind %q, want toggle, pulse or value", where, a.Kind)
+			}
+			if a.Condition != "" && a.Condition != "engine_off" && a.Condition != "engine_running" {
+				t.Errorf("%s: condition %q, want engine_off or engine_running", where, a.Condition)
+			}
+			// A pulse fires an injector or a coil: never into a running engine.
+			if a.Kind == "pulse" && a.Condition != "engine_off" {
+				t.Errorf("%s: a pulse test needs condition engine_off", where)
 			}
 			if len(a.Warning) > 0 {
 				both(where+" warning", a.Warning)

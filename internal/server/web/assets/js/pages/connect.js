@@ -12,6 +12,7 @@ export function render(view) {
   let defs = [];
 
   const statusBox = el('div');
+  const quickBox = el('div');
   const adaptersBox = el('div.adapters');
   const portBox = el('div');
   const profileBox = el('div');
@@ -22,6 +23,7 @@ export function render(view) {
     el('h1', t('connect.title')),
     el('p.secondary', t('connect.lead')),
     statusBox,
+    quickBox,
     el('div.card.steps',
       el('div.step-title', t('connect.adapter')), adaptersBox,
       el('div.step-title', t('connect.port')), portBox,
@@ -60,6 +62,24 @@ export function render(view) {
       log.scrollTop = log.scrollHeight;
     }
     goBtn.disabled = s.state === 'connecting';
+    paintQuick();
+  }
+
+  // paintQuick offers the last connection with one button, so a regular
+  // user does not have to go through the form again.
+  function paintQuick() {
+    clear(quickBox);
+    const last = store.settings.last;
+    if (!data || !last || !last.adapter || ['connected', 'connecting'].includes(store.status.state)) return;
+    const a = data.adapters.find(x => x.id === last.adapter);
+    if (!a) return;
+    const p = (data.profiles || []).find(x => x.id === last.profile);
+    const parts = [tr(a.name), last.port || '', p ? tr(p.name) : '', last.simVariant || ''].filter(Boolean);
+    const b = el('button.primary', '▶ ' + t('connect.go'));
+    b.onclick = () => busy(b, () => api.post('/api/connect',
+      Object.fromEntries(Object.entries(last).filter(([, v]) => v !== '' && v !== null && v !== undefined))));
+    quickBox.append(el('div.card.quick',
+      el('div', el('b', t('connect.quickTitle')), el('div.secondary.small', parts.join(' · '))), b));
   }
 
   function renderAdapters() {
@@ -204,6 +224,7 @@ export function render(view) {
       [data] = await Promise.all([api.get('/api/adapters'), loadPorts()]);
       defs = (await api.get('/api/definitions')).definitions || [];
       renderAll();
+      paintQuick();
     } catch (e) {
       toast(e.message, 'bad');
     }

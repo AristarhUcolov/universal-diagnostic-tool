@@ -1,9 +1,9 @@
-import { api } from '../api.js';
-import { t, tr, unitName } from '../i18n.js';
-import { el, clear, toast, busy, fmt, convert, statusBadge } from '../ui.js';
+import { api, token } from '../api.js';
+import { t, tr, unitName, lang } from '../i18n.js';
+import { el, clear, toast, busy, fmt, convert, statusBadge, pageHeader } from '../ui.js';
 import { sparkline, meter } from '../charts.js';
 import { store, subscribe, currentECU } from '../app.js';
-import { ecuSelect, ecuPath, hasCap, keyParams, limitsFor } from './common.js';
+import { ecuSelect, ecuPath, hasCap, keyParams, limitsFor, repairHints, sevBadge } from './common.js';
 
 export function render(view) {
   const unsubs = [];
@@ -15,7 +15,11 @@ export function render(view) {
   let params = [];
   let tiles = {};
 
-  view.append(el('h1', t('dash.title')), ecuSelect(() => paint()), el('div.grid.two', ecuCard, codesCard), liveCard, extra);
+  const go = (hash, label) => el('button.small', { onclick: () => { location.hash = hash; } }, label);
+  const report = el('button.small', { onclick: () => window.open(`/api/report?lang=${lang()}&t=${encodeURIComponent(token)}`, '_blank') }, t('dtc.report'));
+  view.append(
+    pageHeader(t('dash.title'), null, go('#/dtc', t('nav.dtc')), go('#/live', t('nav.live')), go('#/tests', t('nav.tests')), go('#/checks', t('nav.checks')), report),
+    ecuSelect(() => paint()), el('div.grid.two', ecuCard, codesCard), liveCard, extra);
 
   function paintECU() {
     const e = currentECU();
@@ -45,10 +49,17 @@ export function render(view) {
       return;
     }
     const n = codes.length;
+    const shown = codes.slice(0, 4).map(d => ({ d, sev: el('span') }));
     codesCard.append(
       el('div.row', el('span.hero', String(n)), el('span.secondary', n ? '' : t('dtc.none'))),
-      el('ul.codes', codes.slice(0, 4).map(d => el('li', el('span.code', d.code), ' ', tr(d.desc)))),
-      el('button', { onclick: () => { location.hash = '#/dtc'; } }, t('nav.dtc') + ' →'));
+      el('ul.codes', shown.map(x => el('li', el('span.code', x.d.code), ' ', tr(x.d.desc), ' ', x.sev))),
+      el('button', { onclick: () => { location.hash = '#/dtc'; } }, (n ? t('dtc.howFix') : t('nav.dtc')) + ' →'));
+    repairHints().then(h => {
+      for (const x of shown) {
+        const hint = h[x.d.hint] || h.generic;
+        if (hint) x.sev.append(sevBadge(hint.severity));
+      }
+    }).catch(() => {});
   }
 
   function buildTiles() {

@@ -1,7 +1,7 @@
 import { api, token } from '../api.js';
 import { t, tr, lang, count, unitName } from '../i18n.js';
-import { el, clear, toast, busy, confirmBox, fmt } from '../ui.js';
-import { ecuSelect, ecuPath, hasCap } from './common.js';
+import { el, clear, toast, busy, confirmBox, fmt, errText } from '../ui.js';
+import { ecuSelect, ecuPath, hasCap, repairHints, hintCard, sevBadge } from './common.js';
 
 const flagStyle = {
   active: 'bad', mil: 'bad', testFailed: 'bad', pending: 'warn', intermittent: 'warn',
@@ -39,7 +39,7 @@ export function render(view) {
     clear(result).append(el('p.muted', '…'));
     const r = await api.get(ecuPath('dtc'));
     flagNames = r.flagNames || {};
-    paint(r.codes || []);
+    await paint(r.codes || []);
     if (hasCap('freeze') && r.codes && r.codes.length) loadFreeze();
   }
 
@@ -49,23 +49,40 @@ export function render(view) {
     return el('span.badge' + cls, icon + (tr(flagNames[f]) || f));
   }
 
-  function paint(codes) {
+  async function paint(codes) {
     clear(result);
     if (!codes.length) {
       result.append(el('div.empty', el('span.status-line.good', '✓ ' + t('dtc.none'))));
       return;
     }
-    result.append(el('p.secondary', count(codes.length, 'dtc.count')),
+    let hints = {};
+    try { hints = await repairHints(); } catch (e) { /* advice is optional */ }
+    const bySev = { stop: 0, soon: 0, info: 0 };
+    const tbody = el('tbody');
+    for (const d of codes) {
+      const h = hints[d.hint] || hints.generic;
+      if (h) bySev[h.severity] = (bySev[h.severity] || 0) + 1;
+      const detail = el('tr.hint-row.hidden', el('td', { colSpan: 5 }, h ? hintCard(h) : null));
+      const toggle = el('button.small', t('dtc.howFix') + ' ▾');
+      toggle.onclick = () => {
+        const open = !detail.classList.toggle('hidden');
+        toggle.textContent = t('dtc.howFix') + (open ? ' ▴' : ' ▾');
+      };
+      tbody.append(el('tr',
+        el('td', el('span.code', d.code), d.extra && d.extra.sae ? el('div.muted.small', d.extra.sae) : null),
+        el('td', tr(d.desc) || '—',
+          d.detail ? el('div.secondary.small', tr(d.detail)) : null,
+          !d.known ? el('div.muted.small', t('dtc.unknown')) : null,
+          d.raw ? el('div.muted.small', t('dtc.bytes') + ': ', el('span.mono', d.raw)) : null),
+        el('td', (d.flags || []).map(flagBadge)),
+        el('td.small', d.source || '', d.protocol ? el('div.muted', d.protocol) : null),
+        el('td.dtc-fix', h ? sevBadge(h.severity) : null, h ? toggle : null)), detail);
+    }
+    const summary = ['stop', 'soon', 'info'].filter(k => bySev[k]).map(k => `${bySev[k]} — ${t('sev.' + k).toLowerCase()}`).join(' · ');
+    result.append(el('p.secondary', count(codes.length, 'dtc.count'), summary ? ' · ' + summary : ''),
       el('div.table-wrap', el('table.codes',
-        el('thead', el('tr', el('th', t('dtc.code')), el('th', t('dtc.desc')), el('th', t('dtc.status')), el('th', t('dtc.source')))),
-        el('tbody', codes.map(d => el('tr',
-          el('td', el('span.code', d.code), d.extra && d.extra.sae ? el('div.muted.small', d.extra.sae) : null),
-          el('td', tr(d.desc) || '—',
-            d.detail ? el('div.secondary.small', tr(d.detail)) : null,
-            !d.known ? el('div.muted.small', t('dtc.unknown')) : null,
-            d.raw ? el('div.muted.small', t('dtc.bytes') + ': ', el('span.mono', d.raw)) : null),
-          el('td', (d.flags || []).map(flagBadge)),
-          el('td.small', d.source || '', d.protocol ? el('div.muted', d.protocol) : null)))))));
+        el('thead', el('tr', el('th', t('dtc.code')), el('th', t('dtc.desc')), el('th', t('dtc.status')), el('th', t('dtc.source')), el('th', t('dtc.fix')))),
+        tbody)));
   }
 
   async function loadFreeze() {
@@ -84,7 +101,7 @@ export function render(view) {
     } catch (e) { /* optional */ }
   }
 
-  read().catch(e => { clear(result).append(el('p', { style: { color: 'var(--critical-ink)' } }, e.message)); });
+  read().catch(e => { clear(result).append(el('p', { style: { color: 'var(--critical-ink)' } }, errText(e))); });
 }
 
 export function lookupCard() {

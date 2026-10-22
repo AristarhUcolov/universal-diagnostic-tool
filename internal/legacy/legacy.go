@@ -215,7 +215,7 @@ func (l *Link) ReadParams(ctx context.Context, codes []byte, sizes []int) ([]byt
 }
 
 // ReadErrors returns the fault numbers reported by command 0x02. The
-// answer is [count] followed by pairs [code][separator 0xE0].
+// answer is [count] followed by pairs [code][separator].
 func (l *Link) ReadErrors(ctx context.Context) ([]byte, error) {
 	resp, err := l.Transact(ctx, []byte{CmdReadErrors})
 	if err != nil {
@@ -224,18 +224,28 @@ func (l *Link) ReadErrors(ctx context.Context) ([]byte, error) {
 	return ParseErrors(resp)
 }
 
-// ParseErrors decodes the answer to command 0x02.
+// ParseErrors decodes the answer to command 0x02: [count], then each
+// code followed by a separator. The protocol description names 0xE0 as
+// the separator, a real Микас-5.47 sends 0x40, and a code may itself
+// equal either value, so codes are taken by position, never by value.
+// Lists without separators are understood too.
 func ParseErrors(resp []byte) ([]byte, error) {
 	if len(resp) == 0 {
 		return nil, fmt.Errorf("legacy: empty fault list")
 	}
 	n := int(resp[0])
+	body := resp[1:]
 	var codes []byte
-	for i := 1; i < len(resp) && len(codes) < n; i++ {
-		if resp[i] == 0xE0 {
-			continue
+	switch {
+	case n == 0:
+	case len(body) >= 2*n-1:
+		for i := 0; i < n; i++ {
+			codes = append(codes, body[2*i])
 		}
-		codes = append(codes, resp[i])
+	case len(body) >= n:
+		codes = append(codes, body[:n]...)
+	default:
+		return nil, fmt.Errorf("legacy: fault list announces %d codes but carries %d bytes", n, len(body))
 	}
 	return codes, nil
 }

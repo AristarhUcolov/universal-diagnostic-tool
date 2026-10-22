@@ -97,6 +97,16 @@ func (db *DB) Families() []string {
 // Count returns the number of descriptions in a family.
 func (db *DB) Count(family string) int { return len(db.families[family]) }
 
+// Codes lists the codes described in a family, sorted.
+func (db *DB) Codes(family string) []string {
+	out := make([]string, 0, len(db.families[family]))
+	for c := range db.families[family] {
+		out = append(out, c)
+	}
+	sort.Strings(out)
+	return out
+}
+
 // Describe looks the code up in the given families in order and then in
 // the generic SAE table. It returns the text and the family it came
 // from.

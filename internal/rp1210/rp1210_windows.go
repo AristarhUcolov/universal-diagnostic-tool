@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 	"unsafe"
 
@@ -28,7 +27,6 @@ type Link struct {
 	name   string
 	log    journal.Logger
 	ch     chan func()
-	mu     sync.Mutex
 }
 
 func (l *Link) do(f func()) {

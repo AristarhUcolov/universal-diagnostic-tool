@@ -16,6 +16,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/i18n"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/j2534"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/repair"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/rp1210"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/serial"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/sim"
@@ -34,6 +35,7 @@ const helpText = `Universal Diagnostic Tool %s
   udt dtc     [conn] [-clear]       read (and clear) trouble codes
   udt live    [conn] [-params a,b] [-interval 500ms] [-count N]   print live values
   udt raw     [conn] "21 01" ...    send raw requests (hex)
+  udt reset   [conn]       restart the control unit (ecuReset) and reconnect
   udt bridge  [conn] [-listen 0.0.0.0:35000]   share the connection as an ELM327 for apps
   udt lookup  P0130 ...    describe trouble codes offline
   udt version
@@ -75,7 +77,7 @@ func runCommand(cmd string, args []string) int {
 		return cmdDefinitions()
 	case "lookup":
 		return cmdLookup(args)
-	case "scan", "dtc", "live", "raw", "bridge":
+	case "scan", "dtc", "live", "raw", "bridge", "reset":
 		return cmdSession(cmd, args)
 	}
 	fmt.Fprintf(os.Stderr, "unknown command %q; run \"udt help\"\n", cmd)
@@ -303,6 +305,9 @@ func cmdSession(cmd string, args []string) int {
 					fmt.Printf(" [%s]", strings.Join(flags, ", "))
 				}
 				fmt.Println()
+				if h := repair.Get(repair.Match(d.Code, d.Desc)); h != nil {
+					fmt.Printf("  %-12s -> %s\n", "", h.Title.Get(l))
+				}
 			}
 			if *clearFlag {
 				if err := en.Handler().ClearDTC(ctx); err != nil {
@@ -334,6 +339,8 @@ func cmdSession(cmd string, args []string) int {
 		for _, id := range ids {
 			if p, ok := index[id]; ok {
 				fmt.Printf("%s = %s [%s]\n", id, p.Name.Get(l), p.Unit)
+			} else {
+				fmt.Fprintf(os.Stderr, "unknown parameter %q (run without -params to see the first ones)\n", id)
 			}
 		}
 		for n := 0; *count == 0 || n < *count; n++ {
@@ -364,6 +371,18 @@ func cmdSession(cmd string, args []string) int {
 			case <-time.After(*interval):
 			}
 		}
+	case "reset":
+		rs, ok := h.(ecu.Resetter)
+		if !ok {
+			fmt.Fprintln(os.Stderr, "this control unit cannot be restarted from the program")
+			return 1
+		}
+		start := time.Now()
+		if err := rs.Reset(ctx); err != nil {
+			fmt.Fprintln(os.Stderr, "restart failed:", err)
+			return 1
+		}
+		fmt.Printf("control unit restarted, communication restored (%.1f s)\n", time.Since(start).Seconds())
 	case "raw":
 		for _, a := range fs.Args() {
 			req, err := hexutil.Parse(a)

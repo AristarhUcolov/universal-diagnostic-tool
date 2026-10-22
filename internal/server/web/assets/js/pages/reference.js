@@ -2,22 +2,23 @@ import { api } from '../api.js';
 import { t, tr, lang } from '../i18n.js';
 import { el, clear, toast, statusBadge } from '../ui.js';
 import { lookupCard } from './dtc.js';
+import { repairHints, hintCard, sevBadge } from './common.js';
 
 const obdPins = {
   en: [
-    ['1', 'manufacturer (GM single-wire CAN, VAG ignition)'], ['2', 'SAE J1850 bus + (PWM, VPW)'],
-    ['3', 'manufacturer (Ford MS-CAN high, BMW Ethernet RX+)'], ['4', 'chassis ground'], ['5', 'signal ground'],
-    ['6', 'CAN high (ISO 15765-4)'], ['7', 'K-Line (ISO 9141-2, ISO 14230-4)'], ['8', 'manufacturer (BMW Ethernet activation)'],
-    ['9', 'manufacturer'], ['10', 'SAE J1850 bus − (PWM)'], ['11', 'manufacturer (Ford MS-CAN low, BMW Ethernet RX−)'],
-    ['12', 'manufacturer (BMW Ethernet TX+)'], ['13', 'manufacturer (BMW Ethernet TX−)'], ['14', 'CAN low (ISO 15765-4)'],
+    ['1', 'manufacturer (GM single-wire CAN)'], ['2', 'SAE J1850 bus + (PWM, VPW)'],
+    ['3', 'manufacturer (Ford MS-CAN; Ethernet: DoIP, BMW ENET)'], ['4', 'chassis ground'], ['5', 'signal ground'],
+    ['6', 'CAN high (ISO 15765-4)'], ['7', 'K-Line (ISO 9141-2, ISO 14230-4)'], ['8', 'manufacturer (Ethernet activation: DoIP, BMW ENET)'],
+    ['9', 'manufacturer'], ['10', 'SAE J1850 bus − (PWM)'], ['11', 'manufacturer (Ford MS-CAN; Ethernet: DoIP, BMW ENET)'],
+    ['12', 'manufacturer (Ethernet: DoIP, BMW ENET)'], ['13', 'manufacturer (Ethernet: DoIP, BMW ENET)'], ['14', 'CAN low (ISO 15765-4)'],
     ['15', 'L-Line (ISO 9141-2, ISO 14230-4)'], ['16', 'battery +12 V (permanent)'],
   ],
   ru: [
-    ['1', 'на усмотрение производителя (GM SW-CAN, VAG зажигание)'], ['2', 'шина SAE J1850 + (PWM, VPW)'],
-    ['3', 'производителя (Ford MS-CAN high, BMW Ethernet RX+)'], ['4', 'масса кузова'], ['5', 'сигнальная масса'],
-    ['6', 'CAN high (ISO 15765-4)'], ['7', 'K-Line (ISO 9141-2, ISO 14230-4)'], ['8', 'производителя (активация BMW Ethernet)'],
-    ['9', 'производителя'], ['10', 'шина SAE J1850 − (PWM)'], ['11', 'производителя (Ford MS-CAN low, BMW Ethernet RX−)'],
-    ['12', 'производителя (BMW Ethernet TX+)'], ['13', 'производителя (BMW Ethernet TX−)'], ['14', 'CAN low (ISO 15765-4)'],
+    ['1', 'на усмотрение производителя (GM: однопроводной CAN)'], ['2', 'шина SAE J1850 + (PWM, VPW)'],
+    ['3', 'производителя (Ford MS-CAN; Ethernet: DoIP, BMW ENET)'], ['4', 'масса кузова'], ['5', 'сигнальная масса'],
+    ['6', 'CAN high (ISO 15765-4)'], ['7', 'K-Line (ISO 9141-2, ISO 14230-4)'], ['8', 'производителя (активация Ethernet: DoIP, BMW ENET)'],
+    ['9', 'производителя'], ['10', 'шина SAE J1850 − (PWM)'], ['11', 'производителя (Ford MS-CAN; Ethernet: DoIP, BMW ENET)'],
+    ['12', 'производителя (Ethernet: DoIP, BMW ENET)'], ['13', 'производителя (Ethernet: DoIP, BMW ENET)'], ['14', 'CAN low (ISO 15765-4)'],
     ['15', 'L-Line (ISO 9141-2, ISO 14230-4)'], ['16', '+12 В АКБ (постоянно)'],
   ],
 };
@@ -31,9 +32,11 @@ export function render(view) {
   const l = lang();
   const adapters = el('div', el('p.muted', '…'));
   const defs = el('div', el('p.muted', '…'));
+  const advice = el('div', el('p.muted', '…'));
   view.append(
     el('h1', t('ref.title')),
     lookupCard(),
+    el('div.card', el('h2', t('ref.repair')), el('p.secondary', t('ref.repairLead')), advice),
     el('div.card', el('h2', t('ref.adapters')), adapters),
     el('div.card', el('h2', t('ref.connectors')),
       el('div.grid.two',
@@ -42,6 +45,11 @@ export function render(view) {
         el('div', el('h3', l === 'ru' ? 'Грузовики и спецтехника' : 'Trucks and machinery'), el('div.pinout', truckPins[l])))),
     el('div.card', el('h2', t('ref.defs')), defs),
     el('div.card', el('h2', t('ref.notSupported')), el('p', t('ref.notSupportedText'))));
+
+  repairHints().then(h => {
+    clear(advice).append(...Object.values(h).map(x => el('details.advice',
+      el('summary', el('b', tr(x.title)), ' ', sevBadge(x.severity)), hintCard(x))));
+  }).catch(e => toast(e.message, 'bad'));
 
   api.get('/api/adapters').then(r => {
     clear(adapters).append(el('table', el('tbody', r.adapters.map(a => el('tr',

@@ -135,6 +135,12 @@ type ActDef struct {
 	Max     float64   `json:"max,omitempty"`
 	Unit    string    `json:"unit,omitempty"`
 	Warning i18n.Text `json:"warning,omitempty"`
+	// Condition: "engine_off" or "engine_running"; checked against the
+	// engine speed before the test starts.
+	Condition string `json:"condition,omitempty"`
+	// TimeoutS: an output left on is handed back to the control unit
+	// after this many seconds (default 60).
+	TimeoutS int `json:"timeout_s,omitempty"`
 }
 
 // Size returns how many bytes the parameter type occupies.
@@ -398,7 +404,6 @@ func (l *Library) add(data []byte, file string) error {
 	if err := json.Unmarshal(data, &head); err != nil {
 		return fmt.Errorf("%s: %w", file, err)
 	}
-	var d Definition
 	if head.Extends != "" {
 		l.mu.RLock()
 		base, ok := l.raw[head.Extends]
@@ -406,13 +411,13 @@ func (l *Library) add(data []byte, file string) error {
 		if !ok {
 			return fmt.Errorf("%s: base definition %q not found", file, head.Extends)
 		}
-		if err := json.Unmarshal(base, &d); err != nil {
-			return fmt.Errorf("%s: base: %w", file, err)
+		merged, err := extend(base, data)
+		if err != nil {
+			return fmt.Errorf("%s: %w", file, err)
 		}
-		// Fields of the base that the child does not repeat are kept;
-		// lists such as blocks are replaced as a whole.
-		d.Match = MatchDef{}
+		data = merged
 	}
+	var d Definition
 	if err := json.Unmarshal(data, &d); err != nil {
 		return fmt.Errorf("%s: %w", file, err)
 	}
@@ -422,15 +427,29 @@ func (l *Library) add(data []byte, file string) error {
 	d.file = file
 	l.mu.Lock()
 	l.defs[d.ID] = &d
-	l.raw[d.ID] = data
-	if head.Extends != "" {
-		// Store the merged form so that definitions can extend this one.
-		if merged, err := json.Marshal(&d); err == nil {
-			l.raw[d.ID] = merged
-		}
-	}
+	l.raw[d.ID] = data // merged, so that definitions can extend this one
 	l.mu.Unlock()
 	return nil
+}
+
+// extend applies a definition to the one it extends. Every top-level
+// field the child names replaces the base's field as a whole: its blocks
+// or output tests are never mixed with the base's element by element,
+// which would hand a parameter the formula of whatever stood at the same
+// place in the base. The base's identification rules are not inherited.
+func extend(base, child []byte) ([]byte, error) {
+	var b, c map[string]json.RawMessage
+	if err := json.Unmarshal(base, &b); err != nil {
+		return nil, fmt.Errorf("base: %w", err)
+	}
+	if err := json.Unmarshal(child, &c); err != nil {
+		return nil, err
+	}
+	delete(b, "match")
+	for k, v := range c {
+		b[k] = v
+	}
+	return json.Marshal(b)
 }
 
 // LoadDir adds user definitions from a directory (they override built-in

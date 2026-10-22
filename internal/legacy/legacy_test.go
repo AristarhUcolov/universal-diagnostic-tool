@@ -65,17 +65,30 @@ func TestDecodeErrors(t *testing.T) {
 }
 
 func TestParseErrors(t *testing.T) {
-	// Count, then the codes; 0xE0 entries are fillers and skipped.
-	codes, err := ParseErrors([]byte{0x02, 0x23, 0xE0, 0xAF})
+	// The fault list of a real Микас-5.47 (GAZ-3110, ZMZ-406) as it
+	// arrived on the wire: faults 062, 182 and 168, each followed by 0x40.
+	body, err := Decode(hexutil.MustParse("03 3E 40 00 B6 40 00 A8 40 00 A1"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Equal(codes, []byte{0x23, 0xAF}) {
-		t.Fatalf("codes = % X", codes)
+	codes, err := ParseErrors(body)
+	if err != nil || !bytes.Equal(codes, []byte{62, 182, 168}) {
+		t.Fatalf("real Микас-5.47: % X, %v", codes, err)
 	}
-	codes, err = ParseErrors([]byte{0x00})
-	if err != nil || len(codes) != 0 {
-		t.Fatalf("no faults: % X, %v", codes, err)
+	for _, c := range []struct{ name, resp, want string }{
+		{"separator from the protocol description", "02 23 E0 AF E0", "23 AF"},
+		{"last separator missing", "02 23 E0 AF", "23 AF"},
+		{"codes equal to separators", "02 40 40 E0 E0", "40 E0"},
+		{"no separators", "02 23 AF", "23 AF"},
+		{"no faults", "00", ""},
+	} {
+		codes, err := ParseErrors(hexutil.MustParse(c.resp))
+		if err != nil || hexutil.Format(codes) != c.want {
+			t.Errorf("%s: % X, %v; want %s", c.name, codes, err, c.want)
+		}
+	}
+	if _, err := ParseErrors(hexutil.MustParse("03 3E 40")); err == nil {
+		t.Error("short list accepted")
 	}
 	if _, err := ParseErrors(nil); err == nil {
 		t.Fatal("empty answer accepted")

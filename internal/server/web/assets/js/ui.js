@@ -71,6 +71,24 @@ export function confirmBox(title, text, okText, danger) {
   });
 }
 
+// errText explains an error in the interface language where the server
+// gave a reason code (an output test that needs the engine stopped).
+export function errText(e) {
+  if (e && e.code) {
+    const key = 'err.' + e.code;
+    const s = t(key);
+    if (s !== key) return s;
+  }
+  return e && e.message ? e.message : String(e);
+}
+
+// pageHeader is the title row of a page: title, a lead line and the
+// page's main actions on the right.
+export function pageHeader(title, lead, ...actions) {
+  return el('div.page-head', el('div', el('h1', title), lead ? el('p.secondary.lead', lead) : null),
+    actions.length ? el('div.row.page-actions', actions) : null);
+}
+
 // busy disables a button while an async action runs.
 export async function busy(btn, fn) {
   const old = btn.textContent;
@@ -79,7 +97,7 @@ export async function busy(btn, fn) {
   try {
     return await fn();
   } catch (e) {
-    toast(e.message, 'bad');
+    toast(errText(e), 'bad');
     return undefined;
   } finally {
     btn.disabled = false;

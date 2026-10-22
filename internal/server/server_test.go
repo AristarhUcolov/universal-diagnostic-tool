@@ -143,6 +143,68 @@ func TestOpenURL(t *testing.T) {
 	}
 }
 
+// TestServiceEndpoints covers the service page and the repair advice:
+// an output test refused with a reason code, the restart and the advice
+// attached to trouble codes.
+func TestServiceEndpoints(t *testing.T) {
+	s, base := newTestServer(t)
+	tok := s.Token
+	if code, body := do(t, "POST", base+"/api/connect", "", tok, `{"adapter":"sim","profile":"ru-kwp","simVariant":"vaz-m154"}`); code != http.StatusOK {
+		t.Fatalf("connect: %d %s", code, body)
+	}
+	deadline := time.Now().Add(40 * time.Second)
+	for {
+		_, body := do(t, "GET", base+"/api/status", "", tok, "")
+		if strings.Contains(body, `"state":"connected"`) {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("not connected: %s", body)
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+
+	code, body := do(t, "GET", base+"/api/repair", "", tok, "")
+	var rep struct {
+		Hints []struct {
+			ID string `json:"id"`
+		} `json:"hints"`
+	}
+	if code != http.StatusOK || json.Unmarshal([]byte(body), &rep) != nil || len(rep.Hints) < 20 {
+		t.Fatalf("repair advice: %d, %d hints", code, len(rep.Hints))
+	}
+
+	code, body = do(t, "GET", base+"/api/ecu/e1/dtc", "", tok, "")
+	var codes struct {
+		Codes []struct {
+			Code string `json:"code"`
+			Hint string `json:"hint"`
+		} `json:"codes"`
+	}
+	if code != http.StatusOK || json.Unmarshal([]byte(body), &codes) != nil || len(codes.Codes) == 0 {
+		t.Fatalf("dtc: %d %s", code, body)
+	}
+	for _, c := range codes.Codes {
+		if c.Hint == "" {
+			t.Errorf("%s has no repair advice", c.Code)
+		}
+	}
+
+	// The simulated engine runs: an injector pulse must be refused with
+	// a code the interface can explain.
+	code, body = do(t, "POST", base+"/api/ecu/e1/actuate", "", tok, `{"id":"inj1","action":"pulse"}`)
+	if code != http.StatusConflict || !strings.Contains(body, `"code":"engine_off"`) {
+		t.Fatalf("injector pulse with the engine running: %d %s", code, body)
+	}
+
+	if code, body := do(t, "POST", base+"/api/ecu/e1/reset", "", tok, `{}`); code != http.StatusOK {
+		t.Fatalf("reset: %d %s", code, body)
+	}
+	if code, body := do(t, "GET", base+"/api/ecu/e1/dtc", "", tok, ""); code != http.StatusOK {
+		t.Fatalf("dtc after the restart: %d %s", code, body)
+	}
+}
+
 // TestSimulatedSession drives the API like the interface does: connect to
 // the simulated GAZ-3110 (Микас-7.1), read the trouble codes, poll values
 // and build the report.

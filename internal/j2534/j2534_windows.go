@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 	"unsafe"
 
@@ -140,7 +139,6 @@ type API struct {
 	name     string
 	log      journal.Logger
 	procs    map[string]*windows.LazyProc
-	mu       sync.Mutex
 	Firmware string
 	DLLVer   string
 	APIVer   string

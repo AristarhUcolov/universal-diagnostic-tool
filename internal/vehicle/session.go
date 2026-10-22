@@ -13,6 +13,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/can"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ecu"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/kline"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/sim"
 )
 
@@ -32,8 +33,22 @@ type Event struct {
 	ECU    string      `json:"ecu,omitempty"`
 	Values []ecu.Value `json:"values,omitempty"`
 	Text   string      `json:"text,omitempty"`
+	Code   string      `json:"code,omitempty"` // see ErrorCode
 	Time   time.Time   `json:"time"`
 	Data   any         `json:"data,omitempty"`
+}
+
+// ErrorCode names the errors that the interface explains in the user's
+// language ("" for the others).
+func ErrorCode(err error) string {
+	var ce *ecu.ConditionError
+	switch {
+	case errors.As(err, &ce):
+		return ce.Code()
+	case errors.Is(err, kline.ErrNoEcho):
+		return "no_echo"
+	}
+	return ""
 }
 
 // closer releases an adapter.
@@ -233,7 +248,7 @@ func (s *Session) StartLive(cfg LiveConfig) error {
 			}
 			if err != nil {
 				fails++
-				s.emit(Event{Type: "live", ECU: e.ID, Text: err.Error()})
+				s.emit(Event{Type: "live", ECU: e.ID, Text: err.Error(), Code: ErrorCode(err)})
 				if fails > 5 {
 					journal.Errorf(s.log, "app", "live data stopped after repeated errors: %v", err)
 					s.emit(Event{Type: "status", Text: "live-stopped"})

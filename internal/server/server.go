@@ -8,6 +8,7 @@ import (
 	"embed"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -22,6 +23,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ecu"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/settings"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/vehicle"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/version"
 )
 
@@ -200,6 +202,7 @@ func (s *Server) routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/ecu/{id}/read", s.apiRead)
 	mux.HandleFunc("GET /api/ecu/{id}/actuators", s.apiActuators)
 	mux.HandleFunc("POST /api/ecu/{id}/actuate", s.apiActuate)
+	mux.HandleFunc("POST /api/ecu/{id}/reset", s.apiReset)
 	mux.HandleFunc("POST /api/ecu/{id}/raw", s.apiRaw)
 	mux.HandleFunc("GET /api/ecu/{id}/blocks", s.apiBlocks)
 	mux.HandleFunc("POST /api/ecu/{id}/block", s.apiBlock)
@@ -211,6 +214,7 @@ func (s *Server) routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/monitor/stop", s.apiMonitorStop)
 	mux.HandleFunc("POST /api/monitor/send", s.apiMonitorSend)
 	mux.HandleFunc("GET /api/dtc/search", s.apiDTCSearch)
+	mux.HandleFunc("GET /api/repair", s.apiRepair)
 	mux.HandleFunc("GET /api/journal", s.apiJournal)
 	mux.HandleFunc("GET /api/journal/export.csv", s.apiJournalCSV)
 	mux.HandleFunc("POST /api/journal/clear", s.apiJournalClear)
@@ -245,9 +249,15 @@ type apiError struct {
 }
 
 func writeError(w http.ResponseWriter, status int, err error) {
+	// The interface explains coded errors in the user's language.
+	e := apiError{Error: err.Error(), Code: vehicle.ErrorCode(err)}
+	var ce *ecu.ConditionError
+	if errors.As(err, &ce) {
+		status = http.StatusConflict
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(apiError{Error: err.Error()})
+	_ = json.NewEncoder(w).Encode(e)
 }
 
 func readJSON(r *http.Request, v any) error {

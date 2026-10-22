@@ -6,9 +6,8 @@
 
 **Разделы:** [Запуск](#запуск) · [Подключение](#подключение) ·
 [Обзор](#обзор) · [Ошибки](#ошибки) · [Параметры](#параметры) ·
-[Блок управления](#блок-управления) ·
-[Исполнительные механизмы](#исполнительные-механизмы) ·
-[Терминал](#терминал) · [Монитор CAN](#монитор-can) · [Журнал](#журнал) ·
+[Блок управления](#блок-управления) · [Сервис](#сервис) ·
+[Проверки](#проверки) · [Терминал](#терминал) · [Монитор CAN](#монитор-can) · [Журнал](#журнал) ·
 [Настройки](#настройки) · [Мост ELM327](#мост-elm327) ·
 [С телефона](#с-телефона-или-планшета) ·
 [Командная строка](#командная-строка) ·
@@ -48,6 +47,9 @@
    для ВАЗ/ГАЗ/УАЗ — «ВАЗ / ГАЗ / УАЗ — автоматически».
 5. **Подключиться.** «Ход подключения» показывает каждую попытку.
 
+В следующий раз вверху страницы будет карточка **«Как в прошлый раз»**: тот
+же адаптер, порт и профиль одной кнопкой.
+
 **Дополнительные настройки:** адрес блока (hex; `10` — двигатель KWP2000,
 `01` — двигатель VW), инициализация K-Line (быстрая или 5 бод), скорость CAN,
 идентификаторы UDS (по умолчанию `7E0` / `7E8`), принудительное описание
@@ -68,16 +70,24 @@
 - **Прочитать** — коды с расшифровкой на языке интерфейса, статусом (активна,
   подтверждена, ожидает, постоянная, лампа MIL) и блоком-источником. Для
   OBD-II ниже показывается стоп-кадр — значения в момент записи ошибки.
+- **Как исправить ▾** — под каждым кодом: что делает узел, признаки,
+  возможные причины (от простых и дешёвых к дорогим) и как проверить. Метка
+  у кода — насколько срочно: «Опасно ехать», «Устранить скоро», «Можно
+  отложить»; сверху — сводка по всем кодам. Это общие рекомендации:
+  окончательное слово — за руководством по ремонту вашей машины.
 - **Стереть** — с подтверждением. Если неисправность осталась, код вернётся.
-- **Отчёт для печати** — откроется страница с машиной, блоками, ошибками и
-  параметрами; сохраните её в PDF через печать браузера.
+- **Отчёт для печати** — откроется страница с машиной, блоками, ошибками,
+  советами по ремонту и параметрами; сохраните её в PDF через печать
+  браузера.
 - **Поиск кода** — по номеру (`P0130`, `053`, `00532`) или слову; в
-  разделе «Справочник» он работает и без подключения.
+  разделе «Справочник» он работает и без подключения. Там же —
+  **«Справочник по ремонту»**: все советы по узлам без подключения к машине.
 
 ## Параметры
 
-Отметьте параметры слева (по группам, с фильтром) и нажмите **Старт**.
-Частота: максимально быстро, 4 раза в секунду или раз в секунду.
+Отметьте параметры слева (по группам, с фильтром) или нажмите готовый
+набор — «Основные», «Холостой ход», «Смесь и топливо» — и нажмите
+**Старт**. Частота: максимально быстро, 4 раза в секунду или раз в секунду.
 
 - **Таблица** — значение, единица, минимум и максимум за сеанс.
 - **Графики** — последняя минута; у каждого параметра своя ось. Наведите
@@ -95,11 +105,47 @@
 копирования, описание блока: статус, машины, возможности, источники. Внизу —
 все блоки сеанса.
 
-## Исполнительные механизмы
+## Сервис
 
-Включение форсунок, реле, клапанов, вентилятора — если описание блока их
-знает. У каждого — предупреждение. Выполняйте на неподвижной машине; при
-отключении программа сама выключит всё, что включила.
+Сервисные функции блока. Вверху — живая полоска: обороты, температура,
+напряжение и значения холостого хода, чтобы сразу видеть, как отрабатывает
+двигатель.
+
+- **Перезагрузка блока управления** — как поворот ключа: временные
+  регулировки сбрасываются, связь программа восстанавливает сама. Для блоков
+  KWP2000 и UDS (команда ecuReset).
+- **Импульсные тесты** — форсунки и катушки зажигания: короткий импульс,
+  слушайте щелчок. Только на заглушенном двигателе с включённым зажиганием.
+- **Реле и клапаны** — бензонасос, вентилятор, кондиционер, лампа
+  неисправности, клапан адсорбера. Включённое вернётся блоку само — через
+  60 секунд, бензонасос через 30; обратный отсчёт виден на карточке.
+- **Регулировки холостого хода** — задайте обороты ХХ или положение РДВ и
+  смотрите на обороты рядом. «Вернуть ЭБУ» отдаёт управление блоку.
+
+У каждого теста указано условие — «двигатель заглушен» или «двигатель
+работает». Программа проверяет его по оборотам и не запустит тест, если
+условие не выполнено или обороты прочитать не удалось. Набор тестов зависит
+от описания блока: сейчас они есть для ВАЗ с Bosch M1.5.4 / M1.5.4N,
+Январь-5.1, VS-5.1 и Январь-7.2 (KWP2000). Для Микас-5.4 / 7.1 тесты не
+предлагаются: их команды не опубликованы.
+
+## Проверки
+
+Пошаговые проверки с оценкой «норма» или «не норма» по живым показаниям
+блока. Программа подсказывает, что сделать (заглушить или завести
+двигатель, включить нагрузку), измеряет и объясняет результат.
+
+- **Аккумулятор и генератор** — заряд без нагрузки, зарядка на работающем
+  двигателе, напряжение под нагрузкой.
+- **Прогрев и термостат** — как растёт температура охлаждающей жидкости.
+- **Стабильность холостого хода** — насколько ровно держатся обороты
+  прогретого двигателя.
+- **Датчик кислорода** — переключается ли передний датчик между «богато» и
+  «бедно».
+- **Датчик положения дросселя** — на заглушенном двигателе нажмите педаль
+  до упора и отпустите: показания должны пройти весь ход от 0 до 100 %.
+
+Если блок не сообщает нужных значений, проверка помечена «Недоступно».
 
 ## Терминал
 
@@ -158,9 +204,13 @@ udt scan    [связь]      подключиться и показать бл�
 udt dtc     [связь] [-clear]
 udt live    [связь] [-params a,b] [-interval 500ms] [-count N]
 udt raw     [связь] "21 01" ...
+udt reset   [связь]      перезагрузить блок управления и восстановить связь
 udt bridge  [связь] [-listen 0.0.0.0:35000]
 udt lookup  P0130 ...    расшифровать коды без подключения
 ```
+
+`udt dtc` печатает под каждым кодом, какой раздел справочника по ремонту к
+нему относится.
 
 Ключи связи: `-adapter` (`sim`, `kkl`, `elm327`, `elm327-wifi`, `j2534`,
 `slcan`, `socketcan`, `pcan`, `kvaser`, `rp1210`, `doip`, `hsfz`), `-port`,
@@ -180,7 +230,9 @@ udt live -adapter sim -sim gaz-mikas -params twat,freq,uacc
 
 - **K-Line (KKL):** Latency Timer = 1 мс для FTDI; явный профиль вместо
   автоматического; «Эхо адаптера», DTR и RTS в дополнительных настройках;
-  переключатель режима на кабеле (K+DCAN) — в K-Line. Подробно —
+  переключатель режима на кабеле (K+DCAN) — в K-Line. Сообщение «кабель
+  перестал слышать собственные байты» значит, что у кабеля пропало питание
+  +12 В (выключено зажигание, отошёл разъём). Подробно —
   [GAZ-VOLGA.md](GAZ-VOLGA.md#7-если-не-связывается).
 - **ELM327:** Bluetooth — сопрягите адаптер в системе и выберите
   **исходящий** COM-порт; скорость порта программа подбирает сама; дешёвые
@@ -204,8 +256,10 @@ udt live -adapter sim -sim gaz-mikas -params twat,freq,uacc
   именем сервера отклоняются.
 - С ключом `-listen 0.0.0.0:…` управлять машиной сможет любой, у кого есть
   ссылка с ключом. Включайте это только в своей сети.
-- Стирание ошибок, проверка механизмов и терминал меняют состояние блока.
-  Делайте это на неподвижной машине.
+- Стирание ошибок, сервисные функции и терминал меняют состояние блока.
+  Делайте это на неподвижной машине. Тесты с условием по двигателю
+  программа без проверки оборотов не запускает, а включённые выходы сама
+  возвращает блоку по таймеру и при отключении.
 
 ## Поддержать проект
 
@@ -254,6 +308,9 @@ or `~/.config/udt` (Linux); **Settings → Folders** opens them.
    VAZ/GAZ/UAZ — "VAZ / GAZ / UAZ — automatic".
 5. **Connect.** The progress list shows every attempt.
 
+Next time a **"Connect like last time"** card at the top of the page offers
+the same adapter, port and profile with one button.
+
 **Advanced:** control unit address (hex; `10` — KWP2000 engine, `01` — VW
 engine), K-Line initialisation (fast or 5 baud), CAN bit rate, UDS
 identifiers (`7E0` / `7E8` by default), a forced control unit description,
@@ -273,16 +330,23 @@ MIL. For the simulator: engine controls and "inject a fault".
   (active, confirmed, pending, permanent, MIL) and the source unit. For
   OBD-II the freeze frame is shown below — values at the moment the code was
   stored.
+- **How to fix ▾** — under each code: what the part does, symptoms, possible
+  causes (cheap and simple first) and how to check them. The badge says how
+  urgent it is: "Driving on is risky", "Repair soon", "Can wait"; a summary
+  of all codes is on top. This is general advice: the repair manual of your
+  car has the final word.
 - **Clear** — after a confirmation. If the fault remains, the code returns.
-- **Printable report** — a page with the vehicle, units, codes and values;
-  save it as PDF from the browser's print dialog.
+- **Printable report** — a page with the vehicle, units, codes, repair
+  advice and values; save it as PDF from the browser's print dialog.
 - **Code search** — by number (`P0130`, `053`, `00532`) or by word; in the
-  "Reference" section it works without a connection too.
+  "Reference" section it works without a connection too, next to the
+  **repair advice** for every part.
 
 ## Live data
 
-Tick parameters on the left (grouped, with a filter) and press **Start**.
-Rate: as fast as possible, 4 times a second or once a second.
+Tick parameters on the left (grouped, with a filter) or pick a ready set —
+"Key values", "Idle", "Mixture and fuel" — and press **Start**. Rate: as
+fast as possible, 4 times a second or once a second.
 
 - **Table** — value, unit, session minimum and maximum.
 - **Charts** — the last minute; one axis per parameter. Hover to read any
@@ -301,11 +365,48 @@ Identification (unit and software numbers, the VIN if the unit stores it), a
 copy button, the description: status, vehicles, capabilities, sources. All
 units of the session are listed at the bottom.
 
-## Output tests
+## Service
 
-Injectors, relays, valves, the fan — where the description knows them. Each
-comes with a warning. Run them with the vehicle stationary; on disconnect the
-program switches off whatever it switched on.
+The control unit's service functions. A live strip on top shows engine
+speed, temperature, voltage and the idle values, so you see at once how the
+engine responds.
+
+- **Restart the control unit** — like turning the key: temporary
+  adjustments are dropped and the program restores communication by itself.
+  For KWP2000 and UDS units (ecuReset).
+- **Pulse tests** — injectors and ignition coils: a short pulse, listen for
+  the click. Engine stopped, ignition on.
+- **Relays and valves** — fuel pump, fan, A/C, check-engine lamp, canister
+  purge. Anything left on returns to the control unit by itself after 60
+  seconds (the fuel pump after 30); the card counts down.
+- **Idle adjustments** — set the idle speed or the idle air valve position
+  and watch the engine speed next to it. "Hand back" returns control to the
+  unit.
+
+Each test states its condition — "engine stopped" or "engine running". The
+program checks it against the engine speed and does not start the test when
+the condition is not met or the speed cannot be read. The tests depend on
+the description: they exist for VAZ with Bosch M1.5.4 / M1.5.4N,
+Январь-5.1, VS-5.1 and Январь-7.2 (KWP2000). Микас-5.4 / 7.1 get none: the
+commands are not published.
+
+## Checks
+
+Step-by-step checks with a pass or fail verdict from the live values. The
+program says what to do (stop or start the engine, switch a load on),
+measures and explains the result.
+
+- **Battery and charging** — charge at rest, charging with the engine
+  running, voltage under load.
+- **Warm-up and thermostat** — how the coolant temperature rises.
+- **Idle stability** — how steady the idle speed of a warm engine is.
+- **Oxygen sensor** — whether the front sensor switches between rich and
+  lean.
+- **Throttle sensor** — engine stopped, press the pedal to the floor and
+  release it: the reading must cover the whole range from 0 to 100 %.
+
+A check is marked "Not available" when the unit does not report the values
+it needs.
 
 ## Terminal
 
@@ -363,9 +464,12 @@ udt scan    [conn]       connect and list the units with identification
 udt dtc     [conn] [-clear]
 udt live    [conn] [-params a,b] [-interval 500ms] [-count N]
 udt raw     [conn] "21 01" ...
+udt reset   [conn]       restart the control unit and restore communication
 udt bridge  [conn] [-listen 0.0.0.0:35000]
 udt lookup  P0130 ...    describe codes offline
 ```
+
+`udt dtc` prints under each code the repair advice section it belongs to.
 
 Connection flags: `-adapter` (`sim`, `kkl`, `elm327`, `elm327-wifi`, `j2534`,
 `slcan`, `socketcan`, `pcan`, `kvaser`, `rp1210`, `doip`, `hsfz`), `-port`,
@@ -385,7 +489,8 @@ shows whether requests go out (`tx`) and answers come back (`rx`).
 
 - **K-Line (KKL):** Latency Timer 1 ms for FTDI; an explicit profile instead
   of automatic; "adapter echo", DTR and RTS under Advanced; the cable's mode
-  switch (K+DCAN) set to K-Line. Details:
+  switch (K+DCAN) set to K-Line. "The cable stopped hearing its own bytes"
+  means the cable lost its +12 V (ignition off, plug loose). Details:
   [GAZ-VOLGA.md](GAZ-VOLGA.md#eng).
 - **ELM327:** Bluetooth — pair the adapter in the OS and choose the
   **outgoing** COM port; the program finds the port speed itself; cheap
@@ -409,8 +514,10 @@ adapter, car, year, control unit and the journal file.
   host name are refused.
 - With `-listen 0.0.0.0:…` anyone who has the link with the key can control
   the car. Use it only on your own network.
-- Clearing codes, output tests and the terminal change the unit's state. Do
-  them with the vehicle stationary.
+- Clearing codes, service functions and the terminal change the unit's
+  state. Do them with the vehicle stationary. Tests with an engine condition
+  are not started without checking the engine speed, and outputs left on
+  are handed back to the unit by a timer and on disconnect.
 
 ## Support the project
 

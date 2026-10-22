@@ -22,6 +22,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/j2534"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/pcan"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/repair"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/rp1210"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/serial"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/settings"
@@ -219,6 +220,9 @@ func (s *Server) apiDTC(w http.ResponseWriter, r *http.Request) {
 	if codes == nil {
 		codes = []dtc.DTC{}
 	}
+	for i := range codes {
+		codes[i].Hint = repair.Match(codes[i].Code, codes[i].Desc)
+	}
 	journal.Infof(s.journal, "app", "read %d trouble code(s)", len(codes))
 	writeJSON(w, map[string]any{"codes": codes, "flagNames": dtc.FlagNames, "time": time.Now()})
 }
@@ -352,6 +356,34 @@ func (s *Server) apiActuate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, map[string]any{"ok": true, "response": resp})
+}
+
+// apiRepair returns the repair advice the interface shows next to
+// trouble codes.
+func (s *Server) apiRepair(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, map[string]any{"hints": repair.All()})
+}
+
+// apiReset restarts the control unit and restores communication.
+func (s *Server) apiReset(w http.ResponseWriter, r *http.Request) {
+	h, _, ok := s.handler(w, r)
+	if !ok {
+		return
+	}
+	rs, can := h.(ecu.Resetter)
+	if !can {
+		writeError(w, http.StatusBadRequest, errors.New("this control unit cannot be restarted from the program"))
+		return
+	}
+	ctx, cancel := ctxFor(r, 25*time.Second)
+	defer cancel()
+	journal.Infof(s.journal, "app", "restarting the control unit")
+	if err := rs.Reset(ctx); err != nil {
+		writeError(w, http.StatusBadGateway, err)
+		return
+	}
+	journal.Infof(s.journal, "app", "control unit restarted, communication restored")
+	writeJSON(w, map[string]bool{"ok": true})
 }
 
 func (s *Server) apiRaw(w http.ResponseWriter, r *http.Request) {

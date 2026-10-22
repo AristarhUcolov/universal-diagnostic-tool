@@ -39,6 +39,10 @@ type Engine struct {
 	VIN      string
 	rng      *rand.Rand
 	cleared  time.Time
+	// Values forced by a tester through output control.
+	idleTarget float64   // idle speed set point, rpm (0: the unit decides)
+	iacTarget  float64   // idle air valve position, steps (0: the unit decides)
+	fanSince   time.Time // cooling fan forced on since (zero: off)
 }
 
 // State is a snapshot of the simulated engine.
@@ -129,6 +133,41 @@ func (e *Engine) Rev(d time.Duration, level float64) {
 func (e *Engine) SetDriving(on bool) {
 	e.mu.Lock()
 	e.driving = on
+	e.mu.Unlock()
+}
+
+// SetIdleTarget forces the idle speed set point (0 returns it to the
+// control unit).
+func (e *Engine) SetIdleTarget(rpm float64) {
+	e.mu.Lock()
+	e.idleTarget = rpm
+	e.mu.Unlock()
+}
+
+// SetIACTarget forces the idle air valve position (0 returns it).
+func (e *Engine) SetIACTarget(steps float64) {
+	e.mu.Lock()
+	e.iacTarget = steps
+	e.mu.Unlock()
+}
+
+// SetFan switches the cooling fan on or off.
+func (e *Engine) SetFan(on bool) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	switch {
+	case on && e.fanSince.IsZero():
+		e.fanSince = time.Now()
+	case !on:
+		e.fanSince = time.Time{}
+	}
+}
+
+// ResetOverrides drops everything forced by a tester, as a restarting
+// control unit does.
+func (e *Engine) ResetOverrides() {
+	e.mu.Lock()
+	e.idleTarget, e.iacTarget, e.fanSince = 0, 0, time.Time{}
 	e.mu.Unlock()
 }
 
@@ -223,8 +262,15 @@ func (e *Engine) stateLocked() State {
 	s.CoolantC = 90 - (90-e.coolant0)*math.Exp(-t/120)
 	s.OilC = 90 - (90-e.coolant0)*math.Exp(-t/200)
 	s.IntakeC = s.AmbientC + 12*(1-math.Exp(-t/300))
+	if !e.fanSince.IsZero() {
+		// A forced fan pulls the temperature down by a few degrees.
+		s.CoolantC -= math.Min(6, now.Sub(e.fanSince).Seconds()*0.1)
+	}
 	cold := clamp((60-s.CoolantC)/60, 0, 1)
 	s.DesiredIdleRPM = math.Round((850+350*cold)/10) * 10
+	if e.idleTarget > 0 {
+		s.DesiredIdleRPM = e.idleTarget
+	}
 	throttle := 0.0
 	if now.Before(e.revUntil) {
 		throttle = 100 * e.revLevel
@@ -270,7 +316,15 @@ func (e *Engine) stateLocked() State {
 	}
 	s.AFR = 14.7 * (1 + s.STFT/100)
 	s.DesiredIACSteps = math.Round(30 + 40*cold)
+	if e.idleTarget > 0 {
+		s.DesiredIACSteps = math.Round(s.DesiredIACSteps + (e.idleTarget-850)/12)
+	}
 	s.IACSteps = s.DesiredIACSteps + math.Round(noise(1))
+	if e.iacTarget > 0 && s.Idle {
+		// A valve held open or closed moves the idle speed with it.
+		s.RPM = math.Max(300, s.RPM+(e.iacTarget-s.DesiredIACSteps)*8)
+		s.IACSteps = e.iacTarget
+	}
 	s.CatTempC = 250 + 400*(1-math.Exp(-t/90)) + throttle*3
 	s.FuelPressureKPa = 300
 	s.Knock = throttle > 60 && e.rng.Float64() < 0.1

@@ -57,6 +57,43 @@ func TestBuiltinDefinitions(t *testing.T) {
 	}
 }
 
+// A definition that extends another inherits the fields it does not name,
+// but a list it brings replaces the base's list as a whole: an entry must
+// not pick up the formula, OBD mapping or engine condition of whatever
+// stood at the same place in the base.
+func TestExtend(t *testing.T) {
+	l := &Library{defs: map[string]*Definition{}, raw: map[string][]byte{}}
+	errs := l.addAll(map[string][]byte{
+		"base": []byte(`{"id": "base", "name": "Base", "protocol": "kwp2000", "profile": "p", "status": "partial",
+			"session": "10 81", "match": {"version": ["09"]},
+			"blocks": [{"id": "01", "request": "21 01", "params": [
+				{"id": "a", "offset": 0, "type": "u16le", "expr": "x/128", "unit": "l/100km", "obd": "14"}]}],
+			"actuators": [{"id": "inj", "kind": "pulse", "on": "30 01 06 01", "condition": "engine_off", "timeout_s": 30}]}`),
+		"child": []byte(`{"id": "child", "extends": "base", "name": "Child",
+			"blocks": [{"id": "01", "request": "21 01", "params": [{"id": "b", "offset": 0}]}],
+			"actuators": [{"id": "fan", "kind": "toggle", "on": "30 0A 06 01"}]}`),
+	})
+	if len(errs) > 0 {
+		t.Fatal(errs)
+	}
+	c, ok := l.Get("child")
+	if !ok {
+		t.Fatal("child not loaded")
+	}
+	if c.Protocol != "kwp2000" || c.Session != "10 81" || c.Name != "Child" {
+		t.Errorf("fields not inherited or not overridden: %+v", c)
+	}
+	if len(c.Match.Version) != 0 {
+		t.Errorf("identification rules inherited: %+v", c.Match)
+	}
+	if p := c.Blocks[0].Params[0]; p.ID != "b" || p.Type != "u8" || p.Expr != "" || p.Unit != "" || p.OBD != "" {
+		t.Errorf("parameter mixed with the base's: %+v", p)
+	}
+	if a := c.Actuators[0]; a.ID != "fan" || a.Condition != "" || a.TimeoutS != 0 {
+		t.Errorf("output test mixed with the base's: %+v", a)
+	}
+}
+
 // A real answer of a Январь-7.2 controller to 21 01 with the engine
 // stopped (published on cxem.net): it must decode to plausible values
 // with the AvtoVAZ layout.

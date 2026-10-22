@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr } from '../i18n.js';
-import { el, clear, toast, statusBadge, copyText } from '../ui.js';
+import { el, clear, toast, statusBadge, copyText, errText } from '../ui.js';
 import { store, currentECU } from '../app.js';
 import { ecuSelect, ecuPath } from './common.js';
 
@@ -35,7 +35,7 @@ export function render(view) {
         }
       }
     } catch (e) {
-      clear(identBox).append(el('h2', t('info.ident')), el('p', { style: { color: 'var(--critical-ink)' } }, e.message));
+      clear(identBox).append(el('h2', t('info.ident')), el('p', { style: { color: 'var(--critical-ink)' } }, errText(e)));
     }
   }
   load();

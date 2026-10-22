@@ -11,6 +11,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/dtc"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ecu"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/i18n"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/repair"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/settings"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/version"
 )
@@ -23,6 +24,7 @@ type reportECU struct {
 	Values   []reportValue
 	Monitors []ecu.Monitor
 	MIL      bool
+	Hints    []*repair.Hint // advice for the codes, each once
 }
 
 type reportValue struct {
@@ -34,12 +36,16 @@ var reportLabels = map[string]map[string]string{
 		"unit": "Control unit", "ident": "Identification", "codes": "Trouble codes", "none": "No trouble codes stored.",
 		"values": "Live values at the time of the report", "readiness": "Readiness monitors", "ready": "complete",
 		"notready": "not complete", "code": "Code", "desc": "Description", "status": "Status", "detail": "Detail",
-		"footer": "Created with Universal Diagnostic Tool", "print": "Print / save as PDF", "protocol": "Protocol"},
+		"footer": "Created with Universal Diagnostic Tool", "print": "Print / save as PDF", "protocol": "Protocol",
+		"whatcheck": "What to check", "causes": "Possible causes", "checks": "How to check", "stop": "driving on is risky",
+		"hintnote": "General advice; the repair manual of your car has the final word."},
 	"ru": {"title": "Отчёт о диагностике", "vehicle": "Подключение", "adapter": "Адаптер", "date": "Дата",
 		"unit": "Блок управления", "ident": "Идентификация", "codes": "Коды неисправностей", "none": "Кодов неисправностей нет.",
 		"values": "Параметры на момент отчёта", "readiness": "Мониторы готовности", "ready": "завершён",
 		"notready": "не завершён", "code": "Код", "desc": "Описание", "status": "Статус", "detail": "Уточнение",
-		"footer": "Создано программой Universal Diagnostic Tool", "print": "Печать / сохранить в PDF", "protocol": "Протокол"},
+		"footer": "Создано программой Universal Diagnostic Tool", "print": "Печать / сохранить в PDF", "protocol": "Протокол",
+		"whatcheck": "Что проверить", "causes": "Возможные причины", "checks": "Как проверить", "stop": "дальнейшая езда опасна",
+		"hintnote": "Общие рекомендации; окончательное слово — за руководством по ремонту вашего автомобиля."},
 }
 
 const reportHTML = `<!doctype html>
@@ -52,7 +58,8 @@ h3{font-size:15px;margin:18px 0 6px}table{border-collapse:collapse;width:100%;ma
 td,th{border:1px solid #c9ced8;padding:5px 8px;text-align:left;vertical-align:top}th{background:#eef1f6}
 .muted{color:#5a6475}.code{font-family:ui-monospace,Consolas,monospace;font-weight:600;white-space:nowrap}
 .flag{display:inline-block;border:1px solid #9aa3b2;border-radius:4px;padding:0 5px;margin:1px;font-size:12px}
-.bad{color:#b42318}.ok{color:#1a7f37}@media print{.noprint{display:none}body{margin:0}}
+.bad{color:#b42318}.ok{color:#1a7f37}.hint{border-left:3px solid #c9ced8;padding:2px 0 2px 12px;margin:10px 0;break-inside:avoid}
+.hint p{margin:4px 0}.hint ul,.hint ol{margin:2px 0 6px;padding-left:22px}@media print{.noprint{display:none}body{margin:0}}
 </style></head><body>
 <p class="noprint"><button onclick="window.print()">{{.L.print}}</button></p>
 <h1>{{.L.title}}</h1>
@@ -66,6 +73,11 @@ td,th{border:1px solid #c9ced8;padding:5px 8px;text-align:left;vertical-align:to
 <table><tr><th>{{$.L.code}}</th><th>{{$.L.desc}}</th><th>{{$.L.status}}</th></tr>
 {{range .Codes}}<tr><td class="code">{{.Code}}</td><td>{{tr .Desc}}{{if .Detail}}<br><span class="muted">{{tr .Detail}}</span>{{end}}</td>
 <td>{{range .Flags}}<span class="flag">{{flag .}}</span>{{end}}</td></tr>{{end}}</table>{{end}}
+{{if .Hints}}<h3>{{$.L.whatcheck}}</h3>
+{{range .Hints}}<div class="hint"><b>{{tr .Title}}</b>{{if eq .Severity "stop"}} <span class="bad">— {{$.L.stop}}</span>{{end}}
+<p>{{tr .What}}</p><p class="muted">{{$.L.causes}}:</p><ul>{{range .Causes}}<li>{{tr .}}</li>{{end}}</ul>
+<p class="muted">{{$.L.checks}}:</p><ol>{{range .Checks}}<li>{{tr .}}</li>{{end}}</ol></div>{{end}}
+<p class="muted">{{$.L.hintnote}}</p>{{end}}
 {{if .Monitors}}<h3>{{$.L.readiness}}</h3><table>{{range .Monitors}}<tr><td>{{tr .Name}}</td><td class="{{if .Complete}}ok{{else}}bad{{end}}">{{if .Complete}}{{$.L.ready}}{{else}}{{$.L.notready}}{{end}}</td></tr>{{end}}</table>{{end}}
 {{if .Values}}<h3>{{$.L.values}}</h3><table>{{range .Values}}<tr><td>{{.Name}}</td><td>{{.Value}} {{.Unit}}</td></tr>{{end}}</table>{{end}}
 {{end}}
@@ -98,6 +110,17 @@ func (s *Server) apiReport(w http.ResponseWriter, r *http.Request) {
 			re.CodesErr = err.Error()
 		} else {
 			re.Codes = codes
+			seen := map[string]bool{}
+			for i := range codes {
+				id := repair.Match(codes[i].Code, codes[i].Desc)
+				codes[i].Hint = id
+				if !seen[id] {
+					seen[id] = true
+					if hint := repair.Get(id); hint != nil {
+						re.Hints = append(re.Hints, hint)
+					}
+				}
+			}
 		}
 		if rr, ok := h.(ecu.ReadinessReader); ok {
 			re.MIL, _, re.Monitors, _ = rr.Readiness(ctx)

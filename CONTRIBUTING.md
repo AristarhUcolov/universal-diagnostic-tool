@@ -42,7 +42,15 @@
   `unverified`: программа покажет предупреждение, и это честно;
 - отсутствующий параметр лучше выдуманного;
 - весь текст — на английском и русском; тест проверит, что второй язык не
-  забыт.
+  забыт;
+- советы по ремонту лежат в
+  [`internal/repair/hints.json`](internal/repair/hints.json): что делает
+  узел, признаки, причины от простых к дорогим, как проверить и срочность
+  (`stop`, `soon`, `info`). Пишите только то, что можно проверить
+  мультиметром, манометром или в разделе «Параметры», без названий
+  платных программ;
+- проверили тест механизма или регулировку на своей машине — напишите,
+  какой блок и что произошло, и пришлите журнал.
 
 CI проверит формат за вас. Go устанавливать не обязательно — можно прислать
 pull request прямо через веб-интерфейс GitHub.
@@ -144,7 +152,15 @@ In short:
   the program shows a warning, and that is honest;
 - a missing value is better than an invented one;
 - all text is in English and Russian; a test makes sure neither is
-  forgotten.
+  forgotten;
+- repair advice lives in
+  [`internal/repair/hints.json`](internal/repair/hints.json): what the part
+  does, symptoms, causes from cheap to expensive, how to check, and urgency
+  (`stop`, `soon`, `info`). Write only what can be checked with a
+  multimeter, a pressure gauge or on the Live data page, and name no paid
+  software;
+- tried an output test or an idle adjustment on your car — tell us which
+  unit and what happened, and send the journal.
 
 CI checks the format for you. You do not need Go — a pull request can be sent
 straight from GitHub's web interface.

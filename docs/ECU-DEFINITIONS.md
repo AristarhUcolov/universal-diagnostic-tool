@@ -69,8 +69,10 @@
 ```
 
 Описание может унаследовать другое: `"extends": "vaz-m154n-euro2"` берёт
-всё из базового, а поля из файла заменяют унаследованные. Так сделаны
-`vaz-j72` и `vaz-m154-r83`.
+всё из базового, а поля из файла заменяют унаследованные **целиком**: свой
+список `blocks` или `actuators` полностью заменяет базовый, параметры и
+тесты не смешиваются по порядку. Правила опознания `match` не наследуются.
+Так сделаны `vaz-j72` и `vaz-m154-r83`.
 
 ## Поля
 
@@ -133,6 +135,14 @@
 Блок узнаётся по байту версии: `"match": {"version": ["09", "0A"]}`. Пример —
 [`gaz-mikas71.json`](../internal/ecu/defs/gaz-mikas71.json).
 
+Длина ответа на `61` — сумма длин запрошенных параметров, поэтому один
+неверный `type` сдвинул бы все значения после него. Если длина не сходится,
+программа опрашивает параметры по одному, запоминает настоящую длину,
+пишет предупреждение в журнал, а вместо значения такого параметра
+показывает сырые байты — ни одно соседнее значение не будет неверным.
+Так нашлось, что настоящий Микас-5.47 передаёт «установку расхода воздуха»
+(`59`) одним байтом, хотя в описании протокола — два.
+
 ## UDS
 
 Для `"protocol": "uds"` записи данных — это идентификаторы DID:
@@ -158,6 +168,11 @@
 В шаблоне `set` значение подставляется в фигурных скобках: `{v}` — один
 байт, `{v/10}` — с формулой, `{v:u16be}` — два байта. При отключении
 программа сама выключает всё, что включила.
+
+| Поле | Что это |
+|---|---|
+| `condition` | `engine_off` — тест выполняется только на заглушенном двигателе, `engine_running` — только на работающем. Программа проверяет обороты (параметр с `"obd": "0C"`) и без них тест не запустит. У `pulse` (форсунки, катушки) `engine_off` обязателен — это проверяет CI |
+| `timeout_s` | через сколько секунд включённый выход вернётся блоку сам (по умолчанию 60, не больше 600); бензонасосу хватит 30 |
 
 ## Статус и источники
 
@@ -241,7 +256,7 @@ text. The fields:
 | Field | Meaning |
 |---|---|
 | `id` | unique identifier: Latin letters, digits, hyphens |
-| `extends` | `id` of the description this one builds on; fields in the file override inherited ones |
+| `extends` | `id` of the description this one builds on; each field in the file replaces the inherited one **as a whole** (a `blocks` or `actuators` list of its own replaces the base's list, entries are never mixed by position); `match` is not inherited |
 | `name`, `vendor` | control unit name and maker |
 | `protocol` | `kwp2000`, `legacy` (Микас, Январь-4) or `uds` |
 | `profile` | connection profile the unit belongs to (`ru-kwp`, `ru-legacy`, `uds`…) |
@@ -273,7 +288,13 @@ parentheses, unary minus and `abs`, `min`, `max`, `round`, `floor`, `ceil`,
 (command `61`). Use `blocks` without `request` and give each parameter a
 `code` instead of an `offset`; recognise the unit with
 `"match": {"version": ["09", "0A"]}`. See
-[`gaz-mikas71.json`](../internal/ecu/defs/gaz-mikas71.json).
+[`gaz-mikas71.json`](../internal/ecu/defs/gaz-mikas71.json). The answer to
+`61` is the sizes of the requested values added up, so one wrong `type`
+would shift every value after it. When the length does not add up, the
+program asks for the values one by one, remembers the real size, writes a
+warning to the journal and shows that value as raw bytes. This is how a
+real Микас-5.47 turned out to send the air flow set point (`59`) as one
+byte, where the protocol description says two.
 
 **UDS:** data records are DIDs (`"request": "22 F4 0C"`, `"skip": 3`); codes
 are read with `19 02 FF` by default. A UDS description is chosen by hand for
@@ -284,7 +305,12 @@ now: **Connect → Advanced → Control unit description** or
 `max` milliseconds — at most 1000, default 300 — then `off`), `value` (`set`
 template with `min`, `max`, `unit`). In templates `{v}` is one byte, `{v/10}`
 applies a formula, `{v:u16be}` writes two bytes. On disconnect the program
-switches off everything it switched on.
+switches off everything it switched on. `condition`: `engine_off` or
+`engine_running` — checked against the engine speed (the value with
+`"obd": "0C"`) before the test starts; when the speed cannot be read, the
+test is not started. A `pulse` (injector, coil) must have `engine_off`,
+which CI checks. `timeout_s`: an output left on is handed back
+to the control unit after this many seconds (default 60, at most 600).
 
 ## Status and sources
 

@@ -45,6 +45,10 @@ type Line interface {
 var (
 	ErrTimeout = errors.New("k-line: no data (timeout)")
 	ErrEcho    = errors.New("k-line: echo mismatch (bus collision or wrong adapter mode)")
+	// ErrNoEcho: an echoing adapter heard nothing of its own bytes. The
+	// cable's line driver has lost its +12 V (OBD pin 16, often switched
+	// with the ignition) or the cable is unplugged.
+	ErrNoEcho = errors.New("k-line: the adapter does not hear its own bytes (no +12 V on the cable: ignition off, or the cable unplugged)")
 )
 
 // EchoMode tells whether the adapter echoes transmitted bytes.
@@ -202,8 +206,16 @@ func (l *SerialLine) consumeEcho(p []byte, gap time.Duration) error {
 		// these are already answer bytes.
 		l.echo = EchoOff
 		l.buf = append(got, l.buf...)
-		journal.Infof(l.log, "kline", "adapter does not echo transmitted bytes")
+		if len(got) == 0 {
+			journal.Infof(l.log, "kline", "adapter does not echo transmitted bytes (a KKL cable always does: if this is one, it has no +12 V from the car)")
+		} else {
+			journal.Infof(l.log, "kline", "adapter does not echo transmitted bytes")
+		}
 		return nil
+	}
+	if len(got) == 0 {
+		journal.Errorf(l.log, "kline", "no echo of % X: the cable has no +12 V from the car (ignition off?) or is unplugged", p)
+		return fmt.Errorf("%w: sent % X", ErrNoEcho, p)
 	}
 	journal.Errorf(l.log, "kline", "echo mismatch: sent % X, read back % X", p, got)
 	return fmt.Errorf("%w: sent % X, read back % X", ErrEcho, p, got)

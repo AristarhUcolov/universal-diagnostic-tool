@@ -1,0 +1,1422 @@
+[
+  {
+    "id": "o2",
+    "severity": "soon",
+    "title": {
+      "en": "Oxygen sensor (lambda probe)",
+      "ru": "Датчик кислорода (лямбда-зонд)"
+    },
+    "what": {
+      "en": "Measures oxygen in the exhaust. The control unit uses it to keep the mixture at about 14.7:1.",
+      "ru": "Измеряет кислород в выхлопе. По нему блок управления держит состав смеси около 14,7:1."
+    },
+    "symptoms": {
+      "en": "Higher fuel consumption, uneven idle, smell of fuel in the exhaust, failed emissions test.",
+      "ru": "Повышенный расход топлива, неровный холостой ход, запах топлива в выхлопе, не проходит токсичность."
+    },
+    "causes": [
+      {
+        "en": "The sensor has aged or is contaminated (oil, silicone sealant, leaded fuel).",
+        "ru": "Датчик выработал ресурс или отравлен (масло, силиконовый герметик, этилированный бензин)."
+      },
+      {
+        "en": "Damaged wiring or a corroded connector.",
+        "ru": "Повреждена проводка или окислился разъём."
+      },
+      {
+        "en": "An exhaust leak before the sensor lets air in.",
+        "ru": "Подсос воздуха в выпуске до датчика."
+      },
+      {
+        "en": "The mixture really is wrong: intake air leak, injectors, fuel pressure.",
+        "ru": "Смесь действительно неправильная: подсос воздуха во впуске, форсунки, давление топлива."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Warm the engine up and open Live data: at 2000–2500 rpm the voltage of a conventional sensor should swing between about 0.1 and 0.9 V several times a second.",
+        "ru": "Прогрейте двигатель и откройте «Параметры»: на 2000–2500 об/мин напряжение обычного датчика должно несколько раз в секунду меняться примерно от 0,1 до 0,9 В."
+      },
+      {
+        "en": "Stuck near 0.45 V — the sensor does not work or is cold (check its heater).",
+        "ru": "Стоит около 0,45 В — датчик не работает или холодный (проверьте подогрев)."
+      },
+      {
+        "en": "Stuck low (below 0.3 V) — lean mixture: look for air leaks first, then fuel pressure.",
+        "ru": "Стоит низко (ниже 0,3 В) — бедная смесь: сначала ищите подсос воздуха, затем проверьте давление топлива."
+      },
+      {
+        "en": "Stuck high (above 0.7 V) — rich mixture: check injectors, fuel pressure and the coolant temperature sensor.",
+        "ru": "Стоит высоко (выше 0,7 В) — богатая смесь: проверьте форсунки, давление топлива и датчик температуры ОЖ."
+      },
+      {
+        "en": "Check the wiring and connector. Replace the sensor only after the checks above.",
+        "ru": "Проверьте проводку и разъём. Меняйте датчик только после проверок выше."
+      },
+      {
+        "en": "The \"Oxygen sensor\" check on the Checks page runs this test with a pass/fail result.",
+        "ru": "Проверка «Датчик кислорода» в разделе «Проверки» выполнит этот тест и покажет результат."
+      }
+    ]
+  },
+  {
+    "id": "o2heater",
+    "severity": "soon",
+    "title": {
+      "en": "Oxygen sensor heater",
+      "ru": "Подогрев датчика кислорода"
+    },
+    "what": {
+      "en": "Heats the sensor so that it works soon after a cold start.",
+      "ru": "Разогревает датчик, чтобы он начал работать вскоре после холодного пуска."
+    },
+    "symptoms": {
+      "en": "Higher consumption and emissions after a cold start; usually no change in driving.",
+      "ru": "Повышенный расход и токсичность после холодного пуска; на ходу обычно незаметно."
+    },
+    "causes": [
+      {
+        "en": "Open heater element inside the sensor.",
+        "ru": "Обрыв нагревателя внутри датчика."
+      },
+      {
+        "en": "Blown fuse, faulty relay or no +12 V supply.",
+        "ru": "Сгорел предохранитель, неисправно реле или нет питания +12 В."
+      },
+      {
+        "en": "Damaged wiring to the control unit.",
+        "ru": "Повреждена проводка к блоку управления."
+      }
+    ],
+    "checks": [
+      {
+        "en": "With the connector unplugged, measure the heater resistance: usually from a few ohms to about ten (see the manual).",
+        "ru": "Отключите разъём и измерьте сопротивление нагревателя: обычно от единиц до десятка ом (см. руководство)."
+      },
+      {
+        "en": "With the ignition on, check +12 V on the heater supply wire.",
+        "ru": "При включённом зажигании проверьте +12 В на проводе питания нагревателя."
+      },
+      {
+        "en": "Check the fuse, the relay and the wire to the control unit.",
+        "ru": "Проверьте предохранитель, реле и провод до блока управления."
+      }
+    ]
+  },
+  {
+    "id": "maf",
+    "severity": "soon",
+    "title": {
+      "en": "Mass air flow sensor",
+      "ru": "Датчик массового расхода воздуха (ДМРВ)"
+    },
+    "what": {
+      "en": "Measures how much air the engine takes in; the fuel quantity is calculated from it.",
+      "ru": "Измеряет, сколько воздуха забирает двигатель; по нему рассчитывается подача топлива."
+    },
+    "symptoms": {
+      "en": "Hesitation, poor pick-up, unstable or high idle, higher consumption, the engine runs in limp mode.",
+      "ru": "Провалы, плохая динамика, неустойчивые или повышенные обороты ХХ, повышенный расход, двигатель в аварийном режиме."
+    },
+    "causes": [
+      {
+        "en": "Dirt or oil on the sensing element.",
+        "ru": "Грязь или масло на чувствительном элементе."
+      },
+      {
+        "en": "An air leak between the sensor and the throttle (cracked hose, loose clamp).",
+        "ru": "Подсос воздуха между датчиком и дросселем (трещина патрубка, ослабленный хомут)."
+      },
+      {
+        "en": "Damaged wiring or connector, no supply or ground.",
+        "ru": "Повреждена проводка или разъём, нет питания или массы."
+      },
+      {
+        "en": "The sensor itself has failed.",
+        "ru": "Неисправен сам датчик."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Inspect the air filter and the hose after the sensor for cracks and loose clamps.",
+        "ru": "Осмотрите воздушный фильтр и патрубок после датчика на трещины и ослабленные хомуты."
+      },
+      {
+        "en": "Compare the air flow at warm idle with your manual or with a known good car of the same model.",
+        "ru": "Сравните расход воздуха на прогретом ХХ с руководством или с исправной машиной той же модели."
+      },
+      {
+        "en": "Check the connector, supply and ground with the ignition on.",
+        "ru": "Проверьте разъём, питание и массу при включённом зажигании."
+      },
+      {
+        "en": "If the engine runs better with the sensor unplugged, the sensor is suspect.",
+        "ru": "Если с отключённым датчиком двигатель работает лучше — датчик под подозрением."
+      }
+    ]
+  },
+  {
+    "id": "map",
+    "severity": "soon",
+    "title": {
+      "en": "Manifold pressure sensor",
+      "ru": "Датчик абсолютного давления во впускном коллекторе"
+    },
+    "what": {
+      "en": "Measures the vacuum in the intake manifold, from which the engine load is calculated.",
+      "ru": "Измеряет разрежение во впускном коллекторе, по нему рассчитывается нагрузка двигателя."
+    },
+    "symptoms": {
+      "en": "Poor running, black smoke or a lean stumble, high consumption.",
+      "ru": "Неровная работа, чёрный дым или провалы, повышенный расход."
+    },
+    "causes": [
+      {
+        "en": "Cracked or disconnected vacuum hose to the sensor.",
+        "ru": "Треснул или слетел вакуумный шланг к датчику."
+      },
+      {
+        "en": "Damaged wiring, no 5 V reference.",
+        "ru": "Повреждена проводка, нет опорного напряжения 5 В."
+      },
+      {
+        "en": "Sensor failure.",
+        "ru": "Неисправность датчика."
+      }
+    ],
+    "checks": [
+      {
+        "en": "With the engine off and the ignition on the pressure should equal the atmospheric pressure (about 100 kPa at sea level).",
+        "ru": "При заглушённом двигателе и включённом зажигании давление должно быть равно атмосферному (около 100 кПа на уровне моря)."
+      },
+      {
+        "en": "At warm idle it drops to roughly 30–40 kPa on a healthy engine.",
+        "ru": "На прогретом ХХ у исправного двигателя оно падает примерно до 30–40 кПа."
+      },
+      {
+        "en": "Check the hose and the connector.",
+        "ru": "Проверьте шланг и разъём."
+      }
+    ]
+  },
+  {
+    "id": "iat",
+    "severity": "info",
+    "title": {
+      "en": "Intake air temperature sensor",
+      "ru": "Датчик температуры воздуха"
+    },
+    "what": {
+      "en": "Corrects the fuel quantity for the air temperature.",
+      "ru": "Корректирует подачу топлива по температуре воздуха."
+    },
+    "symptoms": {
+      "en": "Usually minor: slightly harder starts, small change in consumption.",
+      "ru": "Обычно немного: чуть хуже пуск, небольшое изменение расхода."
+    },
+    "causes": [
+      {
+        "en": "Damaged wiring or connector.",
+        "ru": "Повреждена проводка или разъём."
+      },
+      {
+        "en": "Sensor failure.",
+        "ru": "Неисправность датчика."
+      }
+    ],
+    "checks": [
+      {
+        "en": "On a cold engine that has stood for hours the reading should be close to the outside temperature.",
+        "ru": "На холодном двигателе, простоявшем несколько часов, показание должно быть близко к температуре улицы."
+      },
+      {
+        "en": "A reading of -40 °C means an open circuit, a very high one means a short.",
+        "ru": "Показание −40 °C означает обрыв цепи, очень высокое — замыкание."
+      },
+      {
+        "en": "Check the connector and the wiring, then the sensor's resistance against the manual's table.",
+        "ru": "Проверьте разъём и проводку, затем сопротивление датчика по таблице из руководства."
+      }
+    ]
+  },
+  {
+    "id": "ect",
+    "severity": "soon",
+    "title": {
+      "en": "Coolant temperature sensor",
+      "ru": "Датчик температуры охлаждающей жидкости"
+    },
+    "what": {
+      "en": "Tells the control unit how warm the engine is: it sets the mixture, the idle speed and switches the fan.",
+      "ru": "Сообщает блоку, насколько прогрет двигатель: от него зависят смесь, обороты ХХ и включение вентилятора."
+    },
+    "symptoms": {
+      "en": "Hard starts cold or hot, the fan runs all the time, rich mixture and black smoke, high idle.",
+      "ru": "Плохой пуск на холодную или горячую, вентилятор работает постоянно, богатая смесь и чёрный дым, повышенные обороты ХХ."
+    },
+    "causes": [
+      {
+        "en": "Damaged wiring or a corroded connector.",
+        "ru": "Повреждена проводка или окислился разъём."
+      },
+      {
+        "en": "Sensor failure.",
+        "ru": "Неисправность датчика."
+      },
+      {
+        "en": "Low coolant level: the sensor stands in steam.",
+        "ru": "Низкий уровень ОЖ: датчик оказывается в паре."
+      }
+    ],
+    "checks": [
+      {
+        "en": "On a cold engine the reading should match the outside temperature; while warming up it must rise smoothly.",
+        "ru": "На холодном двигателе показание должно совпадать с температурой улицы; при прогреве — плавно расти."
+      },
+      {
+        "en": "-40 °C means an open circuit, a very high value a short to ground.",
+        "ru": "−40 °C — обрыв цепи, очень высокое значение — замыкание на массу."
+      },
+      {
+        "en": "Check the coolant level, then the connector and wiring, then the sensor's resistance against the manual's table.",
+        "ru": "Проверьте уровень ОЖ, затем разъём и проводку, затем сопротивление датчика по таблице из руководства."
+      }
+    ]
+  },
+  {
+    "id": "thermostat",
+    "severity": "soon",
+    "title": {
+      "en": "Engine does not warm up (thermostat)",
+      "ru": "Двигатель не прогревается (термостат)"
+    },
+    "what": {
+      "en": "The control unit noticed that the engine takes too long to reach its working temperature.",
+      "ru": "Блок управления заметил, что двигатель слишком долго выходит на рабочую температуру."
+    },
+    "symptoms": {
+      "en": "The temperature gauge stays low, the heater blows cool air, consumption is higher.",
+      "ru": "Стрелка температуры стоит низко, печка дует прохладным воздухом, расход повышен."
+    },
+    "causes": [
+      {
+        "en": "Thermostat stuck open.",
+        "ru": "Термостат заклинил в открытом положении."
+      },
+      {
+        "en": "Low coolant level or air in the system.",
+        "ru": "Низкий уровень ОЖ или воздух в системе."
+      },
+      {
+        "en": "Faulty coolant temperature sensor.",
+        "ru": "Неисправен датчик температуры ОЖ."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Run the \"Warm-up and thermostat\" check on the Checks page: at idle in moderate weather the engine usually reaches 80–90 °C within 10–15 minutes.",
+        "ru": "Выполните проверку «Прогрев и термостат» в разделе «Проверки»: на ХХ в умеренную погоду двигатель обычно выходит на 80–90 °C за 10–15 минут."
+      },
+      {
+        "en": "The radiator hose should stay cool until the thermostat opens; if it warms up at once, the thermostat is open.",
+        "ru": "Верхний шланг радиатора должен оставаться холодным до открытия термостата; если он греется сразу — термостат открыт."
+      },
+      {
+        "en": "Check the coolant level when the engine is cold.",
+        "ru": "Проверьте уровень ОЖ на холодном двигателе."
+      }
+    ]
+  },
+  {
+    "id": "tps",
+    "severity": "soon",
+    "title": {
+      "en": "Throttle position sensor",
+      "ru": "Датчик положения дроссельной заслонки"
+    },
+    "what": {
+      "en": "Reports how far the throttle is open.",
+      "ru": "Сообщает, насколько открыта дроссельная заслонка."
+    },
+    "symptoms": {
+      "en": "Jerks and dips when pressing the pedal, high or floating idle.",
+      "ru": "Рывки и провалы при нажатии педали, повышенные или «плавающие» обороты ХХ."
+    },
+    "causes": [
+      {
+        "en": "Worn track inside the sensor.",
+        "ru": "Износ резистивного слоя внутри датчика."
+      },
+      {
+        "en": "Damaged wiring, no 5 V reference or ground.",
+        "ru": "Повреждена проводка, нет опорного напряжения 5 В или массы."
+      },
+      {
+        "en": "Throttle linkage stuck or out of adjustment.",
+        "ru": "Заедает или неправильно отрегулирован привод заслонки."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Engine off, ignition on: press the pedal slowly to the floor and release it. The position in Live data must rise and fall smoothly from about 0 to about 100 %, without jumps.",
+        "ru": "Двигатель заглушен, зажигание включено: медленно выжмите педаль до упора и отпустите. Положение в «Параметрах» должно плавно расти и падать примерно от 0 до 100 %, без скачков."
+      },
+      {
+        "en": "The \"Throttle sensor\" check on the Checks page records the minimum and maximum.",
+        "ru": "Проверка «Датчик дросселя» в разделе «Проверки» запишет минимум и максимум."
+      },
+      {
+        "en": "Check the 5 V reference and ground at the connector.",
+        "ru": "Проверьте опорные 5 В и массу на разъёме."
+      }
+    ]
+  },
+  {
+    "id": "iac",
+    "severity": "soon",
+    "title": {
+      "en": "Idle air control",
+      "ru": "Регулятор холостого хода (РДВ)"
+    },
+    "what": {
+      "en": "Lets air past the closed throttle to keep the idle speed.",
+      "ru": "Пропускает воздух в обход закрытой заслонки и поддерживает обороты холостого хода."
+    },
+    "symptoms": {
+      "en": "The idle speed floats, is too high or too low, the engine stalls when releasing the pedal.",
+      "ru": "Обороты ХХ «плавают», завышены или занижены, двигатель глохнет при отпускании педали."
+    },
+    "causes": [
+      {
+        "en": "Carbon in the throttle body and the regulator's air passage.",
+        "ru": "Нагар в дроссельном узле и в канале регулятора."
+      },
+      {
+        "en": "Air leaks (vacuum hoses, intake gaskets).",
+        "ru": "Подсос воздуха (вакуумные шланги, прокладки впуска)."
+      },
+      {
+        "en": "Regulator motor or wiring failure.",
+        "ru": "Неисправность мотора регулятора или проводки."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Clean the throttle body and the regulator's passage.",
+        "ru": "Очистите дроссельный узел и канал регулятора."
+      },
+      {
+        "en": "On the Service page set the idle speed to, say, 1200 rpm and back: the engine should follow within a few seconds.",
+        "ru": "В разделе «Сервис» задайте обороты ХХ, например 1200 об/мин, и верните обратно: двигатель должен отработать за несколько секунд."
+      },
+      {
+        "en": "Watch the regulator position at warm idle with all loads off and compare it with the manual; a value far from the usual one points to air leaks or dirt.",
+        "ru": "Посмотрите положение регулятора на прогретом ХХ с выключенными потребителями и сравните с руководством; сильное отличие указывает на подсос воздуха или грязь."
+      },
+      {
+        "en": "Look for air leaks.",
+        "ru": "Поищите подсос воздуха."
+      }
+    ]
+  },
+  {
+    "id": "injector",
+    "severity": "soon",
+    "title": {
+      "en": "Injector circuit",
+      "ru": "Цепь форсунки"
+    },
+    "what": {
+      "en": "The control unit opens the injectors electrically; it found a problem in an injector's circuit.",
+      "ru": "Блок открывает форсунки электрическим сигналом и обнаружил неисправность в цепи форсунки."
+    },
+    "symptoms": {
+      "en": "A cylinder does not work: shaking, misfires, loss of power.",
+      "ru": "Не работает цилиндр: тряска, пропуски, потеря мощности."
+    },
+    "causes": [
+      {
+        "en": "Open or shorted injector winding.",
+        "ru": "Обрыв или замыкание обмотки форсунки."
+      },
+      {
+        "en": "Damaged wiring or connector.",
+        "ru": "Повреждена проводка или разъём."
+      },
+      {
+        "en": "Fault in the control unit's output stage.",
+        "ru": "Неисправность выходного каскада блока управления."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Measure the injector resistance: high-impedance injectors usually have about 11–16 Ω; all injectors of an engine should be close to each other.",
+        "ru": "Измерьте сопротивление форсунки: у высокоомных обычно около 11–16 Ом; у всех форсунок двигателя значения должны быть близки."
+      },
+      {
+        "en": "With the engine stopped, give the injector a pulse on the Service page and listen for a click.",
+        "ru": "На заглушённом двигателе подайте импульс на форсунку в разделе «Сервис» и послушайте щелчок."
+      },
+      {
+        "en": "Check +12 V at the connector with the ignition on and the wire to the control unit.",
+        "ru": "Проверьте +12 В на разъёме при включённом зажигании и провод до блока."
+      }
+    ]
+  },
+  {
+    "id": "fuelpump",
+    "severity": "soon",
+    "title": {
+      "en": "Fuel pump and its relay",
+      "ru": "Бензонасос и его реле"
+    },
+    "what": {
+      "en": "The pump supplies fuel under pressure; the control unit switches it through a relay.",
+      "ru": "Насос подаёт топливо под давлением; блок включает его через реле."
+    },
+    "symptoms": {
+      "en": "Hard or no start, stalling, dips under load.",
+      "ru": "Плохой пуск или его отсутствие, двигатель глохнет, провалы под нагрузкой."
+    },
+    "causes": [
+      {
+        "en": "Faulty relay, blown fuse.",
+        "ru": "Неисправно реле, сгорел предохранитель."
+      },
+      {
+        "en": "Worn pump, clogged filter or strainer.",
+        "ru": "Изношен насос, засорён фильтр или сетка."
+      },
+      {
+        "en": "Damaged wiring, poor ground.",
+        "ru": "Повреждена проводка, плохая масса."
+      }
+    ],
+    "checks": [
+      {
+        "en": "When the ignition is switched on, the pump should run for about two seconds.",
+        "ru": "При включении зажигания насос должен поработать около двух секунд."
+      },
+      {
+        "en": "Switch the relay on the Service page and listen to the pump.",
+        "ru": "Включите реле в разделе «Сервис» и послушайте насос."
+      },
+      {
+        "en": "Measure the fuel pressure with a gauge and compare with the manual.",
+        "ru": "Измерьте давление топлива манометром и сравните с руководством."
+      },
+      {
+        "en": "Check the fuse, the relay and the fuel filter.",
+        "ru": "Проверьте предохранитель, реле и топливный фильтр."
+      }
+    ]
+  },
+  {
+    "id": "misfire",
+    "severity": "stop",
+    "title": {
+      "en": "Misfires",
+      "ru": "Пропуски воспламенения"
+    },
+    "what": {
+      "en": "The control unit saw the crankshaft slow down: a cylinder did not fire. Unburnt fuel overheats and destroys the catalytic converter.",
+      "ru": "Блок увидел замедление коленвала: цилиндр не сработал. Несгоревшее топливо перегревает и разрушает нейтрализатор."
+    },
+    "symptoms": {
+      "en": "Shaking, loss of power, a flashing check-engine lamp.",
+      "ru": "Тряска, потеря мощности, мигающая лампа «Check Engine»."
+    },
+    "causes": [
+      {
+        "en": "Spark plugs, high-voltage leads, ignition coils.",
+        "ru": "Свечи, высоковольтные провода, катушки зажигания."
+      },
+      {
+        "en": "Injectors, low fuel pressure.",
+        "ru": "Форсунки, низкое давление топлива."
+      },
+      {
+        "en": "Air leaks, low compression, valve timing.",
+        "ru": "Подсос воздуха, низкая компрессия, фазы газораспределения."
+      }
+    ],
+    "checks": [
+      {
+        "en": "If the lamp flashes, drive gently and only as far as necessary.",
+        "ru": "Если лампа мигает, двигайтесь бережно и только по необходимости."
+      },
+      {
+        "en": "The code number often tells the cylinder (P0301 is cylinder 1). Swap that cylinder's coil or plug with a neighbour: if the misfire moves, the part is found.",
+        "ru": "Номер кода часто указывает цилиндр (P0301 — первый). Поменяйте катушку или свечу этого цилиндра с соседним: если пропуски переехали — деталь найдена."
+      },
+      {
+        "en": "Inspect the spark plugs and leads, then check the injectors and the compression.",
+        "ru": "Осмотрите свечи и провода, затем проверьте форсунки и компрессию."
+      }
+    ]
+  },
+  {
+    "id": "knock",
+    "severity": "soon",
+    "title": {
+      "en": "Knock sensor",
+      "ru": "Датчик детонации"
+    },
+    "what": {
+      "en": "Hears knocking combustion; the control unit then retards the ignition to protect the engine.",
+      "ru": "«Слышит» детонацию; блок тогда уменьшает угол опережения зажигания, защищая двигатель."
+    },
+    "symptoms": {
+      "en": "Loss of power and higher consumption (the ignition is retarded for safety).",
+      "ru": "Потеря мощности и повышенный расход (зажигание сдвинуто в позднюю сторону для защиты)."
+    },
+    "causes": [
+      {
+        "en": "The sensor is loose or its mounting surface is dirty.",
+        "ru": "Датчик ослаб или загрязнена привалочная поверхность."
+      },
+      {
+        "en": "Damaged wiring or shield.",
+        "ru": "Повреждена проводка или экран."
+      },
+      {
+        "en": "Real knock: low-octane fuel, overheating, carbon in the chambers.",
+        "ru": "Настоящая детонация: низкооктановое топливо, перегрев, нагар в камерах сгорания."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Check that the sensor is tight (torque from the manual) and the surface is clean.",
+        "ru": "Проверьте затяжку датчика (момент — по руководству) и чистоту поверхности."
+      },
+      {
+        "en": "Check the wiring and the shield to ground.",
+        "ru": "Проверьте проводку и экран на массу."
+      },
+      {
+        "en": "Use fuel with the octane rating the manual asks for.",
+        "ru": "Заправляйтесь топливом с октановым числом из руководства."
+      }
+    ]
+  },
+  {
+    "id": "ckp",
+    "severity": "stop",
+    "title": {
+      "en": "Crankshaft position sensor",
+      "ru": "Датчик положения коленчатого вала (ДПКВ)"
+    },
+    "what": {
+      "en": "The main signal of the engine: without it there is no spark and no injection.",
+      "ru": "Главный сигнал двигателя: без него нет ни искры, ни впрыска."
+    },
+    "symptoms": {
+      "en": "The engine does not start, stops suddenly, revs are limited, the tachometer drops out.",
+      "ru": "Двигатель не заводится, внезапно глохнет, ограничены обороты, «падает» тахометр."
+    },
+    "causes": [
+      {
+        "en": "Damaged wiring or connector, broken shield.",
+        "ru": "Повреждена проводка или разъём, нарушен экран."
+      },
+      {
+        "en": "Wrong gap to the timing wheel, damaged teeth, the wheel slipped on the damper.",
+        "ru": "Неправильный зазор до задающего диска, повреждены зубья, диск провернулся на демпфере."
+      },
+      {
+        "en": "Sensor failure.",
+        "ru": "Неисправность датчика."
+      }
+    ],
+    "checks": [
+      {
+        "en": "The engine can stop on the road: fix this before long trips.",
+        "ru": "Двигатель может заглохнуть в пути: устраните до дальних поездок."
+      },
+      {
+        "en": "Measure the sensor resistance (an inductive sensor usually has several hundred ohms — see the manual).",
+        "ru": "Измерьте сопротивление датчика (у индуктивного обычно несколько сотен ом — см. руководство)."
+      },
+      {
+        "en": "Check the gap to the timing wheel (often 0.5–1.5 mm) and the wheel's teeth.",
+        "ru": "Проверьте зазор до задающего диска (часто 0,5–1,5 мм) и его зубья."
+      },
+      {
+        "en": "Check the wiring and its shield.",
+        "ru": "Проверьте проводку и её экран."
+      }
+    ]
+  },
+  {
+    "id": "cmp",
+    "severity": "soon",
+    "title": {
+      "en": "Camshaft position sensor",
+      "ru": "Датчик фаз (положения распредвала)"
+    },
+    "what": {
+      "en": "Tells the control unit which cylinder is on its compression stroke, for sequential injection.",
+      "ru": "Сообщает блоку, в каком цилиндре такт сжатия, — для последовательного впрыска."
+    },
+    "symptoms": {
+      "en": "Higher consumption, longer cranking; on some engines a start problem.",
+      "ru": "Повышенный расход, более долгий пуск; на некоторых двигателях — проблемы с пуском."
+    },
+    "causes": [
+      {
+        "en": "Damaged wiring or connector.",
+        "ru": "Повреждена проводка или разъём."
+      },
+      {
+        "en": "Sensor failure or wrong gap.",
+        "ru": "Неисправность датчика или неправильный зазор."
+      },
+      {
+        "en": "The timing belt or chain jumped a tooth.",
+        "ru": "Ремень или цепь ГРМ перескочили на зуб."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Check the wiring and connector.",
+        "ru": "Проверьте проводку и разъём."
+      },
+      {
+        "en": "Check the timing marks if the engine also runs poorly.",
+        "ru": "Если двигатель ещё и плохо работает — проверьте метки ГРМ."
+      }
+    ]
+  },
+  {
+    "id": "coil",
+    "severity": "soon",
+    "title": {
+      "en": "Ignition coil circuit",
+      "ru": "Цепь катушки зажигания"
+    },
+    "what": {
+      "en": "The control unit found a problem in the circuit of an ignition coil.",
+      "ru": "Блок обнаружил неисправность в цепи катушки зажигания."
+    },
+    "symptoms": {
+      "en": "Misfires, shaking, loss of power.",
+      "ru": "Пропуски, тряска, потеря мощности."
+    },
+    "causes": [
+      {
+        "en": "Coil winding failure.",
+        "ru": "Неисправность обмотки катушки."
+      },
+      {
+        "en": "Damaged wiring or connector.",
+        "ru": "Повреждена проводка или разъём."
+      },
+      {
+        "en": "Fault in the control unit's output stage.",
+        "ru": "Неисправность выходного каскада блока."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Measure the primary and secondary resistance and compare with the manual.",
+        "ru": "Измерьте сопротивление первичной и вторичной обмоток и сравните с руководством."
+      },
+      {
+        "en": "With the engine stopped, test the coil from the Service page.",
+        "ru": "На заглушённом двигателе проверьте катушку из раздела «Сервис»."
+      },
+      {
+        "en": "Inspect the high-voltage leads and plugs.",
+        "ru": "Осмотрите высоковольтные провода и свечи."
+      }
+    ]
+  },
+  {
+    "id": "egr",
+    "severity": "soon",
+    "title": {
+      "en": "Exhaust gas recirculation",
+      "ru": "Рециркуляция отработавших газов (EGR)"
+    },
+    "what": {
+      "en": "Returns a little exhaust gas to the intake to lower combustion temperatures.",
+      "ru": "Возвращает часть выхлопных газов во впуск, чтобы снизить температуру сгорания."
+    },
+    "symptoms": {
+      "en": "Rough idle (valve stuck open) or knocking (no flow).",
+      "ru": "Неровный холостой ход (клапан застрял открытым) или детонация (нет потока)."
+    },
+    "causes": [
+      {
+        "en": "Carbon in the valve or passages.",
+        "ru": "Нагар в клапане или каналах."
+      },
+      {
+        "en": "Vacuum hoses, wiring, valve failure.",
+        "ru": "Вакуумные шланги, проводка, неисправность клапана."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Inspect and clean the valve and passages.",
+        "ru": "Осмотрите и очистите клапан и каналы."
+      },
+      {
+        "en": "Check the hoses and the wiring.",
+        "ru": "Проверьте шланги и проводку."
+      }
+    ]
+  },
+  {
+    "id": "catalyst",
+    "severity": "info",
+    "title": {
+      "en": "Catalytic converter efficiency",
+      "ru": "Эффективность нейтрализатора"
+    },
+    "what": {
+      "en": "The rear oxygen sensor shows that the converter no longer cleans the exhaust well.",
+      "ru": "Задний датчик кислорода показывает, что нейтрализатор плохо очищает выхлоп."
+    },
+    "symptoms": {
+      "en": "Usually none; sometimes a rattle or a blocked exhaust with loss of power.",
+      "ru": "Обычно никаких; иногда дребезг или забитый выпуск с потерей мощности."
+    },
+    "causes": [
+      {
+        "en": "The converter is worn or damaged (often after misfires or a rich mixture).",
+        "ru": "Нейтрализатор выработал ресурс или повреждён (часто после пропусков или богатой смеси)."
+      },
+      {
+        "en": "An exhaust leak near the sensors.",
+        "ru": "Негерметичность выпуска рядом с датчиками."
+      },
+      {
+        "en": "A faulty rear oxygen sensor.",
+        "ru": "Неисправен задний датчик кислорода."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Fix misfires and mixture faults first.",
+        "ru": "Сначала устраните пропуски и проблемы со смесью."
+      },
+      {
+        "en": "Compare both oxygen sensors in Live data: with a working converter the rear one stays fairly steady (around 0.6–0.7 V) while the front one swings.",
+        "ru": "Сравните оба датчика кислорода в «Параметрах»: при исправном нейтрализаторе задний держится довольно ровно (около 0,6–0,7 В), а передний колеблется."
+      },
+      {
+        "en": "Look for exhaust leaks.",
+        "ru": "Проверьте выпуск на негерметичность."
+      }
+    ]
+  },
+  {
+    "id": "evap",
+    "severity": "info",
+    "title": {
+      "en": "Evaporative emissions (canister purge)",
+      "ru": "Система улавливания паров (клапан адсорбера)"
+    },
+    "what": {
+      "en": "Catches fuel vapour in a charcoal canister and burns it in the engine through the purge valve.",
+      "ru": "Собирает пары топлива в угольном адсорбере и дожигает их в двигателе через клапан продувки."
+    },
+    "symptoms": {
+      "en": "Usually none; sometimes a smell of fuel or an unstable idle.",
+      "ru": "Обычно никаких; иногда запах бензина или неустойчивый холостой ход."
+    },
+    "causes": [
+      {
+        "en": "Purge valve open circuit or stuck.",
+        "ru": "Обрыв цепи или заклинивание клапана продувки."
+      },
+      {
+        "en": "Cracked hoses, a loose fuel cap.",
+        "ru": "Треснувшие шланги, неплотно закрыта пробка бака."
+      },
+      {
+        "en": "Damaged wiring.",
+        "ru": "Повреждена проводка."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Switch the valve on the Service page and listen for the click.",
+        "ru": "Включите клапан в разделе «Сервис» и послушайте щелчок."
+      },
+      {
+        "en": "Measure the valve's resistance, inspect the hoses and the fuel cap.",
+        "ru": "Измерьте сопротивление клапана, осмотрите шланги и пробку бака."
+      }
+    ]
+  },
+  {
+    "id": "fan",
+    "severity": "soon",
+    "title": {
+      "en": "Cooling fan",
+      "ru": "Вентилятор системы охлаждения"
+    },
+    "what": {
+      "en": "The control unit switches the radiator fan through a relay when the engine gets hot.",
+      "ru": "Блок включает вентилятор радиатора через реле, когда двигатель горячий."
+    },
+    "symptoms": {
+      "en": "Overheating in traffic, or a fan that never stops.",
+      "ru": "Перегрев в пробках или вентилятор, который не выключается."
+    },
+    "causes": [
+      {
+        "en": "Relay, fuse, motor or wiring failure.",
+        "ru": "Неисправность реле, предохранителя, мотора или проводки."
+      },
+      {
+        "en": "Faulty coolant temperature sensor.",
+        "ru": "Неисправен датчик температуры ОЖ."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Switch the fan on the Service page: if it runs, the circuit is fine and the problem is the temperature sensor or the switch-on logic.",
+        "ru": "Включите вентилятор в разделе «Сервис»: если он работает, цепь исправна и дело в датчике температуры или условиях включения."
+      },
+      {
+        "en": "If it does not run, check the fuse, the relay, the motor (straight from the battery) and the wiring.",
+        "ru": "Если не работает — проверьте предохранитель, реле, мотор (напрямую от аккумулятора) и проводку."
+      },
+      {
+        "en": "Stop driving if the temperature keeps rising.",
+        "ru": "Если температура продолжает расти — прекратите движение."
+      }
+    ]
+  },
+  {
+    "id": "vss",
+    "severity": "info",
+    "title": {
+      "en": "Vehicle speed sensor",
+      "ru": "Датчик скорости автомобиля"
+    },
+    "what": {
+      "en": "Reports the road speed; the control unit uses it for idle control and fuel cut-off.",
+      "ru": "Сообщает скорость движения; блок использует её для холостого хода и отключения подачи топлива."
+    },
+    "symptoms": {
+      "en": "The speedometer does not work, the idle speed dips when coasting.",
+      "ru": "Не работает спидометр, обороты проваливаются при накате."
+    },
+    "causes": [
+      {
+        "en": "Sensor or its drive failure.",
+        "ru": "Неисправность датчика или его привода."
+      },
+      {
+        "en": "Damaged wiring.",
+        "ru": "Повреждена проводка."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Check whether the speedometer works.",
+        "ru": "Проверьте, работает ли спидометр."
+      },
+      {
+        "en": "Watch the speed in Live data while driving.",
+        "ru": "Посмотрите скорость в «Параметрах» во время движения."
+      },
+      {
+        "en": "Check the sensor's supply, ground and signal wire.",
+        "ru": "Проверьте питание, массу и сигнальный провод датчика."
+      }
+    ]
+  },
+  {
+    "id": "voltage",
+    "severity": "soon",
+    "title": {
+      "en": "Supply voltage",
+      "ru": "Напряжение бортсети"
+    },
+    "what": {
+      "en": "The control unit measured a supply voltage outside its normal range.",
+      "ru": "Блок измерил напряжение питания вне нормы."
+    },
+    "symptoms": {
+      "en": "Hard starts, dim lights, a battery that runs flat, or bulbs that burn out (overcharge).",
+      "ru": "Плохой пуск, тусклый свет, разряжается аккумулятор или перегорают лампы (перезаряд)."
+    },
+    "causes": [
+      {
+        "en": "Worn battery.",
+        "ru": "Изношен аккумулятор."
+      },
+      {
+        "en": "Alternator, its regulator or a slipping belt.",
+        "ru": "Генератор, его регулятор напряжения или проскальзывающий ремень."
+      },
+      {
+        "en": "Corroded terminals or a poor ground strap.",
+        "ru": "Окисленные клеммы или плохая «масса»."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Run the \"Battery and charging\" check on the Checks page.",
+        "ru": "Выполните проверку «Аккумулятор и генератор» в разделе «Проверки»."
+      },
+      {
+        "en": "Engine off: a charged battery shows about 12.4–12.7 V. Engine running: about 13.5–14.7 V.",
+        "ru": "Двигатель заглушен: заряженный аккумулятор показывает около 12,4–12,7 В. Двигатель работает: около 13,5–14,7 В."
+      },
+      {
+        "en": "Clean and tighten the terminals and ground straps, check the belt.",
+        "ru": "Очистите и затяните клеммы и «массы», проверьте ремень."
+      }
+    ]
+  },
+  {
+    "id": "ecu",
+    "severity": "soon",
+    "title": {
+      "en": "Control unit fault",
+      "ru": "Неисправность блока управления"
+    },
+    "what": {
+      "en": "The control unit found a fault in itself: memory, checksum or internal circuit.",
+      "ru": "Блок обнаружил неисправность в себе: память, контрольная сумма или внутренняя цепь."
+    },
+    "symptoms": {
+      "en": "Anything from none to an engine that does not start.",
+      "ru": "От никаких до незапускающегося двигателя."
+    },
+    "causes": [
+      {
+        "en": "Poor supply or ground of the control unit.",
+        "ru": "Плохое питание или масса блока."
+      },
+      {
+        "en": "Damaged or unsuitable software (often after tuning).",
+        "ru": "Повреждённая или неподходящая программа (часто после «чип-тюнинга»)."
+      },
+      {
+        "en": "Internal failure.",
+        "ru": "Внутренняя неисправность."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Check the battery voltage, the control unit's fuses and its ground points.",
+        "ru": "Проверьте напряжение аккумулятора, предохранители и точки массы блока."
+      },
+      {
+        "en": "Clear the code and see whether it comes back.",
+        "ru": "Сотрите код и посмотрите, вернётся ли он."
+      },
+      {
+        "en": "Repair or replace the unit only after the supply and grounds are proven good.",
+        "ru": "Ремонтируйте или меняйте блок, только убедившись в исправности питания и масс."
+      }
+    ]
+  },
+  {
+    "id": "lean",
+    "severity": "soon",
+    "title": {
+      "en": "Mixture too lean",
+      "ru": "Слишком бедная смесь"
+    },
+    "what": {
+      "en": "The control unit adds much more fuel than usual and still sees too much oxygen.",
+      "ru": "Блок добавляет топлива намного больше обычного и всё равно видит избыток кислорода."
+    },
+    "symptoms": {
+      "en": "Dips, poor pick-up, uneven idle, sometimes misfires.",
+      "ru": "Провалы, плохая динамика, неровный холостой ход, иногда пропуски."
+    },
+    "causes": [
+      {
+        "en": "An intake air leak: vacuum hoses, intake gasket, brake booster hose.",
+        "ru": "Подсос воздуха: вакуумные шланги, прокладка впуска, шланг вакуумного усилителя."
+      },
+      {
+        "en": "Low fuel pressure: pump, filter, regulator.",
+        "ru": "Низкое давление топлива: насос, фильтр, регулятор."
+      },
+      {
+        "en": "Clogged injectors, a dirty air flow sensor.",
+        "ru": "Загрязнённые форсунки, грязный ДМРВ."
+      },
+      {
+        "en": "An exhaust leak before the oxygen sensor.",
+        "ru": "Подсос воздуха в выпуске до датчика кислорода."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Look at the fuel trims in Live data: a long-term correction above about +10 % confirms the fault.",
+        "ru": "Посмотрите коррекции топливоподачи в «Параметрах»: долговременная коррекция выше примерно +10 % подтверждает неисправность."
+      },
+      {
+        "en": "Listen for hissing and check the hoses; a smoke test finds leaks quickly.",
+        "ru": "Послушайте шипение и проверьте шланги; «дымогенератор» быстро находит подсосы."
+      },
+      {
+        "en": "Measure the fuel pressure.",
+        "ru": "Измерьте давление топлива."
+      }
+    ]
+  },
+  {
+    "id": "rich",
+    "severity": "soon",
+    "title": {
+      "en": "Mixture too rich",
+      "ru": "Слишком богатая смесь"
+    },
+    "what": {
+      "en": "The control unit removes much more fuel than usual and still sees too little oxygen.",
+      "ru": "Блок убирает топлива намного больше обычного и всё равно видит недостаток кислорода."
+    },
+    "symptoms": {
+      "en": "High consumption, black smoke, smell of fuel, sooty plugs.",
+      "ru": "Большой расход, чёрный дым, запах топлива, чёрные свечи."
+    },
+    "causes": [
+      {
+        "en": "Leaking injectors, too high fuel pressure (regulator).",
+        "ru": "Подтекающие форсунки, слишком высокое давление топлива (регулятор)."
+      },
+      {
+        "en": "A coolant temperature sensor that reads too cold.",
+        "ru": "Датчик температуры ОЖ показывает слишком низкую температуру."
+      },
+      {
+        "en": "A clogged air filter, a faulty air flow sensor.",
+        "ru": "Забитый воздушный фильтр, неисправный ДМРВ."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Look at the fuel trims: a long-term correction below about -10 % confirms the fault.",
+        "ru": "Посмотрите коррекции: долговременная коррекция ниже примерно −10 % подтверждает неисправность."
+      },
+      {
+        "en": "Check the coolant temperature reading against reality.",
+        "ru": "Сравните показание температуры ОЖ с реальной."
+      },
+      {
+        "en": "Check the fuel pressure and the injectors for leaks.",
+        "ru": "Проверьте давление топлива и форсунки на подтекание."
+      }
+    ]
+  },
+  {
+    "id": "network",
+    "severity": "soon",
+    "title": {
+      "en": "Communication between control units",
+      "ru": "Связь между блоками управления"
+    },
+    "what": {
+      "en": "A control unit stopped hearing another one on the vehicle's network (usually CAN).",
+      "ru": "Блок перестал «слышать» другой блок в сети автомобиля (обычно CAN)."
+    },
+    "symptoms": {
+      "en": "Warning lamps, missing gauges, functions of the silent unit do not work.",
+      "ru": "Горят контрольные лампы, не работают приборы, функции «молчащего» блока недоступны."
+    },
+    "causes": [
+      {
+        "en": "The other unit has no supply or ground (fuse!).",
+        "ru": "У другого блока нет питания или массы (предохранитель!)."
+      },
+      {
+        "en": "Damaged network wiring or a corroded connector.",
+        "ru": "Повреждена проводка сети или окислился разъём."
+      },
+      {
+        "en": "Low battery voltage during start.",
+        "ru": "Низкое напряжение аккумулятора при пуске."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Check the fuses and supply of the unit named in the code.",
+        "ru": "Проверьте предохранители и питание блока, указанного в коде."
+      },
+      {
+        "en": "With the ignition off, the resistance between CAN High and CAN Low (OBD pins 6 and 14) should be about 60 Ω.",
+        "ru": "При выключенном зажигании сопротивление между CAN High и CAN Low (контакты 6 и 14 разъёма OBD) должно быть около 60 Ом."
+      },
+      {
+        "en": "Clear the codes: old network codes often remain after a flat battery.",
+        "ru": "Сотрите коды: старые коды связи часто остаются после разряда аккумулятора."
+      }
+    ]
+  },
+  {
+    "id": "immo",
+    "severity": "soon",
+    "title": {
+      "en": "Immobiliser",
+      "ru": "Иммобилайзер"
+    },
+    "what": {
+      "en": "The anti-theft system did not recognise the key or lost contact with the engine control unit.",
+      "ru": "Противоугонная система не распознала ключ или потеряла связь с блоком управления двигателем."
+    },
+    "symptoms": {
+      "en": "The engine does not start or stops after a second.",
+      "ru": "Двигатель не заводится или глохнет через секунду."
+    },
+    "causes": [
+      {
+        "en": "A key that is not programmed, a weak key transponder.",
+        "ru": "Непрописанный ключ, слабый транспондер ключа."
+      },
+      {
+        "en": "Wiring between the immobiliser and the control unit.",
+        "ru": "Проводка между иммобилайзером и блоком управления."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Try the second original key.",
+        "ru": "Попробуйте второй оригинальный ключ."
+      },
+      {
+        "en": "Check the immobiliser's fuse and connectors.",
+        "ru": "Проверьте предохранитель и разъёмы иммобилайзера."
+      },
+      {
+        "en": "Programming keys is done by an authorised service; this program does not program immobilisers.",
+        "ru": "Прописывание ключей выполняет авторизованный сервис; эта программа иммобилайзеры не программирует."
+      }
+    ]
+  },
+  {
+    "id": "mil",
+    "severity": "info",
+    "title": {
+      "en": "Check-engine lamp circuit",
+      "ru": "Цепь лампы «Check Engine»"
+    },
+    "what": {
+      "en": "The control unit found an open or short in the warning lamp's circuit.",
+      "ru": "Блок обнаружил обрыв или замыкание в цепи контрольной лампы."
+    },
+    "symptoms": {
+      "en": "The lamp does not light at ignition on, or never goes out.",
+      "ru": "Лампа не загорается при включении зажигания или не гаснет."
+    },
+    "causes": [
+      {
+        "en": "Burnt bulb or LED, damaged wiring, instrument cluster connector.",
+        "ru": "Перегорела лампа или светодиод, повреждена проводка, разъём комбинации приборов."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Switch the lamp from the Service page.",
+        "ru": "Включите лампу из раздела «Сервис»."
+      },
+      {
+        "en": "Check the bulb and the wiring to the instrument cluster.",
+        "ru": "Проверьте лампу и проводку до комбинации приборов."
+      }
+    ]
+  },
+  {
+    "id": "overheat",
+    "severity": "stop",
+    "title": {
+      "en": "Engine overheating",
+      "ru": "Перегрев двигателя"
+    },
+    "what": {
+      "en": "The coolant got hotter than the engine can stand for long. Driving on can warp the cylinder head and blow the head gasket.",
+      "ru": "Охлаждающая жидкость нагрелась сильнее, чем двигатель выдерживает долго. Дальнейшая езда грозит короблением головки блока и пробоем прокладки."
+    },
+    "symptoms": {
+      "en": "The gauge in the red, steam, the heater blows cold air, loss of power.",
+      "ru": "Стрелка в красной зоне, пар из-под капота, печка дует холодным, падение мощности."
+    },
+    "causes": [
+      {
+        "en": "Low coolant level (leak).",
+        "ru": "Низкий уровень ОЖ (утечка)."
+      },
+      {
+        "en": "The cooling fan does not switch on.",
+        "ru": "Не включается вентилятор."
+      },
+      {
+        "en": "Thermostat stuck closed, worn water pump, clogged radiator.",
+        "ru": "Термостат заклинил закрытым, изношена помпа, забит радиатор."
+      },
+      {
+        "en": "Blown head gasket (bubbles in the expansion tank).",
+        "ru": "Пробита прокладка головки блока (пузыри в расширительном бачке)."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Stop and switch the engine off. Never open the cooling system while it is hot.",
+        "ru": "Остановитесь и заглушите двигатель. Не открывайте систему охлаждения на горячем двигателе."
+      },
+      {
+        "en": "When cold, check the coolant level and look for leaks.",
+        "ru": "На остывшем двигателе проверьте уровень ОЖ и поищите утечки."
+      },
+      {
+        "en": "Switch the fan on from the Service page to check it.",
+        "ru": "Проверьте вентилятор, включив его в разделе «Сервис»."
+      },
+      {
+        "en": "Compare the temperature reading with a thermometer to rule out the sensor.",
+        "ru": "Сравните показание температуры с термометром, чтобы исключить датчик."
+      }
+    ]
+  },
+  {
+    "id": "copot",
+    "severity": "info",
+    "title": {
+      "en": "CO trim potentiometer",
+      "ru": "Корректор СО (СО-потенциометр)"
+    },
+    "what": {
+      "en": "On engines without an oxygen sensor the idle mixture is set with a potentiometer (or with a value in the control unit) using a gas analyser.",
+      "ru": "На двигателях без датчика кислорода состав смеси на холостом ходу настраивают потенциометром (или значением в блоке) по газоанализатору."
+    },
+    "symptoms": {
+      "en": "Wrong CO at idle: uneven idle, smell of fuel or a lean stumble.",
+      "ru": "Неверный СО на холостом ходу: неровный ХХ, запах топлива или провалы."
+    },
+    "causes": [
+      {
+        "en": "Damaged potentiometer or its wiring, no 5 V reference.",
+        "ru": "Неисправен потенциометр или его проводка, нет опорных 5 В."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Check the potentiometer, its connector and the 5 V reference.",
+        "ru": "Проверьте потенциометр, его разъём и опорные 5 В."
+      },
+      {
+        "en": "Set the CO with a gas analyser at a service that has one.",
+        "ru": "Регулируйте СО по газоанализатору на сервисе, где он есть."
+      }
+    ]
+  },
+  {
+    "id": "outputcircuit",
+    "severity": "soon",
+    "title": {
+      "en": "Output circuit (relay, valve, gauge signal)",
+      "ru": "Цепь управления (реле, клапан, выход на прибор)"
+    },
+    "what": {
+      "en": "The control unit found an open circuit or a short in something it switches: a relay, a valve or a signal to the instruments.",
+      "ru": "Блок обнаружил обрыв или замыкание в цепи того, чем он управляет: реле, клапана или сигнала на приборы."
+    },
+    "symptoms": {
+      "en": "The device named in the code does not work (for example the A/C, the tachometer or the trip computer).",
+      "ru": "Не работает устройство из описания кода (например, кондиционер, тахометр или маршрутный компьютер)."
+    },
+    "causes": [
+      {
+        "en": "The device itself: an open or shorted relay coil or valve winding.",
+        "ru": "Само устройство: обрыв или замыкание обмотки реле или клапана."
+      },
+      {
+        "en": "Damaged wiring, a corroded connector, a blown fuse.",
+        "ru": "Повреждена проводка, окислился разъём, сгорел предохранитель."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Measure the resistance of the relay coil or valve and compare with a known good one.",
+        "ru": "Измерьте сопротивление обмотки реле или клапана и сравните с исправным."
+      },
+      {
+        "en": "Check its +12 V supply and fuse, then the wire to the control unit.",
+        "ru": "Проверьте его питание +12 В и предохранитель, затем провод до блока."
+      },
+      {
+        "en": "If the Service page has a test for it, switch it from there.",
+        "ru": "Если в разделе «Сервис» есть тест этого устройства — включите его оттуда."
+      }
+    ]
+  },
+  {
+    "id": "selftest",
+    "severity": "info",
+    "title": {
+      "en": "Self-diagnosis mode",
+      "ru": "Режим самодиагностики"
+    },
+    "what": {
+      "en": "Not a fault: the control unit reports that its self-diagnosis (blink code) mode is on.",
+      "ru": "Это не неисправность: блок сообщает, что включён режим самодиагностики (вывод кодов лампой)."
+    },
+    "symptoms": {
+      "en": "The check-engine lamp blinks codes.",
+      "ru": "Лампа «Check Engine» мигает кодами."
+    },
+    "causes": [
+      {
+        "en": "The diagnostic contacts are bridged, or the diagnostic wire is shorted to ground.",
+        "ru": "Замкнуты контакты диагностики или диагностический провод замкнут на массу."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Remove the bridge from the diagnostic socket.",
+        "ru": "Снимите перемычку с колодки диагностики."
+      },
+      {
+        "en": "If nobody bridged it, look for a short to ground in the diagnostic wiring and the socket.",
+        "ru": "Если перемычки не было — ищите замыкание на массу в проводке и колодке диагностики."
+      }
+    ]
+  },
+  {
+    "id": "generic",
+    "severity": "info",
+    "title": {
+      "en": "General advice",
+      "ru": "Общие рекомендации"
+    },
+    "what": {
+      "en": "No specific advice for this code yet — the general approach still finds most faults.",
+      "ru": "Для этого кода пока нет отдельной подсказки — общий порядок всё равно находит большинство неисправностей."
+    },
+    "symptoms": {
+      "en": "Depend on the system named in the code.",
+      "ru": "Зависят от системы, указанной в коде."
+    },
+    "causes": [
+      {
+        "en": "Most faults are in connectors and wiring, then in the sensor or actuator, rarely in the control unit.",
+        "ru": "Чаще всего виноваты разъёмы и проводка, затем датчик или исполнительный механизм, редко — блок управления."
+      }
+    ],
+    "checks": [
+      {
+        "en": "Write the codes down or print the report, then clear them and drive: see which code returns.",
+        "ru": "Запишите коды или распечатайте отчёт, сотрите их и проедьте: посмотрите, какой код вернётся."
+      },
+      {
+        "en": "Inspect the connector and wiring of the part named in the code; check its supply and ground.",
+        "ru": "Осмотрите разъём и проводку узла из описания кода; проверьте его питание и массу."
+      },
+      {
+        "en": "Compare its readings in Live data with the manual.",
+        "ru": "Сравните его показания в «Параметрах» с руководством."
+      }
+    ]
+  }
+]

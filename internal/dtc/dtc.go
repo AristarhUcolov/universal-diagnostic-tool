@@ -29,6 +29,7 @@ type DTC struct {
 	Protocol  string            `json:"protocol,omitempty"`
 	Family    string            `json:"family,omitempty"` // description family used
 	Extra     map[string]string `json:"extra,omitempty"`
+	Hint      string            `json:"hint,omitempty"` // id of the repair advice (package repair)
 }
 
 // Status flag keys. The user interface translates them.

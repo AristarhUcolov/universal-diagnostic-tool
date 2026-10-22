@@ -1,6 +1,38 @@
+import { api } from '../api.js';
 import { t, tr } from '../i18n.js';
 import { el } from '../ui.js';
 import { store, currentECU } from '../app.js';
+
+let hintsCache = null;
+
+// repairHints loads the repair advice once: id -> hint.
+export async function repairHints() {
+  if (!hintsCache) {
+    const r = await api.get('/api/repair');
+    hintsCache = Object.fromEntries((r.hints || []).map(h => [h.id, h]));
+  }
+  return hintsCache;
+}
+
+// sevBadge shows how urgent a fault is, with an icon so that it does
+// not rely on colour alone.
+export function sevBadge(sev) {
+  const cls = { stop: '.bad', soon: '.warn', info: '.info' }[sev] || '';
+  const icon = { stop: '⚠', soon: '!', info: 'i' }[sev] || '';
+  return el('span.badge' + cls, icon + ' ' + t('sev.' + sev));
+}
+
+// hintCard is the "what to check" advice for a trouble code.
+export function hintCard(h) {
+  return el('div.hint-card',
+    el('div.hint-title', el('b', tr(h.title)), sevBadge(h.severity)),
+    el('p', tr(h.what)),
+    el('p.secondary.small', el('b', t('hint.symptoms') + ': '), tr(h.symptoms)),
+    el('div.hint-cols',
+      el('div', el('h4', t('hint.causes')), el('ul', (h.causes || []).map(c => el('li', tr(c))))),
+      el('div', el('h4', t('hint.checks')), el('ol', (h.checks || []).map(c => el('li', tr(c)))))),
+    el('p.muted.small', t('hint.note')));
+}
 
 // ecuSelect shows a selector when the session has several control units.
 export function ecuSelect(onChange) {

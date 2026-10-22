@@ -11,6 +11,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/dtc"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/hexutil"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/i18n"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/legacy"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/uds"
 )
@@ -32,18 +33,29 @@ type DefHandler struct {
 	t      diag.Timing
 	params []Param
 	index  map[string]paramRef
-	active map[string]*ActDef
+
+	// amu guards the outputs switched on by the tester. It is taken
+	// after mu when both are needed.
+	amu  sync.Mutex
+	held map[string]*heldOutput
+}
+
+// heldOutput is an output switched on by the tester and the timer that
+// hands it back to the control unit.
+type heldOutput struct {
+	act   *ActDef
+	timer *time.Timer
 }
 
 // NewDefHandler creates a handler for a KWP2000 ("kwp2000") or UDS
 // ("uds") control unit.
 func NewDefHandler(ch diag.Channel, def *Definition, proto, name string) *DefHandler {
 	h := &DefHandler{ch: ch, def: def, proto: proto, name: name, t: diag.DefaultTiming(),
-		index: map[string]paramRef{}, active: map[string]*ActDef{}}
+		index: map[string]paramRef{}, held: map[string]*heldOutput{}}
 	if def != nil {
-		if h.name == "" {
-			h.name = def.Name
-		}
+		// A recognised unit is named after its description; the generic
+		// name ("KWP2000 control unit 0x10") is for unknown ones only.
+		h.name = def.Name
 		for bi := range def.Blocks {
 			b := &def.Blocks[bi]
 			for pi := range b.Params {
@@ -62,7 +74,7 @@ func (h *DefHandler) Definition() *Definition { return h.def }
 func (h *DefHandler) Describe() Description {
 	info := h.ch.Info()
 	d := Description{ID: "ecu", Name: h.name, Protocol: info.Protocol, Address: fmt.Sprintf("0x%02X", info.Target),
-		Status: "generic", Capabilities: []string{CapDTC, CapClear, CapRaw, CapBlocks}}
+		Status: "generic", Capabilities: []string{CapDTC, CapClear, CapRaw, CapBlocks, CapReset}}
 	if info.CAN {
 		d.Address = fmt.Sprintf("%X", info.Target)
 	}
@@ -278,6 +290,10 @@ func (h *DefHandler) Params() []Param { return h.params }
 func (h *DefHandler) Read(ctx context.Context, ids []string) ([]Value, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	return h.readLocked(ctx, ids)
+}
+
+func (h *DefHandler) readLocked(ctx context.Context, ids []string) ([]Value, error) {
 	data := map[*BlockDef][]byte{}
 	var firstErr error
 	for _, id := range ids {
@@ -326,11 +342,161 @@ func (h *DefHandler) Actuators() []Actuator {
 	if h.def == nil {
 		return nil
 	}
+	h.amu.Lock()
+	defer h.amu.Unlock()
 	out := make([]Actuator, 0, len(h.def.Actuators))
-	for _, a := range h.def.Actuators {
-		out = append(out, Actuator{ID: a.ID, Name: a.Name, Kind: a.Kind, Min: a.Min, Max: a.Max, Unit: a.Unit, Warning: a.Warning})
+	for i := range h.def.Actuators {
+		a := &h.def.Actuators[i]
+		act := Actuator{ID: a.ID, Name: a.Name, Kind: a.Kind, Min: a.Min, Max: a.Max, Unit: a.Unit, Warning: a.Warning,
+			Condition: a.Condition, Active: h.held[a.ID] != nil}
+		if a.Kind != "pulse" {
+			act.TimeoutS = int(outputTimeout(a) / time.Second)
+		}
+		out = append(out, act)
 	}
 	return out
+}
+
+// outputTimeout is how long an output may stay under the tester's
+// control before it is handed back to the control unit.
+func outputTimeout(a *ActDef) time.Duration {
+	s := a.TimeoutS
+	if s <= 0 {
+		s = 60
+	}
+	if s > 600 {
+		s = 600
+	}
+	return time.Duration(s) * time.Second
+}
+
+// engineRunning reads the engine speed (the value standing for OBD
+// PID 0C). ok is false when the unit has no such value.
+func (h *DefHandler) engineRunning(ctx context.Context) (running, ok bool) {
+	for _, p := range h.params {
+		if p.OBD != "0C" {
+			continue
+		}
+		vals, err := h.readLocked(ctx, []string{p.ID})
+		if err != nil || len(vals) == 0 || !vals[0].OK {
+			return false, false
+		}
+		return vals[0].V > 300, true
+	}
+	return false, false
+}
+
+// hold records an output switched on by the tester and hands it back to
+// the control unit when its time is up, so a forgotten fan or pump does
+// not stay on.
+func (h *DefHandler) hold(id string, act *ActDef) {
+	h.amu.Lock()
+	defer h.amu.Unlock()
+	if old := h.held[id]; old != nil {
+		old.timer.Stop()
+	}
+	o := &heldOutput{act: act}
+	o.timer = time.AfterFunc(outputTimeout(act), func() { h.release(id, o) })
+	h.held[id] = o
+}
+
+// forget drops an output from the held ones and returns it. With only
+// given, it does so just while that hold is the current one: a timer that
+// fired as the output was being switched on again must not end the new
+// hold.
+func (h *DefHandler) forget(id string, only *heldOutput) *ActDef {
+	h.amu.Lock()
+	defer h.amu.Unlock()
+	o := h.held[id]
+	if o == nil || only != nil && o != only {
+		return nil
+	}
+	o.timer.Stop()
+	delete(h.held, id)
+	return o.act
+}
+
+// release hands an output back to the control unit when the timer of
+// its hold o runs out.
+func (h *DefHandler) release(id string, o *heldOutput) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	act := h.forget(id, o)
+	if act == nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if req, err := Fill(act.Off, 0); err == nil {
+		_, _ = h.request(ctx, req)
+	}
+}
+
+// releaseAll hands every held output back to the control unit (send) or
+// only forgets them (after a restart the unit has dropped them itself).
+func (h *DefHandler) releaseAll(ctx context.Context, send bool) {
+	h.amu.Lock()
+	ids := make([]string, 0, len(h.held))
+	for id := range h.held {
+		ids = append(ids, id)
+	}
+	h.amu.Unlock()
+	for _, id := range ids {
+		act := h.forget(id, nil)
+		if act == nil || !send {
+			continue
+		}
+		if req, err := Fill(act.Off, 0); err == nil {
+			_, _ = h.request(ctx, req)
+		}
+	}
+}
+
+// Reset restarts the control unit (ecuReset, "power on" mode, as the
+// ignition key would) and restores the session. Outputs held by the
+// tester are forgotten: the unit drops them when it restarts.
+func (h *DefHandler) Reset(ctx context.Context) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.releaseAll(ctx, false)
+	if _, err := h.request(ctx, []byte{0x11, 0x01}); err != nil {
+		return err
+	}
+	// The unit answers first and restarts afterwards.
+	if err := sleepCtx(ctx, time.Second); err != nil {
+		return err
+	}
+	if r, ok := h.ch.(interface{ Reinit(context.Context) error }); ok {
+		var err error
+		for attempt := 0; attempt < 4; attempt++ {
+			if err = r.Reinit(ctx); err == nil {
+				break
+			}
+			if serr := sleepCtx(ctx, time.Second); serr != nil {
+				return serr
+			}
+		}
+		if err != nil {
+			return fmt.Errorf("the control unit restarted but does not answer again: %w", err)
+		}
+	}
+	if h.def != nil && h.def.Session != "" {
+		if req, err := hexutil.Parse(h.def.Session); err == nil {
+			_, _ = h.request(ctx, req)
+		}
+	}
+	return nil
+}
+
+func sleepCtx(ctx context.Context, d time.Duration) error {
+	t := time.NewTimer(d)
+	defer t.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-t.C:
+		return nil
+	}
 }
 
 // Actuate runs an output test: action "on"/"off" for toggles, "pulse"
@@ -357,6 +523,17 @@ func (h *DefHandler) Actuate(ctx context.Context, id, action string, value float
 		}
 		return h.request(ctx, req)
 	}
+	if act.Condition != "" && action != "off" {
+		running, ok := h.engineRunning(ctx)
+		if !ok {
+			// Not knowing is not permission: an injector pulse into a
+			// running engine is exactly what the condition prevents.
+			return "", &ConditionError{Need: act.Condition, Unknown: true}
+		}
+		if act.Condition == "engine_off" && running || act.Condition == "engine_running" && !running {
+			return "", &ConditionError{Need: act.Condition}
+		}
+	}
 	switch {
 	case act.Kind == "pulse" || action == "pulse":
 		if _, err := send(act.On); err != nil {
@@ -372,7 +549,7 @@ func (h *DefHandler) Actuate(ctx context.Context, id, action string, value float
 	case action == "on":
 		resp, err := send(act.On)
 		if err == nil {
-			h.active[id] = act
+			h.hold(id, act)
 		}
 		return hexutil.Format(resp), err
 	case action == "set":
@@ -381,12 +558,12 @@ func (h *DefHandler) Actuate(ctx context.Context, id, action string, value float
 		}
 		resp, err := send(act.Set)
 		if err == nil {
-			h.active[id] = act
+			h.hold(id, act)
 		}
 		return hexutil.Format(resp), err
 	case action == "off":
+		h.forget(id, nil)
 		resp, err := send(act.Off)
-		delete(h.active, id)
 		return hexutil.Format(resp), err
 	}
 	return "", fmt.Errorf("unknown action %q", action)
@@ -461,15 +638,10 @@ func (h *DefHandler) ReadBlock(ctx context.Context, id string) ([]byte, error) {
 
 func (h *DefHandler) Close() error {
 	h.mu.Lock()
+	defer h.mu.Unlock()
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	for id, act := range h.active {
-		if req, err := Fill(act.Off, 0); err == nil {
-			_, _ = h.request(ctx, req)
-		}
-		delete(h.active, id)
-	}
+	h.releaseAll(ctx, true)
 	cancel()
-	h.mu.Unlock()
 	return h.ch.Close()
 }
 
@@ -483,12 +655,18 @@ type LegacyHandler struct {
 	params  []Param
 	index   map[string]*ParamDef
 	adapter string
+	// sizes holds the answer length of parameter codes whose real
+	// length differs from the description, learned from the unit.
+	sizes map[byte]int
+	// Log receives the warnings about such parameters.
+	Log journal.Logger
 }
 
 // NewLegacyHandler creates the handler; version is the answer to the
 // version request.
 func NewLegacyHandler(link *legacy.Link, def *Definition, version byte, adapter string) *LegacyHandler {
-	h := &LegacyHandler{link: link, def: def, version: version, index: map[string]*ParamDef{}, adapter: adapter}
+	h := &LegacyHandler{link: link, def: def, version: version, index: map[string]*ParamDef{}, adapter: adapter,
+		sizes: map[byte]int{}, Log: journal.Discard}
 	if def != nil {
 		for bi := range def.Blocks {
 			for pi := range def.Blocks[bi].Params {
@@ -598,16 +776,14 @@ func (h *LegacyHandler) Read(ctx context.Context, ids []string) ([]Value, error)
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	var codes []byte
-	var sizes []int
-	have := map[byte]bool{}
+	rep := map[byte]*ParamDef{} // one parameter per code (bit flags share a code)
 	for _, id := range ids {
 		p, ok := h.index[id]
-		if !ok || have[p.code] {
+		if !ok || rep[p.code] != nil {
 			continue
 		}
-		have[p.code] = true
+		rep[p.code] = p
 		codes = append(codes, p.code)
-		sizes = append(sizes, p.Size())
 	}
 	raw := map[byte][]byte{}
 	for i := 0; i < len(codes); i += 12 {
@@ -615,16 +791,16 @@ func (h *LegacyHandler) Read(ctx context.Context, ids []string) ([]Value, error)
 		if end > len(codes) {
 			end = len(codes)
 		}
-		resp, err := h.link.ReadParams(ctx, codes[i:end], sizes[i:end])
+		batch := codes[i:end]
+		resp, err := h.readBatch(ctx, batch, rep)
 		if err != nil {
 			return nil, err
 		}
 		off := 0
-		for j := i; j < end; j++ {
-			if off+sizes[j] <= len(resp) {
-				raw[codes[j]] = resp[off : off+sizes[j]]
-			}
-			off += sizes[j]
+		for _, c := range batch {
+			n := h.size(rep[c])
+			raw[c] = resp[off : off+n]
+			off += n
 		}
 	}
 	out := make([]Value, 0, len(ids))
@@ -634,9 +810,64 @@ func (h *LegacyHandler) Read(ctx context.Context, ids []string) ([]Value, error)
 			out = append(out, Value{ID: id})
 			continue
 		}
-		out = append(out, p.Decode(raw[p.code]))
+		b := raw[p.code]
+		if len(b) != p.Size() {
+			// The unit sends this value in another size than its
+			// description says: show the bytes, not a wrong number.
+			out = append(out, Value{ID: id, Raw: hexutil.Format(b)})
+			continue
+		}
+		out = append(out, p.Decode(b))
 	}
 	return out, nil
+}
+
+// size is the length of a parameter's answer: what the unit really sends
+// when that differs from the description.
+func (h *LegacyHandler) size(p *ParamDef) int {
+	if n, ok := h.sizes[p.code]; ok {
+		return n
+	}
+	return p.Size()
+}
+
+// readBatch asks for several parameters at once. When the answer's
+// length does not add up, the values would land in the wrong places, so
+// each parameter is asked for alone to learn its real length.
+func (h *LegacyHandler) readBatch(ctx context.Context, batch []byte, rep map[byte]*ParamDef) ([]byte, error) {
+	want := func() int {
+		n := 0
+		for _, c := range batch {
+			n += h.size(rep[c])
+		}
+		return n
+	}
+	req := append([]byte{legacy.CmdReadParams}, batch...)
+	resp, err := h.link.Transact(ctx, req)
+	if err != nil || len(resp) == want() {
+		return resp, err
+	}
+	journal.Warnf(h.Log, "legacy", "answer has %d bytes, the description expects %d: reading the parameters one by one", len(resp), want())
+	for _, c := range batch {
+		one, err := h.link.Transact(ctx, []byte{legacy.CmdReadParams, c})
+		if err != nil {
+			return nil, err
+		}
+		p := rep[c]
+		if len(one) != p.Size() {
+			h.sizes[c] = len(one)
+			journal.Warnf(h.Log, "legacy", "parameter %s (code %02X): the control unit sends %d byte(s), the description expects %d; the value is not shown",
+				p.ID, c, len(one), p.Size())
+		}
+	}
+	resp, err = h.link.Transact(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if len(resp) != want() {
+		return nil, fmt.Errorf("legacy: answer has %d bytes, expected %d", len(resp), want())
+	}
+	return resp, nil
 }
 
 func (h *LegacyHandler) Actuators() []Actuator { return nil }

@@ -58,6 +58,13 @@ type Actuator struct {
 	Max     float64   `json:"max,omitempty"`
 	Unit    string    `json:"unit,omitempty"`
 	Warning i18n.Text `json:"warning,omitempty"`
+	// Condition is what the test needs: "engine_off" or
+	// "engine_running" (empty: either).
+	Condition string `json:"condition,omitempty"`
+	// TimeoutS is when a switched-on output is handed back to the
+	// control unit automatically.
+	TimeoutS int  `json:"timeoutS,omitempty"`
+	Active   bool `json:"active,omitempty"`
 }
 
 // Description summarises a handler for the user interface.
@@ -83,7 +90,42 @@ const (
 	CapFreeze    = "freeze"
 	CapReadiness = "readiness"
 	CapBlocks    = "blocks"
+	CapReset     = "reset"
 )
+
+// Resetter is implemented by handlers that can restart their control
+// unit (ecuReset) and restore communication afterwards.
+type Resetter interface {
+	Reset(ctx context.Context) error
+}
+
+// ConditionError reports that an output test needs the engine stopped
+// ("engine_off") or running ("engine_running") first. Unknown: the
+// engine speed could not be read, so the condition could not be checked
+// and the test was not started.
+type ConditionError struct {
+	Need    string
+	Unknown bool
+}
+
+func (e *ConditionError) Error() string {
+	switch {
+	case e.Unknown:
+		return "the engine speed could not be read, so the program cannot make sure the engine is in the state this test needs; the test was not started"
+	case e.Need == "engine_off":
+		return "stop the engine first: this test runs with the engine off"
+	}
+	return "start the engine first: this test needs a running engine"
+}
+
+// Code names the error for the interface: engine_off, engine_running or
+// engine_unknown.
+func (e *ConditionError) Code() string {
+	if e.Unknown {
+		return "engine_unknown"
+	}
+	return e.Need
+}
 
 // Handler is the uniform interface to one control unit.
 type Handler interface {
