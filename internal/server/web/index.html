@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="udt-token" content="[[.Token]]">
+<meta name="udt-version" content="[[.Version]]">
+<title>Universal Diagnostic Tool</title>
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/app.css">
+<script type="module" src="/assets/js/app.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <img src="/assets/icon.svg" alt="" width="28" height="28">
+      <div><b>UDT</b><span class="muted small" data-i18n="brand.sub">Universal Diagnostic Tool</span></div>
+    </div>
+    <nav id="nav">
+      <a href="#/connect" data-page="connect"><span class="ico">⏻</span><span data-i18n="nav.connect">Connect</span></a>
+      <a href="#/dashboard" data-page="dashboard"><span class="ico">◉</span><span data-i18n="nav.dashboard">Overview</span></a>
+      <a href="#/dtc" data-page="dtc"><span class="ico">⚠</span><span data-i18n="nav.dtc">Trouble codes</span></a>
+      <a href="#/live" data-page="live"><span class="ico">∿</span><span data-i18n="nav.live">Live data</span></a>
+      <a href="#/info" data-page="info"><span class="ico">ⓘ</span><span data-i18n="nav.info">Control unit</span></a>
+      <a href="#/tests" data-page="tests"><span class="ico">⚙</span><span data-i18n="nav.tests">Output tests</span></a>
+      <a href="#/terminal" data-page="terminal"><span class="ico">⌨</span><span data-i18n="nav.terminal">Terminal</span></a>
+      <a href="#/bus" data-page="bus"><span class="ico">⇄</span><span data-i18n="nav.bus">CAN monitor</span></a>
+      <a href="#/journal" data-page="journal"><span class="ico">☰</span><span data-i18n="nav.journal">Journal</span></a>
+      <a href="#/reference" data-page="reference"><span class="ico">📖</span><span data-i18n="nav.reference">Reference</span></a>
+      <a href="#/settings" data-page="settings"><span class="ico">☼</span><span data-i18n="nav.settings">Settings</span></a>
+    </nav>
+    <div class="side-foot muted small" id="side-foot"></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div id="conn-pill" class="pill"><span class="dot"></span><span id="conn-text"></span></div>
+      <div class="top-right">
+        <span id="volt" class="pill hidden"></span>
+        <button id="lang-btn" class="ghost small" title="Language / Язык">RU</button>
+        <button id="theme-btn" class="ghost small" title="Theme">◐</button>
+      </div>
+    </header>
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+<div id="toasts" aria-live="polite"></div>
+<dialog id="dialog"><form method="dialog"><h3 id="dlg-title"></h3><div id="dlg-body"></div>
+<menu><button value="cancel" class="ghost" id="dlg-cancel"></button><button value="ok" id="dlg-ok" class="primary"></button></menu></form></dialog>
+</body>
+</html>

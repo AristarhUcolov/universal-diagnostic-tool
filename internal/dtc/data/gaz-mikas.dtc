@@ -1,0 +1,165 @@
+# Numeric fault codes of GAZ engine controllers that use the legacy
+# K-Line protocol (Микас-5.4, Микас-7.1/7.2, Автрон): ZMZ-4062, ZMZ-4063,
+# ZMZ-409 and others. The controller sends each code as one byte whose
+# decimal value is the code (0x35 = 53 -> "053"); the same numbers are
+# flashed by the check-engine lamp in self-diagnosis mode.
+# Source: fault list published by 2a2.ru ("Руководство по поиску
+# неисправностей в ЭСУД ГАЗ"). Codes for cylinders 5-8 belong to V8
+# engines; codes marked "Автрон" exist only on Автрон controllers.
+# Format: CODE | English | Russian
+012 | Self-diagnosis mode active (L-line shorted to ground) | Включён режим самодиагностики блока (замыкание L-линии на массу)
+013 | Mass air flow sensor signal low | Низкий уровень сигнала датчика расхода воздуха
+014 | Mass air flow sensor signal high | Высокий уровень сигнала датчика расхода воздуха
+015 | Manifold absolute pressure sensor signal low | Низкий уровень сигнала датчика абсолютного давления воздуха
+016 | Manifold absolute pressure sensor signal high | Высокий уровень сигнала датчика абсолютного давления воздуха
+017 | Intake air temperature sensor signal low | Низкий уровень сигнала датчика температуры воздуха
+018 | Intake air temperature sensor signal high | Высокий уровень сигнала датчика температуры воздуха
+019 | Engine overheating (coolant above 105 °C) | Перегрев двигателя (температура охлаждающей жидкости выше 105 °C)
+021 | Coolant temperature sensor signal low | Низкий уровень сигнала датчика температуры охлаждающей жидкости
+022 | Coolant temperature sensor signal high | Высокий уровень сигнала датчика температуры охлаждающей жидкости
+023 | Throttle position sensor signal low | Низкий уровень сигнала датчика положения дроссельной заслонки
+024 | Throttle position sensor signal high | Высокий уровень сигнала датчика положения дроссельной заслонки
+025 | Battery voltage low | Низкий уровень напряжения в бортовой сети
+026 | Battery voltage high | Высокий уровень напряжения в бортовой сети
+027 | Throttle position sensor initial setting incorrect | Неправильная начальная установка датчика положения дроссельной заслонки
+028 | Engine speed exceeded the maximum | Частота вращения коленчатого вала превысила максимум
+029 | Crankshaft speed sensor connected incorrectly | Неправильное подключение датчика частоты вращения коленчатого вала
+031 | CO trimmer (first) signal low | Низкий уровень сигнала (первого) корректора СО
+032 | CO trimmer (first) signal high | Высокий уровень сигнала (первого) корректора СО
+033 | Second CO trimmer signal low | Низкий уровень сигнала второго корректора СО
+034 | Second CO trimmer signal high | Высокий уровень сигнала второго корректора СО
+035 | Main (first) oxygen sensor signal low | Низкий уровень сигнала основного (первого) лямбда-зонда
+036 | Main (first) oxygen sensor signal high | Высокий уровень сигнала основного (первого) лямбда-зонда
+037 | Additional (second) oxygen sensor signal low | Низкий уровень сигнала дополнительного (второго) лямбда-зонда
+038 | Additional (second) oxygen sensor signal high | Высокий уровень сигнала дополнительного (второго) лямбда-зонда
+041 | Knock sensor (first) circuit fault | Неисправность цепи (первого) датчика детонации
+042 | Second knock sensor circuit fault | Неисправность цепи второго датчика детонации
+043 | EGR valve position sensor signal low | Низкий уровень сигнала датчика положения клапана рециркуляции
+044 | EGR valve position sensor signal high | Высокий уровень сигнала датчика положения клапана рециркуляции
+045 | Canister valve position sensor signal low | Низкий уровень сигнала датчика положения клапана адсорбера
+046 | Canister valve position sensor signal high | Высокий уровень сигнала датчика положения клапана адсорбера
+047 | Power steering sensor signal low | Низкий уровень сигнала датчика гидроусилителя руля
+048 | Power steering sensor signal high | Высокий уровень сигнала датчика гидроусилителя руля
+051 | Control unit fault 1 | Неисправность 1 блока управления
+052 | Control unit fault 2 | Неисправность 2 блока управления
+053 | Crankshaft position sensor fault | Неисправность датчика положения коленчатого вала
+054 | Camshaft position (phase) sensor fault | Неисправность датчика положения распределительного вала
+055 | Vehicle speed sensor fault | Неисправность датчика скорости автомобиля
+056 | Ignition coil circuit cylinders 1/4 short circuit (Автрон) | Короткое замыкание цепи катушки зажигания цилиндров 1/4 (Автрон)
+057 | Ignition coil circuit cylinders 2/3 short circuit (Автрон) | Короткое замыкание цепи катушки зажигания цилиндров 2/3 (Автрон)
+058 | Crankshaft position sensor circuit open (Автрон) | Обрыв цепи датчика положения коленчатого вала (Автрон)
+061 | Control unit reset during operation | Сброс блока управления в рабочем состоянии
+062 | Control unit RAM fault | Неисправность оперативной памяти блока управления
+063 | Control unit ROM fault | Неисправность постоянной памяти блока управления
+064 | Control unit flash read error | Неисправность при чтении флэш-памяти блока управления
+065 | Control unit flash write error | Неисправность при записи во флэш-память блока управления
+066 | Control unit identification code read error | Неисправность при чтении кода идентификации блока управления
+067 | Immobiliser fault 1 | Неисправность 1 иммобилизатора
+068 | Immobiliser fault 2 | Неисправность 2 иммобилизатора
+069 | Immobiliser fault 3 | Неисправность 3 иммобилизатора
+071 | Idle speed too low | Низкая частота вращения коленчатого вала на холостом ходу
+072 | Idle speed too high | Высокая частота вращения коленчатого вала на холостом ходу
+073 | Oxygen sensor 1 reports rich at maximum leaning | Сигнал богатой смеси от лямбда-зонда 1 при максимальном обеднении
+074 | Oxygen sensor 1 reports lean at maximum enrichment | Сигнал бедной смеси от лямбда-зонда 1 при максимальном обогащении
+075 | Oxygen sensor 2 reports rich at maximum leaning | Сигнал богатой смеси от лямбда-зонда 2 при максимальном обеднении
+076 | Oxygen sensor 2 reports lean at maximum enrichment | Сигнал бедной смеси от лямбда-зонда 2 при максимальном обогащении
+079 | EGR valve closed-loop control fault | Неисправность при регулировании клапана рециркуляции по сенсору
+081 | Maximum knock retard in cylinder 1 | Максимальное смещение УОЗ по детонации в цилиндре 1
+082 | Maximum knock retard in cylinder 2 | Максимальное смещение УОЗ по детонации в цилиндре 2
+083 | Maximum knock retard in cylinder 3 | Максимальное смещение УОЗ по детонации в цилиндре 3
+084 | Maximum knock retard in cylinder 4 | Максимальное смещение УОЗ по детонации в цилиндре 4
+085 | Maximum knock retard in cylinder 5 | Максимальное смещение УОЗ по детонации в цилиндре 5
+086 | Maximum knock retard in cylinder 6 | Максимальное смещение УОЗ по детонации в цилиндре 6
+087 | Maximum knock retard in cylinder 7 | Максимальное смещение УОЗ по детонации в цилиндре 7
+088 | Maximum knock retard in cylinder 8 | Максимальное смещение УОЗ по детонации в цилиндре 8
+091 | Ignition circuit 1 shorted to battery | Короткое замыкание на бортсеть в цепи 1 зажигания
+092 | Ignition circuit 2 shorted to battery | Короткое замыкание на бортсеть в цепи 2 зажигания
+093 | Ignition circuit 3 shorted to battery | Короткое замыкание на бортсеть в цепи 3 зажигания
+094 | Ignition circuit 4 shorted to battery | Короткое замыкание на бортсеть в цепи 4 зажигания
+095 | Ignition circuit 5 shorted to battery | Короткое замыкание на бортсеть в цепи 5 зажигания
+096 | Ignition circuit 6 shorted to battery | Короткое замыкание на бортсеть в цепи 6 зажигания
+097 | Ignition circuit 7 shorted to battery | Короткое замыкание на бортсеть в цепи 7 зажигания
+098 | Ignition circuit 8 shorted to battery | Короткое замыкание на бортсеть в цепи 8 зажигания
+099 | High voltage generator fault | Неисправность формирователя высокого напряжения
+131 | Injector 1 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 1
+132 | Injector 1 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 1
+133 | Injector 1 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 1
+134 | Injector 2 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 2
+135 | Injector 2 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 2
+136 | Injector 2 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 2
+137 | Injector 3 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 3
+138 | Injector 3 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 3
+139 | Injector 3 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 3
+141 | Injector 4 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 4
+142 | Injector 4 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 4
+143 | Injector 4 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 4
+144 | Injector 5 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 5
+145 | Injector 5 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 5
+146 | Injector 5 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 5
+147 | Injector 6 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 6
+148 | Injector 6 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 6
+149 | Injector 6 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 6
+151 | Injector 7 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 7
+152 | Injector 7 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 7
+153 | Injector 7 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 7
+154 | Injector 8 circuit shorted to battery | Короткое замыкание на бортсеть цепи форсунки 8
+155 | Injector 8 circuit open or shorted to ground | Обрыв или замыкание на массу цепи форсунки 8
+156 | Injector 8 circuit shorted to ground | Короткое замыкание на массу цепи форсунки 8
+157 | Cold start injector circuit shorted to battery | Короткое замыкание на бортсеть цепи пусковой форсунки
+158 | Cold start injector circuit open or shorted to ground | Обрыв или замыкание на массу цепи пусковой форсунки
+159 | Cold start injector circuit shorted to ground | Короткое замыкание на массу цепи пусковой форсунки
+161 | Idle air valve (РДВ) control circuit 1 shorted to battery | Короткое замыкание на бортсеть цепи 1 управления РДВ
+162 | Idle air valve (РДВ) control circuit 1 open or shorted to ground | Обрыв или замыкание на массу цепи 1 управления РДВ
+163 | Idle air valve (РДВ) control circuit 1 shorted to ground | Короткое замыкание на массу цепи 1 управления РДВ
+164 | Idle air valve (РДВ) control circuit 2 shorted to battery | Короткое замыкание на бортсеть цепи 2 управления РДВ
+165 | Idle air valve (РДВ) control circuit 2 open or shorted to ground | Обрыв или замыкание на массу цепи 2 управления РДВ
+166 | Idle air valve (РДВ) control circuit 2 shorted to ground | Короткое замыкание на массу цепи 2 управления РДВ
+167 | Fuel pump relay circuit shorted to battery | Короткое замыкание на бортсеть цепи реле электробензонасоса
+168 | Fuel pump relay circuit open or shorted to ground | Обрыв или замыкание на массу цепи реле электробензонасоса
+169 | Fuel pump relay circuit shorted to ground | Короткое замыкание на массу цепи реле электробензонасоса
+171 | EGR valve circuit shorted to battery | Короткое замыкание на бортсеть цепи клапана рециркуляции
+172 | EGR valve circuit open or shorted to ground | Обрыв или замыкание на массу цепи клапана рециркуляции
+173 | EGR valve circuit shorted to ground | Короткое замыкание на массу цепи клапана рециркуляции
+174 | Canister valve circuit shorted to battery | Короткое замыкание на бортсеть цепи клапана адсорбера
+175 | Canister valve circuit open or shorted to ground | Обрыв или замыкание на массу цепи клапана адсорбера
+176 | Canister valve circuit shorted to ground | Короткое замыкание на массу цепи клапана адсорбера
+177 | Main relay circuit shorted to battery | Короткое замыкание на бортсеть цепи главного реле
+178 | Main relay circuit open or shorted to ground | Обрыв или замыкание на массу цепи главного реле
+179 | Main relay circuit shorted to ground | Короткое замыкание на массу цепи главного реле
+181 | Check-engine lamp circuit shorted to battery | Короткое замыкание на бортсеть цепи лампы неисправности
+182 | Check-engine lamp circuit open or shorted to ground | Обрыв или замыкание на массу цепи лампы неисправности
+183 | Check-engine lamp circuit shorted to ground | Короткое замыкание на массу цепи лампы неисправности
+184 | Tachometer circuit shorted to battery | Короткое замыкание на бортсеть цепи тахометра
+185 | Tachometer circuit open or shorted to ground | Обрыв или замыкание на массу цепи тахометра
+186 | Tachometer circuit shorted to ground | Короткое замыкание на массу цепи тахометра
+187 | Fuel consumption meter circuit shorted to battery | Короткое замыкание на бортсеть цепи расходомера топлива
+188 | Fuel consumption meter circuit open or shorted to ground | Обрыв или замыкание на массу цепи расходомера топлива
+189 | Fuel consumption meter circuit shorted to ground | Короткое замыкание на массу цепи расходомера топлива
+191 | A/C relay circuit shorted to battery | Короткое замыкание на бортсеть цепи реле кондиционера
+192 | A/C relay circuit open or shorted to ground | Обрыв или замыкание на массу цепи реле кондиционера
+193 | A/C relay circuit shorted to ground | Короткое замыкание на массу цепи реле кондиционера
+194 | Cooling fan relay circuit shorted to battery | Короткое замыкание на бортсеть цепи реле вентилятора охлаждения
+195 | Cooling fan relay circuit open or shorted to ground | Обрыв или замыкание на массу цепи реле вентилятора охлаждения
+196 | Cooling fan relay circuit shorted to ground | Короткое замыкание на массу цепи реле вентилятора охлаждения
+197 | Idle fuel cut-off valve (ЭПХХ) circuit shorted to battery | Короткое замыкание на бортсеть цепи клапана ЭПХХ
+198 | Idle fuel cut-off valve (ЭПХХ) circuit open or shorted to ground | Обрыв или замыкание на массу цепи клапана ЭПХХ
+199 | Idle fuel cut-off valve (ЭПХХ) circuit shorted to ground | Короткое замыкание на массу цепи клапана ЭПХХ
+231 | Ignition circuit 1 open or shorted to ground | Обрыв или замыкание на массу цепи 1 зажигания
+232 | Ignition circuit 2 open or shorted to ground | Обрыв или замыкание на массу цепи 2 зажигания
+233 | Ignition circuit 3 open or shorted to ground | Обрыв или замыкание на массу цепи 3 зажигания
+234 | Ignition circuit 4 open or shorted to ground | Обрыв или замыкание на массу цепи 4 зажигания
+235 | Ignition circuit 5 open or shorted to ground | Обрыв или замыкание на массу цепи 5 зажигания
+236 | Ignition circuit 6 open or shorted to ground | Обрыв или замыкание на массу цепи 6 зажигания
+237 | Ignition circuit 7 open or shorted to ground | Обрыв или замыкание на массу цепи 7 зажигания
+238 | Ignition circuit 8 open or shorted to ground | Обрыв или замыкание на массу цепи 8 зажигания
+241 | Ignition circuit 1 shorted to ground | Короткое замыкание на массу цепи 1 зажигания
+242 | Ignition circuit 2 shorted to ground | Короткое замыкание на массу цепи 2 зажигания
+243 | Ignition circuit 3 shorted to ground | Короткое замыкание на массу цепи 3 зажигания
+244 | Ignition circuit 4 shorted to ground | Короткое замыкание на массу цепи 4 зажигания
+245 | Ignition circuit 5 shorted to ground | Короткое замыкание на массу цепи 5 зажигания
+246 | Ignition circuit 6 shorted to ground | Короткое замыкание на массу цепи 6 зажигания
+247 | Ignition circuit 7 shorted to ground | Короткое замыкание на массу цепи 7 зажигания
+248 | Ignition circuit 8 shorted to ground | Короткое замыкание на массу цепи 8 зажигания
+251 | MAF burn-off circuit shorted to battery | Короткое замыкание на бортсеть цепи прожига датчика расхода воздуха
+252 | MAF burn-off circuit open or shorted to ground | Обрыв или замыкание на массу цепи прожига датчика расхода воздуха
+253 | MAF burn-off circuit shorted to ground | Короткое замыкание на массу цепи прожига датчика расхода воздуха

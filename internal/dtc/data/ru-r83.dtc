@@ -1,0 +1,8 @@
+# Bosch M1.5.4 / Январь-5 software for "Russia-83" norms (no oxygen
+# sensor). Source: АвтоВАЗ KWP2000 specification, version G, 2000.
+# Only the codes that differ from the ru-kwp family are listed.
+# Format: CODE | English | Russian
+P0601 | No communication with the immobiliser | Нет связи с иммобилизатором
+P1171 | CO potentiometer signal low | Низкий уровень сигнала с потенциометра коррекции СО
+P1172 | CO potentiometer signal high | Высокий уровень сигнала с потенциометра коррекции СО
+P1612 | Processor reset error | Ошибка сброса процессора

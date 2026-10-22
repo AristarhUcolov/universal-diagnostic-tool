@@ -1,0 +1,46 @@
+name: Выпуск
+
+# Метка вида v1.0.0 — и через несколько минут на странице релизов лежит
+# готовая программа: udt.exe для Windows (открывается в своём окне),
+# udt-x86.exe для 32-битных драйверов J2534/RP1210 и сборки для Linux
+# (в том числе Raspberry Pi) и macOS (открываются в браузере).
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          check-latest: true
+
+      - name: Тесты
+        run: go test ./...
+
+      - name: Сборка
+        env:
+          CGO_ENABLED: '0'
+        run: |
+          mkdir dist
+          V="-X github.com/AristarhUcolov/universal-diagnostic-tool/internal/version.Version=${GITHUB_REF_NAME#v}"
+          # Без -H=windowsgui: та же программа работает и в командной строке.
+          GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w $V" -o dist/udt.exe ./cmd/udt
+          GOOS=windows GOARCH=386   go build -trimpath -ldflags "-s -w $V" -o dist/udt-x86.exe ./cmd/udt
+          GOOS=linux   GOARCH=amd64 go build -trimpath -ldflags "-s -w $V" -o dist/udt-linux-amd64 ./cmd/udt
+          GOOS=linux   GOARCH=arm64 go build -trimpath -ldflags "-s -w $V" -o dist/udt-linux-arm64 ./cmd/udt
+          GOOS=linux   GOARCH=arm GOARM=7 go build -trimpath -ldflags "-s -w $V" -o dist/udt-linux-armv7 ./cmd/udt
+          GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags "-s -w $V" -o dist/udt-macos-arm64 ./cmd/udt
+          GOOS=darwin  GOARCH=amd64 go build -trimpath -ldflags "-s -w $V" -o dist/udt-macos-amd64 ./cmd/udt
+
+      - name: Релиз
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Universal Diagnostic Tool $GITHUB_REF_NAME" --generate-notes

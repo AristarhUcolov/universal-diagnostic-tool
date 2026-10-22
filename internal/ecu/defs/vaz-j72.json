@@ -1,0 +1,17 @@
+{
+  "id": "vaz-j72",
+  "extends": "vaz-m154n-euro2",
+  "name": "Январь-7.2 (ВАЗ, Euro-2)",
+  "vendor": "Итэлма / Автэл",
+  "status": "partial",
+  "vehicles": ["ВАЗ-2110/2111/2112, 2113-2115, Нива 21214 с ЭБУ Январь-7.2"],
+  "sources": [
+    "Layout of the AvtoVAZ KWP2000 specification (M1.5.4N Euro-2)",
+    "Checked against a recorded Январь-7.2 answer to 21 01 (cxem.net, avto/electronics/4-116): coolant 31 °C, 12.3 V, O2 sensor 0.449 V, engine stopped"
+  ],
+  "notes": {
+    "en": "Январь-7.2 answers 21 01 with 36 data bytes: the first 34 follow the AvtoVAZ Euro-2 layout (decoded fields of a real answer are plausible), the last two are not documented.",
+    "ru": "Январь-7.2 отвечает на 21 01 36 байтами данных: первые 34 совпадают с раскладкой АвтоВАЗ Euro-2 (поля реального ответа расшифровываются правдоподобно), последние два не описаны."
+  },
+  "match": {"block_len": {"21 01": 38}, "ident": ["1411020-3", "I203", "J7"]}
+}

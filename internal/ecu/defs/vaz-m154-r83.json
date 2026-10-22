@@ -1,0 +1,67 @@
+{
+  "id": "vaz-m154-r83",
+  "extends": "vaz-m154n-euro2",
+  "name": "Bosch M1.5.4 / Январь-5 (Россия-83, без датчика кислорода)",
+  "family": "ru-r83",
+  "status": "verified",
+  "vehicles": ["ВАЗ-2110/2111/2112, 2108-21099, 2115 с ЭСУД под нормы Россия-83"],
+  "sources": ["АвтоВАЗ, Keyword Protocol 2000 specification for M1.5.4 / Январь-5 (Russia-83), version G, 04.12.2000 (Д.Б. Дударь)"],
+  "notes": {
+    "en": "No oxygen sensor; the mixture is set with the CO potentiometer. 32 data bytes in 21 01.",
+    "ru": "Без датчика кислорода, состав смеси задаётся потенциометром CO. 32 байта данных в 21 01."
+  },
+  "match": {"block_len": {"21 01": 34}},
+  "blocks": [
+    {
+      "id": "01",
+      "name": {"en": "After-sales data (RLI_ASS)", "ru": "Данные для СТО (RLI_ASS)"},
+      "request": "21 01",
+      "skip": 2,
+      "min_len": 32,
+      "params": [
+        {"id": "twat", "name": {"en": "Coolant temperature", "ru": "Температура охлаждающей жидкости"}, "offset": 8, "expr": "x-40", "unit": "°C", "min": -40, "max": 130, "group": "temperature", "obd": "05"},
+        {"id": "co_corr", "name": {"en": "CO correction factor", "ru": "Коэффициент коррекции CO"}, "offset": 9, "type": "s8", "expr": "x/256", "min": -0.5, "max": 0.5, "digits": 3, "group": "fuel"},
+        {"id": "thr", "name": {"en": "Throttle position", "ru": "Положение дроссельной заслонки"}, "offset": 10, "unit": "%", "min": 0, "max": 100, "group": "air", "obd": "11"},
+        {"id": "rpm", "name": {"en": "Engine speed", "ru": "Обороты двигателя"}, "offset": 11, "expr": "x*40", "unit": "rpm", "min": 0, "max": 7000, "group": "engine", "obd": "0C"},
+        {"id": "rpm_idle", "name": {"en": "Engine speed (idle resolution)", "ru": "Обороты холостого хода"}, "offset": 12, "expr": "x*10", "unit": "rpm", "min": 0, "max": 2550, "group": "engine"},
+        {"id": "iac_desired", "name": {"en": "Idle air control, desired position", "ru": "Желаемое положение РХХ"}, "offset": 13, "unit": "steps", "min": 0, "max": 255, "group": "idle"},
+        {"id": "iac", "name": {"en": "Idle air control, current position", "ru": "Текущее положение РХХ"}, "offset": 14, "unit": "steps", "min": 0, "max": 255, "group": "idle"},
+        {"id": "inj_corr", "name": {"en": "Injection time correction factor", "ru": "Коэффициент коррекции времени впрыска"}, "offset": 15, "expr": "(x+128)/256", "min": 0.5, "max": 1.5, "digits": 3, "group": "fuel"},
+        {"id": "uoz", "name": {"en": "Ignition advance", "ru": "Угол опережения зажигания"}, "offset": 16, "type": "s8", "expr": "x/2", "unit": "°", "min": -20, "max": 50, "digits": 1, "group": "ignition", "obd": "0E"},
+        {"id": "speed", "name": {"en": "Vehicle speed", "ru": "Скорость автомобиля"}, "offset": 17, "unit": "km/h", "min": 0, "max": 200, "group": "vehicle", "obd": "0D"},
+        {"id": "uacc", "name": {"en": "Battery voltage", "ru": "Напряжение бортсети"}, "offset": 18, "expr": "5.2+x*0.05", "unit": "V", "min": 8, "max": 16, "digits": 2, "group": "electrical", "obd": "42"},
+        {"id": "rpm_idle_desired", "name": {"en": "Desired idle speed", "ru": "Желаемые обороты холостого хода"}, "offset": 19, "expr": "x*10", "unit": "rpm", "min": 0, "max": 2000, "group": "idle"},
+        {"id": "inj", "name": {"en": "Injection pulse width", "ru": "Длительность импульса впрыска"}, "offset": 20, "type": "u16le", "expr": "x/125", "unit": "ms", "min": 0, "max": 25, "digits": 2, "group": "fuel"},
+        {"id": "maf", "name": {"en": "Mass air flow", "ru": "Массовый расход воздуха"}, "offset": 22, "type": "u16le", "expr": "x/10", "unit": "kg/h", "min": 0, "max": 500, "digits": 1, "group": "air", "obd": "10"},
+        {"id": "gbc", "name": {"en": "Cyclic air charge", "ru": "Цикловой расход воздуха"}, "offset": 24, "type": "u16le", "expr": "x/6", "unit": "mg/cycle", "min": 0, "max": 1000, "digits": 1, "group": "air"},
+        {"id": "fuel_lh", "name": {"en": "Fuel consumption", "ru": "Часовой расход топлива"}, "offset": 26, "type": "u16le", "expr": "x/50", "unit": "l/h", "min": 0, "max": 40, "digits": 2, "group": "fuel", "obd": "5E"},
+        {"id": "fuel_100", "name": {"en": "Fuel consumption per 100 km", "ru": "Путевой расход топлива"}, "offset": 28, "type": "u16le", "expr": "x/128", "unit": "l/100km", "min": 0, "max": 50, "digits": 1, "group": "fuel"},
+        {"id": "rom_cs", "name": {"en": "ROM checksum", "ru": "Контрольная сумма ПЗУ"}, "offset": 30, "type": "u16le", "min": 0, "max": 65535, "group": "status"},
+        {"id": "idle", "name": {"en": "Idle mode", "ru": "Режим холостого хода"}, "offset": 2, "type": "bit", "bit": 1, "group": "modes"},
+        {"id": "engine_stopped", "name": {"en": "Engine stopped", "ru": "Двигатель остановлен"}, "offset": 2, "type": "bit", "bit": 0, "group": "modes"},
+        {"id": "fuel_cut", "name": {"en": "Fuel cut-off", "ru": "Блокировка подачи топлива"}, "offset": 2, "type": "bit", "bit": 3, "group": "modes"},
+        {"id": "knock", "name": {"en": "Knock detected", "ru": "Обнаружена детонация"}, "offset": 3, "type": "bit", "bit": 5, "group": "modes"},
+        {"id": "faults1", "name": {"en": "Current faults 1", "ru": "Текущие неисправности 1"}, "offset": 4, "type": "flags", "group": "faults",
+          "flags": [{"en": "crankshaft sync sensor", "ru": "датчик синхронизации КВ"}, {}, {"en": "EEPROM", "ru": "EEPROM"}, {}, {"en": "phase sensor", "ru": "датчик фазы"}, {"en": "processor reset", "ru": "сброс процессора"}, {"en": "RAM", "ru": "ОЗУ"}, {"en": "ROM", "ru": "ПЗУ"}]},
+        {"id": "faults2", "name": {"en": "Current faults 2 (signal low)", "ru": "Текущие неисправности 2 (низкий уровень)"}, "offset": 5, "type": "flags", "group": "faults",
+          "flags": [{"en": "battery voltage low", "ru": "низкое напряжение бортсети"}, {"en": "CO potentiometer low", "ru": "потенциометр CO: низкий уровень"}, {}, {"en": "coolant sensor low", "ru": "ДТОЖ: низкий уровень"}, {}, {"en": "throttle sensor low", "ru": "ДПДЗ: низкий уровень"}, {"en": "air flow sensor low", "ru": "ДМРВ: низкий уровень"}, {"en": "engine noise low", "ru": "низкий уровень шума двигателя"}]},
+        {"id": "faults3", "name": {"en": "Current faults 3 (signal high)", "ru": "Текущие неисправности 3 (высокий уровень)"}, "offset": 6, "type": "flags", "group": "faults",
+          "flags": [{"en": "battery voltage high", "ru": "высокое напряжение бортсети"}, {"en": "CO potentiometer high", "ru": "потенциометр CO: высокий уровень"}, {}, {"en": "coolant sensor high", "ru": "ДТОЖ: высокий уровень"}, {}, {"en": "throttle sensor high", "ru": "ДПДЗ: высокий уровень"}, {"en": "air flow sensor high", "ru": "ДМРВ: высокий уровень"}, {"en": "engine noise high", "ru": "высокий уровень шума двигателя"}]},
+        {"id": "faults4", "name": {"en": "Current faults 4", "ru": "Текущие неисправности 4"}, "offset": 7, "type": "flags", "group": "faults",
+          "flags": [{"en": "knock sensor open", "ru": "обрыв датчика детонации"}, {"en": "no immobiliser link", "ru": "нет связи с иммобилизатором"}, {}, {}, {}, {}, {"en": "vehicle speed sensor", "ru": "датчик скорости"}, {"en": "idle air control", "ru": "регулятор холостого хода"}]}
+      ]
+    }
+  ],
+  "actuators": [
+    {"id": "inj", "name": {"en": "Injectors (pulse)", "ru": "Форсунки (импульс)"}, "kind": "pulse", "on": "30 01 06 01", "off": "30 01 00", "max": 300,
+      "warning": {"en": "Each pulse sprays fuel into the cylinders. Engine stopped, ignition on.", "ru": "Каждый импульс впрыскивает топливо в цилиндры. Двигатель заглушен, зажигание включено."}},
+    {"id": "coil14", "name": {"en": "Ignition coil, cylinders 1 and 4 (pulse)", "ru": "Катушка зажигания цил. 1 и 4 (импульс)"}, "kind": "pulse", "on": "30 05 06 01", "off": "30 05 00", "max": 200},
+    {"id": "coil23", "name": {"en": "Ignition coil, cylinders 2 and 3 (pulse)", "ru": "Катушка зажигания цил. 2 и 3 (импульс)"}, "kind": "pulse", "on": "30 06 06 01", "off": "30 06 00", "max": 200},
+    {"id": "pump", "name": {"en": "Fuel pump relay", "ru": "Реле бензонасоса"}, "kind": "toggle", "on": "30 09 06 01", "off": "30 09 00"},
+    {"id": "fan", "name": {"en": "Cooling fan relay", "ru": "Реле вентилятора охлаждения"}, "kind": "toggle", "on": "30 0A 06 01", "off": "30 0A 00"},
+    {"id": "ac", "name": {"en": "A/C relay", "ru": "Реле кондиционера"}, "kind": "toggle", "on": "30 0B 06 01", "off": "30 0B 00"},
+    {"id": "mil", "name": {"en": "Check-engine lamp", "ru": "Лампа неисправности"}, "kind": "toggle", "on": "30 0C 06 01", "off": "30 0C 00"},
+    {"id": "iac_pos", "name": {"en": "Idle air control position", "ru": "Положение РХХ"}, "kind": "value", "set": "30 41 07 {v}", "off": "30 41 00", "min": 0, "max": 255, "unit": "steps"},
+    {"id": "idle_rpm", "name": {"en": "Idle speed set point", "ru": "Обороты холостого хода"}, "kind": "value", "set": "30 42 07 {v/10}", "off": "30 42 00", "min": 600, "max": 1600, "unit": "rpm"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "ru-kwp-generic",
+  "extends": "vaz-m154n-euro2",
+  "name": "KWP2000 engine controller (VAZ/GAZ/UAZ, layout assumed)",
+  "vendor": "Bosch, Микас, Итэлма",
+  "status": "unverified",
+  "vehicles": ["Bosch M7.9.7, MP7.0", "Микас-10.3, Микас-11 (ГАЗ, УАЗ)", "Итэлма M73/M74", "other controllers following the AvtoVAZ KWP2000 specification"],
+  "sources": ["Assumes the AvtoVAZ Euro-2 layout of 21 01; not checked against these controllers"],
+  "notes": {
+    "en": "Used when a KWP2000 controller at address 0x10 does not match a verified definition. Trouble codes, clearing and identification use standard services and work; live values follow the AvtoVAZ layout and MUST be checked with the record explorer (Live data -> Raw records) before trusting them. Please share verified layouts.",
+    "ru": "Используется, когда KWP2000-блок по адресу 0x10 не совпал ни с одним проверенным описанием. Чтение и сброс ошибок и идентификация работают по стандартным сервисам; параметры расшифрованы по раскладке АвтоВАЗ и ТРЕБУЮТ проверки в обозревателе записей (Параметры -> Сырые записи). Поделитесь проверенной раскладкой."
+  },
+  "match": {"fallback": true}
+}

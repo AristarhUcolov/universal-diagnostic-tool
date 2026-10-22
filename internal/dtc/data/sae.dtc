@@ -1,0 +1,392 @@
+# Generic SAE J2012 / ISO 15031-6 trouble codes.
+# Format: CODE | English | Russian
+# Wording follows the standard titles, shortened where they are very long.
+P0001 | Fuel volume regulator control circuit / open | Цепь управления регулятором объёма топлива / обрыв
+P0002 | Fuel volume regulator control circuit range/performance | Цепь регулятора объёма топлива: нарушение диапазона/характеристики
+P0003 | Fuel volume regulator control circuit low | Цепь регулятора объёма топлива: низкий уровень
+P0004 | Fuel volume regulator control circuit high | Цепь регулятора объёма топлива: высокий уровень
+P0005 | Fuel shutoff valve "A" control circuit / open | Цепь управления клапаном отсечки топлива "A" / обрыв
+P0010 | "A" camshaft position actuator circuit (bank 1) | Цепь привода изменения фаз распредвала "A" (банк 1)
+P0011 | "A" camshaft position: timing over-advanced or system performance (bank 1) | Распредвал "A": фазы слишком ранние или нарушение работы системы (банк 1)
+P0012 | "A" camshaft position: timing over-retarded (bank 1) | Распредвал "A": фазы слишком поздние (банк 1)
+P0013 | "B" camshaft position actuator circuit (bank 1) | Цепь привода изменения фаз распредвала "B" (банк 1)
+P0014 | "B" camshaft position: timing over-advanced or system performance (bank 1) | Распредвал "B": фазы слишком ранние или нарушение работы системы (банк 1)
+P0015 | "B" camshaft position: timing over-retarded (bank 1) | Распредвал "B": фазы слишком поздние (банк 1)
+P0016 | Crankshaft position / camshaft position correlation (bank 1 sensor A) | Рассогласование положения коленвала и распредвала (банк 1, датчик A)
+P0017 | Crankshaft position / camshaft position correlation (bank 1 sensor B) | Рассогласование положения коленвала и распредвала (банк 1, датчик B)
+P0018 | Crankshaft position / camshaft position correlation (bank 2 sensor A) | Рассогласование положения коленвала и распредвала (банк 2, датчик A)
+P0019 | Crankshaft position / camshaft position correlation (bank 2 sensor B) | Рассогласование положения коленвала и распредвала (банк 2, датчик B)
+P0020 | "A" camshaft position actuator circuit (bank 2) | Цепь привода изменения фаз распредвала "A" (банк 2)
+P0021 | "A" camshaft position: timing over-advanced or system performance (bank 2) | Распредвал "A": фазы слишком ранние или нарушение работы системы (банк 2)
+P0022 | "A" camshaft position: timing over-retarded (bank 2) | Распредвал "A": фазы слишком поздние (банк 2)
+P0030 | HO2S heater control circuit (bank 1 sensor 1) | Цепь нагревателя датчика кислорода (банк 1, датчик 1)
+P0031 | HO2S heater control circuit low (bank 1 sensor 1) | Цепь нагревателя датчика кислорода: низкий уровень (банк 1, датчик 1)
+P0032 | HO2S heater control circuit high (bank 1 sensor 1) | Цепь нагревателя датчика кислорода: высокий уровень (банк 1, датчик 1)
+P0033 | Turbocharger/supercharger bypass valve control circuit | Цепь управления перепускным клапаном турбокомпрессора
+P0036 | HO2S heater control circuit (bank 1 sensor 2) | Цепь нагревателя датчика кислорода (банк 1, датчик 2)
+P0037 | HO2S heater control circuit low (bank 1 sensor 2) | Цепь нагревателя датчика кислорода: низкий уровень (банк 1, датчик 2)
+P0038 | HO2S heater control circuit high (bank 1 sensor 2) | Цепь нагревателя датчика кислорода: высокий уровень (банк 1, датчик 2)
+P0040 | O2 sensor signals swapped (bank 1 sensor 1 / bank 2 sensor 1) | Перепутаны сигналы датчиков кислорода (банк 1 и банк 2, датчик 1)
+P0050 | HO2S heater control circuit (bank 2 sensor 1) | Цепь нагревателя датчика кислорода (банк 2, датчик 1)
+P0051 | HO2S heater control circuit low (bank 2 sensor 1) | Цепь нагревателя датчика кислорода: низкий уровень (банк 2, датчик 1)
+P0052 | HO2S heater control circuit high (bank 2 sensor 1) | Цепь нагревателя датчика кислорода: высокий уровень (банк 2, датчик 1)
+P0056 | HO2S heater control circuit (bank 2 sensor 2) | Цепь нагревателя датчика кислорода (банк 2, датчик 2)
+P0057 | HO2S heater control circuit low (bank 2 sensor 2) | Цепь нагревателя датчика кислорода: низкий уровень (банк 2, датчик 2)
+P0058 | HO2S heater control circuit high (bank 2 sensor 2) | Цепь нагревателя датчика кислорода: высокий уровень (банк 2, датчик 2)
+P0068 | MAP/MAF - throttle position correlation | Рассогласование ДАД/ДМРВ и положения дросселя
+P0069 | Manifold absolute pressure - barometric pressure correlation | Рассогласование давления во впускном коллекторе и атмосферного давления
+P0070 | Ambient air temperature sensor circuit | Цепь датчика температуры наружного воздуха
+P0071 | Ambient air temperature sensor range/performance | Датчик температуры наружного воздуха: нарушение диапазона/характеристики
+P0072 | Ambient air temperature sensor circuit low | Цепь датчика температуры наружного воздуха: низкий уровень
+P0073 | Ambient air temperature sensor circuit high | Цепь датчика температуры наружного воздуха: высокий уровень
+P0087 | Fuel rail/system pressure too low | Давление в топливной рампе/системе слишком низкое
+P0088 | Fuel rail/system pressure too high | Давление в топливной рампе/системе слишком высокое
+P0089 | Fuel pressure regulator 1 performance | Регулятор давления топлива 1: нарушение работы
+P0090 | Fuel pressure regulator 1 control circuit | Цепь управления регулятором давления топлива 1
+P0093 | Fuel system leak detected - large leak | Обнаружена большая утечка в топливной системе
+P0097 | Intake air temperature sensor 2 circuit low | Цепь датчика температуры воздуха 2: низкий уровень
+P0098 | Intake air temperature sensor 2 circuit high | Цепь датчика температуры воздуха 2: высокий уровень
+P0100 | Mass or volume air flow circuit | Цепь датчика массового расхода воздуха (ДМРВ)
+P0101 | Mass or volume air flow circuit range/performance | ДМРВ: выход сигнала за допустимый диапазон
+P0102 | Mass or volume air flow circuit low input | Цепь ДМРВ: низкий уровень сигнала
+P0103 | Mass or volume air flow circuit high input | Цепь ДМРВ: высокий уровень сигнала
+P0104 | Mass or volume air flow circuit intermittent | Цепь ДМРВ: нестабильный сигнал
+P0105 | Manifold absolute pressure / barometric pressure circuit | Цепь датчика абсолютного давления (ДАД)
+P0106 | Manifold absolute pressure / barometric pressure circuit range/performance | ДАД: выход сигнала за допустимый диапазон
+P0107 | Manifold absolute pressure / barometric pressure circuit low input | Цепь ДАД: низкий уровень сигнала
+P0108 | Manifold absolute pressure / barometric pressure circuit high input | Цепь ДАД: высокий уровень сигнала
+P0109 | Manifold absolute pressure / barometric pressure circuit intermittent | Цепь ДАД: нестабильный сигнал
+P0110 | Intake air temperature sensor 1 circuit | Цепь датчика температуры воздуха (ДТВ)
+P0111 | Intake air temperature sensor 1 circuit range/performance | ДТВ: выход сигнала за допустимый диапазон
+P0112 | Intake air temperature sensor 1 circuit low | Цепь ДТВ: низкий уровень сигнала
+P0113 | Intake air temperature sensor 1 circuit high | Цепь ДТВ: высокий уровень сигнала
+P0114 | Intake air temperature sensor 1 circuit intermittent | Цепь ДТВ: нестабильный сигнал
+P0115 | Engine coolant temperature circuit | Цепь датчика температуры охлаждающей жидкости (ДТОЖ)
+P0116 | Engine coolant temperature circuit range/performance | ДТОЖ: выход сигнала за допустимый диапазон
+P0117 | Engine coolant temperature circuit low | Цепь ДТОЖ: низкий уровень сигнала
+P0118 | Engine coolant temperature circuit high | Цепь ДТОЖ: высокий уровень сигнала
+P0119 | Engine coolant temperature circuit intermittent | Цепь ДТОЖ: нестабильный сигнал
+P0120 | Throttle/pedal position sensor/switch "A" circuit | Цепь датчика положения дроссельной заслонки/педали "A" (ДПДЗ)
+P0121 | Throttle/pedal position sensor/switch "A" circuit range/performance | ДПДЗ "A": выход сигнала за допустимый диапазон
+P0122 | Throttle/pedal position sensor/switch "A" circuit low | Цепь ДПДЗ "A": низкий уровень сигнала
+P0123 | Throttle/pedal position sensor/switch "A" circuit high | Цепь ДПДЗ "A": высокий уровень сигнала
+P0124 | Throttle/pedal position sensor/switch "A" circuit intermittent | Цепь ДПДЗ "A": нестабильный сигнал
+P0125 | Insufficient coolant temperature for closed loop fuel control | Недостаточная температура ОЖ для регулирования по датчику кислорода
+P0126 | Insufficient coolant temperature for stable operation | Недостаточная температура ОЖ для стабильной работы
+P0127 | Intake air temperature too high | Слишком высокая температура впускного воздуха
+P0128 | Coolant thermostat (coolant temperature below regulating temperature) | Термостат: температура ОЖ ниже рабочей
+P0130 | O2 sensor circuit (bank 1 sensor 1) | Цепь датчика кислорода (банк 1, датчик 1)
+P0131 | O2 sensor circuit low voltage (bank 1 sensor 1) | Датчик кислорода: низкий уровень сигнала (банк 1, датчик 1)
+P0132 | O2 sensor circuit high voltage (bank 1 sensor 1) | Датчик кислорода: высокий уровень сигнала (банк 1, датчик 1)
+P0133 | O2 sensor circuit slow response (bank 1 sensor 1) | Датчик кислорода: медленный отклик (банк 1, датчик 1)
+P0134 | O2 sensor circuit no activity detected (bank 1 sensor 1) | Датчик кислорода: нет активности (банк 1, датчик 1)
+P0135 | O2 sensor heater circuit (bank 1 sensor 1) | Цепь нагревателя датчика кислорода (банк 1, датчик 1)
+P0136 | O2 sensor circuit (bank 1 sensor 2) | Цепь датчика кислорода (банк 1, датчик 2)
+P0137 | O2 sensor circuit low voltage (bank 1 sensor 2) | Датчик кислорода: низкий уровень сигнала (банк 1, датчик 2)
+P0138 | O2 sensor circuit high voltage (bank 1 sensor 2) | Датчик кислорода: высокий уровень сигнала (банк 1, датчик 2)
+P0139 | O2 sensor circuit slow response (bank 1 sensor 2) | Датчик кислорода: медленный отклик (банк 1, датчик 2)
+P0140 | O2 sensor circuit no activity detected (bank 1 sensor 2) | Датчик кислорода: нет активности (банк 1, датчик 2)
+P0141 | O2 sensor heater circuit (bank 1 sensor 2) | Цепь нагревателя датчика кислорода (банк 1, датчик 2)
+P0142 | O2 sensor circuit (bank 1 sensor 3) | Цепь датчика кислорода (банк 1, датчик 3)
+P0143 | O2 sensor circuit low voltage (bank 1 sensor 3) | Датчик кислорода: низкий уровень сигнала (банк 1, датчик 3)
+P0144 | O2 sensor circuit high voltage (bank 1 sensor 3) | Датчик кислорода: высокий уровень сигнала (банк 1, датчик 3)
+P0145 | O2 sensor circuit slow response (bank 1 sensor 3) | Датчик кислорода: медленный отклик (банк 1, датчик 3)
+P0146 | O2 sensor circuit no activity detected (bank 1 sensor 3) | Датчик кислорода: нет активности (банк 1, датчик 3)
+P0147 | O2 sensor heater circuit (bank 1 sensor 3) | Цепь нагревателя датчика кислорода (банк 1, датчик 3)
+P0150 | O2 sensor circuit (bank 2 sensor 1) | Цепь датчика кислорода (банк 2, датчик 1)
+P0151 | O2 sensor circuit low voltage (bank 2 sensor 1) | Датчик кислорода: низкий уровень сигнала (банк 2, датчик 1)
+P0152 | O2 sensor circuit high voltage (bank 2 sensor 1) | Датчик кислорода: высокий уровень сигнала (банк 2, датчик 1)
+P0153 | O2 sensor circuit slow response (bank 2 sensor 1) | Датчик кислорода: медленный отклик (банк 2, датчик 1)
+P0154 | O2 sensor circuit no activity detected (bank 2 sensor 1) | Датчик кислорода: нет активности (банк 2, датчик 1)
+P0155 | O2 sensor heater circuit (bank 2 sensor 1) | Цепь нагревателя датчика кислорода (банк 2, датчик 1)
+P0156 | O2 sensor circuit (bank 2 sensor 2) | Цепь датчика кислорода (банк 2, датчик 2)
+P0157 | O2 sensor circuit low voltage (bank 2 sensor 2) | Датчик кислорода: низкий уровень сигнала (банк 2, датчик 2)
+P0158 | O2 sensor circuit high voltage (bank 2 sensor 2) | Датчик кислорода: высокий уровень сигнала (банк 2, датчик 2)
+P0159 | O2 sensor circuit slow response (bank 2 sensor 2) | Датчик кислорода: медленный отклик (банк 2, датчик 2)
+P0160 | O2 sensor circuit no activity detected (bank 2 sensor 2) | Датчик кислорода: нет активности (банк 2, датчик 2)
+P0161 | O2 sensor heater circuit (bank 2 sensor 2) | Цепь нагревателя датчика кислорода (банк 2, датчик 2)
+P0169 | Incorrect fuel composition | Неверный состав топлива
+P0170 | Fuel trim (bank 1) | Коррекция топливоподачи (банк 1)
+P0171 | System too lean (bank 1) | Слишком бедная смесь (банк 1)
+P0172 | System too rich (bank 1) | Слишком богатая смесь (банк 1)
+P0173 | Fuel trim (bank 2) | Коррекция топливоподачи (банк 2)
+P0174 | System too lean (bank 2) | Слишком бедная смесь (банк 2)
+P0175 | System too rich (bank 2) | Слишком богатая смесь (банк 2)
+P0176 | Fuel composition sensor circuit | Цепь датчика состава топлива
+P0180 | Fuel temperature sensor "A" circuit | Цепь датчика температуры топлива "A"
+P0181 | Fuel temperature sensor "A" circuit range/performance | Датчик температуры топлива "A": выход за диапазон
+P0182 | Fuel temperature sensor "A" circuit low | Цепь датчика температуры топлива "A": низкий уровень
+P0183 | Fuel temperature sensor "A" circuit high | Цепь датчика температуры топлива "A": высокий уровень
+P0190 | Fuel rail pressure sensor "A" circuit | Цепь датчика давления топлива в рампе "A"
+P0191 | Fuel rail pressure sensor "A" circuit range/performance | Датчик давления в рампе "A": выход за диапазон
+P0192 | Fuel rail pressure sensor "A" circuit low | Цепь датчика давления в рампе "A": низкий уровень
+P0193 | Fuel rail pressure sensor "A" circuit high | Цепь датчика давления в рампе "A": высокий уровень
+P0194 | Fuel rail pressure sensor "A" circuit intermittent | Цепь датчика давления в рампе "A": нестабильный сигнал
+P0195 | Engine oil temperature sensor | Датчик температуры моторного масла
+P0196 | Engine oil temperature sensor range/performance | Датчик температуры масла: выход за диапазон
+P0197 | Engine oil temperature sensor low | Датчик температуры масла: низкий уровень
+P0198 | Engine oil temperature sensor high | Датчик температуры масла: высокий уровень
+P0200 | Injector circuit / open | Цепь форсунок / обрыв
+P0201 | Injector circuit / open - cylinder 1 | Цепь форсунки цилиндра 1 / обрыв
+P0202 | Injector circuit / open - cylinder 2 | Цепь форсунки цилиндра 2 / обрыв
+P0203 | Injector circuit / open - cylinder 3 | Цепь форсунки цилиндра 3 / обрыв
+P0204 | Injector circuit / open - cylinder 4 | Цепь форсунки цилиндра 4 / обрыв
+P0205 | Injector circuit / open - cylinder 5 | Цепь форсунки цилиндра 5 / обрыв
+P0206 | Injector circuit / open - cylinder 6 | Цепь форсунки цилиндра 6 / обрыв
+P0207 | Injector circuit / open - cylinder 7 | Цепь форсунки цилиндра 7 / обрыв
+P0208 | Injector circuit / open - cylinder 8 | Цепь форсунки цилиндра 8 / обрыв
+P0209 | Injector circuit / open - cylinder 9 | Цепь форсунки цилиндра 9 / обрыв
+P0210 | Injector circuit / open - cylinder 10 | Цепь форсунки цилиндра 10 / обрыв
+P0211 | Injector circuit / open - cylinder 11 | Цепь форсунки цилиндра 11 / обрыв
+P0212 | Injector circuit / open - cylinder 12 | Цепь форсунки цилиндра 12 / обрыв
+P0213 | Cold start injector 1 | Пусковая форсунка 1
+P0214 | Cold start injector 2 | Пусковая форсунка 2
+P0215 | Engine shutoff solenoid | Электромагнит останова двигателя
+P0216 | Injector/injection timing control circuit | Цепь управления моментом впрыска
+P0217 | Engine coolant over temperature condition | Перегрев двигателя (температура ОЖ)
+P0218 | Transmission fluid over temperature condition | Перегрев рабочей жидкости трансмиссии
+P0219 | Engine overspeed condition | Превышение максимальных оборотов двигателя
+P0220 | Throttle/pedal position sensor/switch "B" circuit | Цепь датчика положения дросселя/педали "B"
+P0221 | Throttle/pedal position sensor/switch "B" circuit range/performance | Датчик положения дросселя/педали "B": выход за диапазон
+P0222 | Throttle/pedal position sensor/switch "B" circuit low | Цепь датчика положения дросселя/педали "B": низкий уровень
+P0223 | Throttle/pedal position sensor/switch "B" circuit high | Цепь датчика положения дросселя/педали "B": высокий уровень
+P0225 | Throttle/pedal position sensor/switch "C" circuit | Цепь датчика положения дросселя/педали "C"
+P0226 | Throttle/pedal position sensor/switch "C" circuit range/performance | Датчик положения дросселя/педали "C": выход за диапазон
+P0227 | Throttle/pedal position sensor/switch "C" circuit low | Цепь датчика положения дросселя/педали "C": низкий уровень
+P0228 | Throttle/pedal position sensor/switch "C" circuit high | Цепь датчика положения дросселя/педали "C": высокий уровень
+P0230 | Fuel pump primary circuit | Первичная цепь топливного насоса
+P0231 | Fuel pump secondary circuit low | Вторичная цепь топливного насоса: низкий уровень
+P0232 | Fuel pump secondary circuit high | Вторичная цепь топливного насоса: высокий уровень
+P0234 | Turbocharger/supercharger "A" overboost condition | Турбокомпрессор "A": превышение давления наддува
+P0235 | Turbocharger/supercharger boost sensor "A" circuit | Цепь датчика давления наддува "A"
+P0236 | Turbocharger/supercharger boost sensor "A" circuit range/performance | Датчик давления наддува "A": выход за диапазон
+P0237 | Turbocharger/supercharger boost sensor "A" circuit low | Цепь датчика давления наддува "A": низкий уровень
+P0238 | Turbocharger/supercharger boost sensor "A" circuit high | Цепь датчика давления наддува "A": высокий уровень
+P0243 | Turbocharger/supercharger wastegate solenoid "A" | Клапан перепуска (вестгейт) турбокомпрессора "A"
+P0251 | Injection pump fuel metering control "A" | Дозирование топлива ТНВД "A"
+P0261 | Cylinder 1 injector "A" circuit low | Цепь форсунки цилиндра 1: низкий уровень
+P0262 | Cylinder 1 injector "A" circuit high | Цепь форсунки цилиндра 1: высокий уровень
+P0263 | Cylinder 1 contribution/balance | Вклад/баланс цилиндра 1
+P0264 | Cylinder 2 injector "A" circuit low | Цепь форсунки цилиндра 2: низкий уровень
+P0265 | Cylinder 2 injector "A" circuit high | Цепь форсунки цилиндра 2: высокий уровень
+P0266 | Cylinder 2 contribution/balance | Вклад/баланс цилиндра 2
+P0267 | Cylinder 3 injector "A" circuit low | Цепь форсунки цилиндра 3: низкий уровень
+P0268 | Cylinder 3 injector "A" circuit high | Цепь форсунки цилиндра 3: высокий уровень
+P0269 | Cylinder 3 contribution/balance | Вклад/баланс цилиндра 3
+P0270 | Cylinder 4 injector "A" circuit low | Цепь форсунки цилиндра 4: низкий уровень
+P0271 | Cylinder 4 injector "A" circuit high | Цепь форсунки цилиндра 4: высокий уровень
+P0272 | Cylinder 4 contribution/balance | Вклад/баланс цилиндра 4
+P0273 | Cylinder 5 injector "A" circuit low | Цепь форсунки цилиндра 5: низкий уровень
+P0274 | Cylinder 5 injector "A" circuit high | Цепь форсунки цилиндра 5: высокий уровень
+P0275 | Cylinder 5 contribution/balance | Вклад/баланс цилиндра 5
+P0276 | Cylinder 6 injector "A" circuit low | Цепь форсунки цилиндра 6: низкий уровень
+P0277 | Cylinder 6 injector "A" circuit high | Цепь форсунки цилиндра 6: высокий уровень
+P0278 | Cylinder 6 contribution/balance | Вклад/баланс цилиндра 6
+P0279 | Cylinder 7 injector "A" circuit low | Цепь форсунки цилиндра 7: низкий уровень
+P0280 | Cylinder 7 injector "A" circuit high | Цепь форсунки цилиндра 7: высокий уровень
+P0281 | Cylinder 7 contribution/balance | Вклад/баланс цилиндра 7
+P0282 | Cylinder 8 injector "A" circuit low | Цепь форсунки цилиндра 8: низкий уровень
+P0283 | Cylinder 8 injector "A" circuit high | Цепь форсунки цилиндра 8: высокий уровень
+P0284 | Cylinder 8 contribution/balance | Вклад/баланс цилиндра 8
+P0299 | Turbocharger/supercharger "A" underboost condition | Турбокомпрессор "A": недостаточное давление наддува
+P0300 | Random/multiple cylinder misfire detected | Обнаружены случайные/множественные пропуски воспламенения
+P0301 | Cylinder 1 misfire detected | Пропуски воспламенения в цилиндре 1
+P0302 | Cylinder 2 misfire detected | Пропуски воспламенения в цилиндре 2
+P0303 | Cylinder 3 misfire detected | Пропуски воспламенения в цилиндре 3
+P0304 | Cylinder 4 misfire detected | Пропуски воспламенения в цилиндре 4
+P0305 | Cylinder 5 misfire detected | Пропуски воспламенения в цилиндре 5
+P0306 | Cylinder 6 misfire detected | Пропуски воспламенения в цилиндре 6
+P0307 | Cylinder 7 misfire detected | Пропуски воспламенения в цилиндре 7
+P0308 | Cylinder 8 misfire detected | Пропуски воспламенения в цилиндре 8
+P0309 | Cylinder 9 misfire detected | Пропуски воспламенения в цилиндре 9
+P0310 | Cylinder 10 misfire detected | Пропуски воспламенения в цилиндре 10
+P0311 | Cylinder 11 misfire detected | Пропуски воспламенения в цилиндре 11
+P0312 | Cylinder 12 misfire detected | Пропуски воспламенения в цилиндре 12
+P0313 | Misfire detected with low fuel | Пропуски воспламенения при низком уровне топлива
+P0314 | Single cylinder misfire (cylinder not specified) | Пропуски воспламенения в одном цилиндре (не определён)
+P0315 | Crankshaft position system variation not learned | Не выполнено обучение системы положения коленвала
+P0316 | Engine misfire detected on startup (first 1000 revolutions) | Пропуски воспламенения при пуске (первые 1000 оборотов)
+P0320 | Ignition/distributor engine speed input circuit | Входная цепь сигнала частоты вращения (зажигание/распределитель)
+P0321 | Ignition/distributor engine speed input circuit range/performance | Сигнал частоты вращения: выход за диапазон
+P0322 | Ignition/distributor engine speed input circuit no signal | Сигнал частоты вращения: нет сигнала
+P0325 | Knock sensor 1 circuit (bank 1 or single sensor) | Цепь датчика детонации 1
+P0326 | Knock sensor 1 circuit range/performance | Датчик детонации 1: выход за диапазон
+P0327 | Knock sensor 1 circuit low | Цепь датчика детонации 1: низкий уровень сигнала
+P0328 | Knock sensor 1 circuit high | Цепь датчика детонации 1: высокий уровень сигнала
+P0329 | Knock sensor 1 circuit input intermittent | Цепь датчика детонации 1: нестабильный сигнал
+P0330 | Knock sensor 2 circuit (bank 2) | Цепь датчика детонации 2 (банк 2)
+P0332 | Knock sensor 2 circuit low (bank 2) | Цепь датчика детонации 2: низкий уровень сигнала
+P0333 | Knock sensor 2 circuit high (bank 2) | Цепь датчика детонации 2: высокий уровень сигнала
+P0335 | Crankshaft position sensor "A" circuit | Цепь датчика положения коленвала (ДПКВ)
+P0336 | Crankshaft position sensor "A" circuit range/performance | ДПКВ: выход сигнала за диапазон / ошибка синхронизации
+P0337 | Crankshaft position sensor "A" circuit low | Цепь ДПКВ: низкий уровень сигнала
+P0338 | Crankshaft position sensor "A" circuit high | Цепь ДПКВ: высокий уровень сигнала
+P0339 | Crankshaft position sensor "A" circuit intermittent | Цепь ДПКВ: нестабильный сигнал
+P0340 | Camshaft position sensor "A" circuit (bank 1 or single sensor) | Цепь датчика положения распредвала (датчика фазы)
+P0341 | Camshaft position sensor "A" circuit range/performance | Датчик фазы: выход сигнала за диапазон
+P0342 | Camshaft position sensor "A" circuit low | Цепь датчика фазы: низкий уровень сигнала
+P0343 | Camshaft position sensor "A" circuit high | Цепь датчика фазы: высокий уровень сигнала
+P0344 | Camshaft position sensor "A" circuit intermittent | Цепь датчика фазы: нестабильный сигнал
+P0345 | Camshaft position sensor "A" circuit (bank 2) | Цепь датчика положения распредвала "A" (банк 2)
+P0350 | Ignition coil primary/secondary circuit | Первичная/вторичная цепь катушки зажигания
+P0351 | Ignition coil "A" primary/secondary circuit | Цепь катушки зажигания "A" (цилиндр 1)
+P0352 | Ignition coil "B" primary/secondary circuit | Цепь катушки зажигания "B" (цилиндр 2)
+P0353 | Ignition coil "C" primary/secondary circuit | Цепь катушки зажигания "C" (цилиндр 3)
+P0354 | Ignition coil "D" primary/secondary circuit | Цепь катушки зажигания "D" (цилиндр 4)
+P0355 | Ignition coil "E" primary/secondary circuit | Цепь катушки зажигания "E" (цилиндр 5)
+P0356 | Ignition coil "F" primary/secondary circuit | Цепь катушки зажигания "F" (цилиндр 6)
+P0357 | Ignition coil "G" primary/secondary circuit | Цепь катушки зажигания "G" (цилиндр 7)
+P0358 | Ignition coil "H" primary/secondary circuit | Цепь катушки зажигания "H" (цилиндр 8)
+P0365 | Camshaft position sensor "B" circuit (bank 1) | Цепь датчика положения распредвала "B" (банк 1)
+P0366 | Camshaft position sensor "B" circuit range/performance (bank 1) | Датчик положения распредвала "B": выход за диапазон
+P0380 | Glow plug/heater circuit "A" | Цепь свечей накаливания "A"
+P0381 | Glow plug/heater indicator circuit | Цепь индикатора свечей накаливания
+P0400 | Exhaust gas recirculation "A" flow | Расход рециркуляции отработавших газов (EGR) "A"
+P0401 | Exhaust gas recirculation "A" flow insufficient detected | Недостаточный расход EGR "A"
+P0402 | Exhaust gas recirculation "A" flow excessive detected | Чрезмерный расход EGR "A"
+P0403 | Exhaust gas recirculation "A" control circuit | Цепь управления клапаном EGR "A"
+P0404 | Exhaust gas recirculation "A" control circuit range/performance | Клапан EGR "A": нарушение диапазона/характеристики
+P0405 | Exhaust gas recirculation sensor "A" circuit low | Цепь датчика EGR "A": низкий уровень
+P0406 | Exhaust gas recirculation sensor "A" circuit high | Цепь датчика EGR "A": высокий уровень
+P0410 | Secondary air injection system | Система подачи вторичного воздуха
+P0411 | Secondary air injection system incorrect flow detected | Система вторичного воздуха: неверный расход
+P0420 | Catalyst system efficiency below threshold (bank 1) | Эффективность нейтрализатора ниже порога (банк 1)
+P0421 | Warm up catalyst efficiency below threshold (bank 1) | Эффективность прогрева нейтрализатора ниже порога (банк 1)
+P0422 | Main catalyst efficiency below threshold (bank 1) | Эффективность основного нейтрализатора ниже порога (банк 1)
+P0430 | Catalyst system efficiency below threshold (bank 2) | Эффективность нейтрализатора ниже порога (банк 2)
+P0440 | Evaporative emission system | Система улавливания паров топлива (адсорбер)
+P0441 | Evaporative emission system incorrect purge flow | Неверный расход продувки адсорбера
+P0442 | Evaporative emission system leak detected (small leak) | Утечка в системе улавливания паров топлива (малая)
+P0443 | Evaporative emission system purge control valve "A" circuit | Цепь управления клапаном продувки адсорбера
+P0444 | Evaporative emission system purge control valve "A" circuit open | Цепь клапана продувки адсорбера: обрыв
+P0445 | Evaporative emission system purge control valve "A" circuit shorted | Цепь клапана продувки адсорбера: замыкание
+P0446 | Evaporative emission system vent control circuit | Цепь управления вентиляцией системы улавливания паров
+P0449 | Evaporative emission system vent valve/solenoid circuit | Цепь клапана вентиляции системы улавливания паров
+P0451 | Evaporative emission system pressure sensor/switch "A" range/performance | Датчик давления системы улавливания паров: выход за диапазон
+P0452 | Evaporative emission system pressure sensor/switch "A" circuit low | Датчик давления системы улавливания паров: низкий уровень
+P0453 | Evaporative emission system pressure sensor/switch "A" circuit high | Датчик давления системы улавливания паров: высокий уровень
+P0455 | Evaporative emission system leak detected (large leak) | Утечка в системе улавливания паров топлива (большая)
+P0456 | Evaporative emission system leak detected (very small leak) | Утечка в системе улавливания паров топлива (очень малая)
+P0457 | Evaporative emission system leak detected (fuel cap loose/off) | Утечка паров топлива (не закрыта пробка бака)
+P0460 | Fuel level sensor "A" circuit | Цепь датчика уровня топлива "A"
+P0461 | Fuel level sensor "A" circuit range/performance | Датчик уровня топлива "A": выход за диапазон
+P0462 | Fuel level sensor "A" circuit low | Цепь датчика уровня топлива "A": низкий уровень
+P0463 | Fuel level sensor "A" circuit high | Цепь датчика уровня топлива "A": высокий уровень
+P0480 | Fan 1 control circuit | Цепь управления вентилятором 1
+P0481 | Fan 2 control circuit | Цепь управления вентилятором 2
+P0482 | Fan 3 control circuit | Цепь управления вентилятором 3
+P0491 | Secondary air injection system insufficient flow (bank 1) | Недостаточный расход вторичного воздуха (банк 1)
+P0496 | Evaporative emission system high purge flow | Чрезмерный расход продувки адсорбера
+P0500 | Vehicle speed sensor "A" | Датчик скорости автомобиля "A"
+P0501 | Vehicle speed sensor "A" range/performance | Датчик скорости автомобиля: выход за диапазон
+P0502 | Vehicle speed sensor "A" circuit low input | Цепь датчика скорости: низкий уровень
+P0503 | Vehicle speed sensor "A" intermittent/erratic/high | Датчик скорости: нестабильный/завышенный сигнал
+P0504 | Brake switch "A"/"B" correlation | Рассогласование выключателей тормоза "A"/"B"
+P0505 | Idle air control system | Система регулирования холостого хода (РХХ)
+P0506 | Idle air control system RPM lower than expected | Обороты холостого хода ниже заданных
+P0507 | Idle air control system RPM higher than expected | Обороты холостого хода выше заданных
+P0508 | Idle air control system circuit low | Цепь РХХ: низкий уровень (замыкание на массу)
+P0509 | Idle air control system circuit high | Цепь РХХ: высокий уровень (замыкание на питание)
+P0511 | Idle air control circuit | Цепь управления регулятором холостого хода
+P0520 | Engine oil pressure sensor/switch "A" circuit | Цепь датчика давления масла
+P0521 | Engine oil pressure sensor/switch "A" range/performance | Датчик давления масла: выход за диапазон
+P0522 | Engine oil pressure sensor/switch "A" circuit low | Цепь датчика давления масла: низкий уровень
+P0523 | Engine oil pressure sensor/switch "A" circuit high | Цепь датчика давления масла: высокий уровень
+P0524 | Engine oil pressure too low | Слишком низкое давление масла
+P0530 | A/C refrigerant pressure sensor "A" circuit | Цепь датчика давления хладагента кондиционера
+P0532 | A/C refrigerant pressure sensor "A" circuit low | Цепь датчика давления хладагента: низкий уровень
+P0533 | A/C refrigerant pressure sensor "A" circuit high | Цепь датчика давления хладагента: высокий уровень
+P0560 | System voltage | Напряжение бортовой сети
+P0561 | System voltage unstable | Нестабильное напряжение бортовой сети
+P0562 | System voltage low | Пониженное напряжение бортовой сети
+P0563 | System voltage high | Повышенное напряжение бортовой сети
+P0571 | Brake switch "A" circuit | Цепь выключателя тормоза "A"
+P0572 | Brake switch "A" circuit low | Цепь выключателя тормоза "A": низкий уровень
+P0573 | Brake switch "A" circuit high | Цепь выключателя тормоза "A": высокий уровень
+P0600 | Serial communication link | Последовательный канал связи
+P0601 | Internal control module memory checksum error | Ошибка контрольной суммы памяти блока управления (ПЗУ)
+P0602 | Control module programming error | Ошибка программирования блока управления
+P0603 | Internal control module keep alive memory (KAM) error | Ошибка энергонезависимой памяти (KAM) блока управления
+P0604 | Internal control module random access memory (RAM) error | Ошибка ОЗУ блока управления
+P0605 | Internal control module read only memory (ROM) error | Ошибка ПЗУ блока управления
+P0606 | Control module processor | Неисправность процессора блока управления
+P0607 | Control module performance | Нарушение работы блока управления
+P0608 | Control module VSS output "A" | Выход сигнала скорости "A" блока управления
+P0610 | Control module vehicle options error | Ошибка конфигурации комплектации в блоке управления
+P0615 | Starter relay circuit | Цепь реле стартера
+P0616 | Starter relay circuit low | Цепь реле стартера: низкий уровень
+P0617 | Starter relay circuit high | Цепь реле стартера: высокий уровень
+P0620 | Generator control circuit | Цепь управления генератором
+P0627 | Fuel pump "A" control circuit / open | Цепь управления топливным насосом (реле) / обрыв
+P0628 | Fuel pump "A" control circuit low | Цепь управления топливным насосом: низкий уровень
+P0629 | Fuel pump "A" control circuit high | Цепь управления топливным насосом: высокий уровень
+P0630 | VIN not programmed or incompatible - ECM/PCM | VIN не записан или не совпадает (блок управления двигателем)
+P0641 | Sensor reference voltage "A" circuit / open | Цепь опорного напряжения датчиков "A" / обрыв
+P0645 | A/C clutch relay control circuit | Цепь управления реле муфты кондиционера
+P0646 | A/C clutch relay control circuit low | Цепь реле муфты кондиционера: низкий уровень
+P0647 | A/C clutch relay control circuit high | Цепь реле муфты кондиционера: высокий уровень
+P0650 | Malfunction indicator lamp (MIL) control circuit | Цепь управления лампой неисправности (MIL / Check Engine)
+P0654 | Engine RPM output circuit | Выходная цепь сигнала оборотов (тахометр)
+P0670 | Glow plug control module circuit | Цепь блока управления свечами накаливания
+P0685 | ECM/PCM power relay control circuit / open | Цепь управления главным реле / обрыв
+P0686 | ECM/PCM power relay control circuit low | Цепь управления главным реле: низкий уровень
+P0687 | ECM/PCM power relay control circuit high | Цепь управления главным реле: высокий уровень
+P0688 | ECM/PCM power relay sense circuit / open | Цепь контроля главного реле / обрыв
+P0690 | ECM/PCM power relay sense circuit high | Цепь контроля главного реле: высокий уровень
+P0700 | Transmission control system (MIL request) | Система управления трансмиссией (запрос лампы MIL)
+P0705 | Transmission range sensor "A" circuit (PRNDL input) | Цепь датчика положения селектора (PRNDL)
+P0710 | Transmission fluid temperature sensor "A" circuit | Цепь датчика температуры жидкости трансмиссии
+P0715 | Input/turbine speed sensor "A" circuit | Цепь датчика скорости входного вала / турбины
+P0720 | Output speed sensor circuit | Цепь датчика скорости выходного вала
+P0730 | Incorrect gear ratio | Неверное передаточное отношение
+P0731 | Gear 1 incorrect ratio | Неверное передаточное отношение 1-й передачи
+P0732 | Gear 2 incorrect ratio | Неверное передаточное отношение 2-й передачи
+P0733 | Gear 3 incorrect ratio | Неверное передаточное отношение 3-й передачи
+P0734 | Gear 4 incorrect ratio | Неверное передаточное отношение 4-й передачи
+P0735 | Gear 5 incorrect ratio | Неверное передаточное отношение 5-й передачи
+P0740 | Torque converter clutch solenoid circuit / open | Цепь клапана блокировки гидротрансформатора / обрыв
+P0741 | Torque converter clutch solenoid circuit performance / stuck off | Клапан блокировки гидротрансформатора: не включается
+P0750 | Shift solenoid "A" | Электромагнитный клапан переключения "A"
+P0755 | Shift solenoid "B" | Электромагнитный клапан переключения "B"
+P0760 | Shift solenoid "C" | Электромагнитный клапан переключения "C"
+P0765 | Shift solenoid "D" | Электромагнитный клапан переключения "D"
+P0780 | Shift error | Ошибка переключения передач
+P0A80 | Replace hybrid battery pack | Требуется замена тяговой батареи гибрида
+P2002 | Diesel particulate filter efficiency below threshold (bank 1) | Эффективность сажевого фильтра ниже порога (банк 1)
+P2096 | Post catalyst fuel trim system too lean (bank 1) | Коррекция после нейтрализатора: смесь слишком бедная (банк 1)
+P2097 | Post catalyst fuel trim system too rich (bank 1) | Коррекция после нейтрализатора: смесь слишком богатая (банк 1)
+P2100 | Throttle actuator "A" control motor circuit / open | Цепь мотора привода дроссельной заслонки "A" / обрыв
+P2101 | Throttle actuator "A" control motor circuit range/performance | Мотор привода дросселя "A": нарушение характеристики
+P2106 | Throttle actuator control system - forced limited power | Привод дросселя: принудительное ограничение мощности
+P2111 | Throttle actuator "A" control system - stuck open | Привод дросселя "A": заклинил в открытом положении
+P2112 | Throttle actuator "A" control system - stuck closed | Привод дросселя "A": заклинил в закрытом положении
+P2135 | Throttle/pedal position sensor/switch "A"/"B" voltage correlation | Рассогласование напряжений датчиков положения дросселя "A"/"B"
+P2138 | Throttle/pedal position sensor/switch "D"/"E" voltage correlation | Рассогласование напряжений датчиков положения педали "D"/"E"
+P2177 | System too lean off idle (bank 1) | Смесь слишком бедная вне холостого хода (банк 1)
+P2178 | System too rich off idle (bank 1) | Смесь слишком богатая вне холостого хода (банк 1)
+P2187 | System too lean at idle (bank 1) | Смесь слишком бедная на холостом ходу (банк 1)
+P2188 | System too rich at idle (bank 1) | Смесь слишком богатая на холостом ходу (банк 1)
+P2195 | O2 sensor signal biased/stuck lean (bank 1 sensor 1) | Сигнал датчика кислорода смещён/застрял в "бедной" области (банк 1, датчик 1)
+P2196 | O2 sensor signal biased/stuck rich (bank 1 sensor 1) | Сигнал датчика кислорода смещён/застрял в "богатой" области (банк 1, датчик 1)
+P2270 | O2 sensor signal biased/stuck lean (bank 1 sensor 2) | Сигнал датчика кислорода смещён/застрял в "бедной" области (банк 1, датчик 2)
+P2271 | O2 sensor signal biased/stuck rich (bank 1 sensor 2) | Сигнал датчика кислорода смещён/застрял в "богатой" области (банк 1, датчик 2)
+P2279 | Intake air system leak | Подсос воздуха во впускной системе
+P2300 | Ignition coil "A" primary control circuit low | Первичная цепь катушки зажигания "A": низкий уровень
+P2301 | Ignition coil "A" primary control circuit high | Первичная цепь катушки зажигания "A": высокий уровень
+P2303 | Ignition coil "B" primary control circuit low | Первичная цепь катушки зажигания "B": низкий уровень
+P2304 | Ignition coil "B" primary control circuit high | Первичная цепь катушки зажигания "B": высокий уровень
+P2306 | Ignition coil "C" primary control circuit low | Первичная цепь катушки зажигания "C": низкий уровень
+P2307 | Ignition coil "C" primary control circuit high | Первичная цепь катушки зажигания "C": высокий уровень
+P2309 | Ignition coil "D" primary control circuit low | Первичная цепь катушки зажигания "D": низкий уровень
+P2310 | Ignition coil "D" primary control circuit high | Первичная цепь катушки зажигания "D": высокий уровень
+P2463 | Diesel particulate filter - soot accumulation | Сажевый фильтр: чрезмерное накопление сажи
+U0001 | High speed CAN communication bus | Высокоскоростная шина CAN
+U0073 | Control module communication bus "A" off | Шина связи "A" отключена (bus off)
+U0100 | Lost communication with ECM/PCM "A" | Потеря связи с блоком управления двигателем "A"
+U0101 | Lost communication with TCM | Потеря связи с блоком управления трансмиссией
+U0121 | Lost communication with anti-lock brake system (ABS) control module | Потеря связи с блоком АБС
+U0140 | Lost communication with body control module | Потеря связи с блоком управления кузовом
+U0151 | Lost communication with restraints control module | Потеря связи с блоком подушек безопасности
+U0155 | Lost communication with instrument panel cluster (IPC) control module | Потеря связи с панелью приборов
+U0164 | Lost communication with HVAC control module | Потеря связи с блоком климат-контроля
+U0401 | Invalid data received from ECM/PCM "A" | Неверные данные от блока управления двигателем "A"

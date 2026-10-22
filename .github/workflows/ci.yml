@@ -1,0 +1,109 @@
+name: CI
+
+# Быстрая проверка на каждый push и pull request.
+#
+# Отдельно вынесена проверка данных: описания блоков управления и базы кодов
+# неисправностей будут присылать люди, у которых Go не установлен. Пусть за
+# них проверяет CI: источник указан, оба языка на месте, формат кодов верный
+# и программа загружает описание без ошибок.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          check-latest: true
+
+      - name: Форматирование
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "Не отформатировано (запустите gofmt -w .):"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go vet для всех систем
+        run: |
+          # Драйверы адаптеров (J2534, RP1210, PCAN, Kvaser, SocketCAN,
+          # последовательные порты) у каждой системы свои, поэтому проверяем
+          # каждую, а не только ту, на которой работает CI.
+          for target in linux/amd64 linux/arm64 windows/amd64 windows/386 darwin/arm64; do
+            echo "== $target"
+            GOOS=${target%/*} GOARCH=${target#*/} go vet ./...
+          done
+
+      - name: Тесты
+        run: go test -race ./...
+
+  # Основная платформа пользователей — Windows: последовательные порты,
+  # драйверы J2534 и RP1210 работают только там. Тесты гоняем на ней же.
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          check-latest: true
+
+      - name: Тесты
+        run: go test ./...
+
+      # Одна программа и для окна, и для командной строки, поэтому без
+      # -H=windowsgui: при запуске двойным щелчком консоль прячется сама,
+      # как только откроется окно.
+      - name: Сборка udt.exe (64 и 32 бита)
+        shell: bash
+        env:
+          CGO_ENABLED: '0'
+        run: |
+          GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o udt.exe ./cmd/udt
+          GOARCH=386 go build -trimpath -ldflags "-s -w" -o udt-x86.exe ./cmd/udt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: udt-windows
+          path: |
+            udt.exe
+            udt-x86.exe
+
+  # Отдельный шаг, чтобы в списке проверок PR было прямо видно: присланные
+  # описания блоков и коды неисправностей прошли проверку или нет.
+  data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          check-latest: true
+
+      - name: Проверка описаний блоков и базы кодов
+        run: go test -v -run 'DataFiles|Database|DefinitionData|BuiltinDefinitions|RealFrame' ./internal/dtc/ ./internal/ecu/
+
+      - name: Программа загружает описания без ошибок
+        run: |
+          go build -o /tmp/udt ./cmd/udt
+          /tmp/udt -no-window -listen 127.0.0.1:8799 &
+          sleep 3
+          health=$(curl -sf http://127.0.0.1:8799/api/health)
+          echo "$health"
+          # Описание, отвергнутое при загрузке, валит сборку — иначе
+          # сломанный файл тихо исчезает из программы и никто не замечает.
+          echo "$health" | grep -Eq '"definitionErrors": ?null' || {
+            echo "Есть описания, отвергнутые при загрузке — см. выше."
+            exit 1
+          }

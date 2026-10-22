@@ -1,0 +1,28 @@
+# VAG (VW, Audi, Seat, Skoda) five-digit fault codes reported by KW1281
+# and KWP2000 control units. Codes from 16384 map to SAE P-codes and are
+# described by the generic table; only common VAG-specific codes are
+# listed here.
+# Format: CODE | English | Russian
+00513 | Engine speed sender (G28) | Датчик частоты вращения двигателя (G28)
+00515 | Hall sender (G40) | Датчик Холла (G40)
+00518 | Throttle position sensor (G69) | Потенциометр дроссельной заслонки (G69)
+00519 | Intake manifold pressure sensor (G71) | Датчик давления во впускном коллекторе (G71)
+00520 | Mass air flow sensor (G70) | Расходомер воздуха (G70)
+00522 | Engine coolant temperature sensor (G62) | Датчик температуры охлаждающей жидкости (G62)
+00523 | Intake air temperature sensor (G42) | Датчик температуры впускного воздуха (G42)
+00524 | Knock sensor 1 (G61) | Датчик детонации 1 (G61)
+00525 | Oxygen (lambda) sensor (G39) | Лямбда-зонд (G39)
+00532 | Supply voltage B+ | Напряжение питания B+
+00533 | Idle speed regulation | Регулирование холостого хода
+00537 | Lambda regulation | Лямбда-регулирование
+00540 | Knock sensor 2 (G66) | Датчик детонации 2 (G66)
+00543 | Maximum engine speed exceeded | Превышены максимальные обороты двигателя
+00561 | Mixture adaptation | Адаптация смеси
+00575 | Intake manifold pressure | Давление во впускном коллекторе
+00625 | Speed signal | Сигнал скорости
+00668 | Supply voltage terminal 30 | Напряжение питания клеммы 30
+01087 | Basic setting not performed | Базовая настройка не выполнена
+01312 | Powertrain data bus | Шина данных силового агрегата
+01314 | Engine control module (no communication) | Блок управления двигателем (нет связи)
+01316 | ABS control module (no communication) | Блок управления АБС (нет связи)
+65535 | Control module internal fault | Внутренняя неисправность блока управления

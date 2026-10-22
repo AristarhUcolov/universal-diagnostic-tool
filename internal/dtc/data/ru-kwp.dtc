@@ -1,0 +1,92 @@
+# VAZ / GAZ / UAZ engine control units on KWP2000 (K-Line):
+# Bosch M1.5.4N, Январь-5.1, VS-5.1 (Итэлма), Январь-7.2, Bosch M7.9.7,
+# Bosch MP7.0, Микас-10.3, Микас-11, Итэлма M73/M74.
+# Sources: АвтоВАЗ "Keyword Protocol 2000" specification for M1.5.4N /
+# Январь-5 Euro-2 (Д.Б. Дударь, 2000), published code lists for Микас-11
+# and Bosch M7.9.7. Only codes whose meaning differs from or is missing in
+# SAE J2012 are listed; everything else falls back to the generic table.
+# Format: CODE | English | Russian
+P0102 | Mass air flow sensor signal low | Низкий уровень сигнала датчика массового расхода воздуха
+P0103 | Mass air flow sensor signal high | Высокий уровень сигнала датчика массового расхода воздуха
+P0117 | Coolant temperature sensor signal low | Низкий уровень сигнала датчика температуры охлаждающей жидкости
+P0118 | Coolant temperature sensor signal high | Высокий уровень сигнала датчика температуры охлаждающей жидкости
+P0122 | Throttle position sensor signal low | Низкий уровень сигнала датчика положения дроссельной заслонки
+P0123 | Throttle position sensor signal high | Высокий уровень сигнала датчика положения дроссельной заслонки
+P0131 | Oxygen sensor signal low | Низкий уровень сигнала датчика кислорода
+P0132 | Oxygen sensor signal high | Высокий уровень сигнала датчика кислорода
+P0134 | No oxygen sensor activity | Нет активности датчика кислорода
+P0135 | Oxygen sensor heater open circuit | Обрыв нагревателя датчика кислорода
+P0201 | Injector 1 control circuit open | Цепь управления форсункой №1, обрыв
+P0202 | Injector 2 control circuit open | Цепь управления форсункой №2, обрыв
+P0203 | Injector 3 control circuit open | Цепь управления форсункой №3, обрыв
+P0204 | Injector 4 control circuit open | Цепь управления форсункой №4, обрыв
+P0261 | Injector 1 control circuit shorted to ground | Цепь управления форсункой №1, замыкание на массу
+P0262 | Injector 1 control circuit shorted to +12 V | Цепь управления форсункой №1, замыкание на +12 В
+P0264 | Injector 2 control circuit shorted to ground | Цепь управления форсункой №2, замыкание на массу
+P0265 | Injector 2 control circuit shorted to +12 V | Цепь управления форсункой №2, замыкание на +12 В
+P0267 | Injector 3 control circuit shorted to ground | Цепь управления форсункой №3, замыкание на массу
+P0268 | Injector 3 control circuit shorted to +12 V | Цепь управления форсункой №3, замыкание на +12 В
+P0270 | Injector 4 control circuit shorted to ground | Цепь управления форсункой №4, замыкание на массу
+P0271 | Injector 4 control circuit shorted to +12 V | Цепь управления форсункой №4, замыкание на +12 В
+P0325 | Knock sensor open circuit | Обрыв датчика детонации
+P0327 | Engine noise level (knock sensor signal) too low | Низкий уровень шума двигателя (сигнала датчика детонации)
+P0328 | Engine noise level (knock sensor signal) too high | Высокий уровень шума двигателя (сигнала датчика детонации)
+P0335 | Crankshaft synchronisation sensor error | Ошибка датчика синхронизации коленвала (ДПКВ)
+P0340 | Phase (camshaft) sensor error | Ошибка датчика фазы
+P0443 | Canister purge valve control malfunction | Неисправность управления клапаном продувки адсорбера
+P0480 | Cooling fan 1 control circuit malfunction | Неисправность цепи управления вентилятором №1
+P0501 | Vehicle speed sensor error | Ошибка датчика скорости автомобиля
+P0505 | Idle air control (stepper) error | Ошибка регулятора холостого хода
+P0562 | Low battery voltage | Пониженное напряжение бортовой сети
+P0563 | High battery voltage | Повышенное напряжение бортовой сети
+P0601 | ECU ROM error | Неисправность ПЗУ контроллера
+P0602 | ECU RAM error | Неисправность ОЗУ контроллера
+P0603 | ECU RAM error | Неисправность ОЗУ контроллера
+P0604 | ECU external RAM error | Неисправность внешнего ОЗУ контроллера
+P1102 | Oxygen sensor 1 heater resistance too low | Низкое сопротивление нагревателя датчика кислорода №1
+P1115 | Oxygen sensor 1 heater control circuit malfunction | Неисправность цепи управления нагревателем датчика кислорода №1
+P1123 | Rich mixture: additive (air) mixture correction above threshold | Смесь «богатая»: аддитивная коррекция по воздуху превышает порог
+P1124 | Lean mixture: additive (air) mixture correction above threshold | Смесь «бедная»: аддитивная коррекция по воздуху превышает порог
+P1127 | Rich mixture: multiplicative mixture correction above threshold | Смесь «богатая»: мультипликативная коррекция превышает порог
+P1128 | Lean mixture: multiplicative mixture correction above threshold | Смесь «бедная»: мультипликативная коррекция превышает порог
+P1135 | Oxygen sensor 1 heater circuit malfunction | Неисправность нагревателя датчика кислорода №1
+P1136 | Rich mixture: additive (fuel) mixture correction above threshold | Смесь «богатая»: аддитивная коррекция по топливу превышает порог
+P1137 | Lean mixture: additive (fuel) mixture correction above threshold | Смесь «бедная»: аддитивная коррекция по топливу превышает порог
+P1140 | Measured engine load differs from calculated (air flow signal implausible) | Измеренная нагрузка не совпадает с расчётной (неверный сигнал ДМРВ)
+P1141 | Oxygen sensor 2 heater circuit malfunction | Неисправность нагревателя датчика кислорода №2
+P1171 | CO potentiometer signal low | Низкий уровень сигнала СО-потенциометра
+P1172 | CO potentiometer signal high | Высокий уровень сигнала СО-потенциометра
+P1386 | Knock channel internal test error | Ошибка внутреннего теста канала детонации
+P1410 | Canister purge valve control circuit shorted to +12 V | Цепь управления клапаном продувки адсорбера, замыкание на +12 В
+P1425 | Canister purge valve control circuit shorted to ground | Цепь управления клапаном продувки адсорбера, замыкание на массу
+P1426 | Canister purge valve control circuit open | Цепь управления клапаном продувки адсорбера, обрыв
+P1500 | Fuel pump relay control circuit open | Обрыв цепи управления реле бензонасоса
+P1501 | Fuel pump relay control circuit shorted to ground | Цепь управления реле бензонасоса, замыкание на массу
+P1502 | Fuel pump relay control circuit shorted to +12 V | Цепь управления реле бензонасоса, замыкание на +12 В
+P1509 | Idle air control circuit overload | Перегрузка цепи управления регулятором холостого хода
+P1513 | Idle air control circuit shorted to ground | Цепь управления регулятором холостого хода, замыкание на массу
+P1514 | Idle air control circuit open or shorted to +12 V | Цепь управления регулятором холостого хода, обрыв или замыкание на +12 В
+P1541 | Fuel pump relay control circuit open | Цепь управления реле бензонасоса, обрыв
+P1570 | No answer from the immobiliser (APS) or circuit open | Нет ответа от иммобилизатора (АПС) или обрыв цепи
+P1571 | Unregistered electronic key used | Использован незарегистрированный электронный ключ
+P1572 | Immobiliser antenna circuit open | Обрыв цепи антенны иммобилизатора
+P1573 | Immobiliser internal fault | Внутренняя неисправность иммобилизатора (АПС)
+P1600 | No communication with the immobiliser | Нет связи с иммобилизатором
+P1601 | No communication with the immobiliser | Нет связи с иммобилизатором
+P1602 | Loss of battery voltage at the ECU | Пропадание напряжения бортовой сети на контроллере
+P1603 | ECU EEPROM error | Неисправность EEPROM контроллера
+P1606 | Rough road sensor signal implausible | Неверный сигнал датчика неровной дороги
+P1612 | ECU reset error | Ошибка сброса контроллера
+P1616 | Rough road sensor signal low | Низкий уровень сигнала датчика неровной дороги
+P1617 | Rough road sensor signal high | Высокий уровень сигнала датчика неровной дороги
+P1620 | ECU ROM error | Неисправность ПЗУ контроллера
+P1621 | ECU RAM error | Неисправность ОЗУ контроллера
+P1622 | ECU EEPROM error | Неисправность EEPROM контроллера
+P1640 | ECU EEPROM access/test error | Ошибка доступа/теста EEPROM контроллера
+P1689 | Invalid fault codes in ECU memory | Неверные коды ошибок в памяти контроллера
+P1750 | Torque idle actuator circuit 1 shorted to +12 V | Цепь 1 моментного регулятора холостого хода, замыкание на +12 В
+P1751 | Torque idle actuator circuit 1 open | Цепь 1 моментного регулятора холостого хода, обрыв
+P1752 | Torque idle actuator circuit 1 shorted to ground | Цепь 1 моментного регулятора холостого хода, замыкание на массу
+P1753 | Torque idle actuator circuit 2 shorted to +12 V | Цепь 2 моментного регулятора холостого хода, замыкание на +12 В
+P1754 | Torque idle actuator circuit 2 open | Цепь 2 моментного регулятора холостого хода, обрыв
+P1755 | Torque idle actuator circuit 2 shorted to ground | Цепь 2 моментного регулятора холостого хода, замыкание на массу

@@ -1,0 +1,9 @@
+# В репозитории всегда LF. Проект собирают и на Windows, и на Linux, и
+# смешанные переводы строк превращают каждый diff в кашу.
+* text=auto eol=lf
+
+# Двоичное — не трогать.
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary
