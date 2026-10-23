@@ -3,7 +3,7 @@
 package version
 
 // Version of the program.
-var Version = "0.2.0-dev"
+var Version = "0.3.0-dev"
 
 // Name is the program name.
 const Name = "Universal Diagnostic Tool"
