@@ -370,6 +370,17 @@ func (s *Session) StartRecording(path string) error {
 	return nil
 }
 
+// Recording returns the file live values are written to, or "" when
+// nothing is recorded.
+func (s *Session) Recording() string {
+	s.liveMu.Lock()
+	defer s.liveMu.Unlock()
+	if s.rec == nil {
+		return ""
+	}
+	return s.rec.path
+}
+
 // StopRecording closes the CSV file and returns its path.
 func (s *Session) StopRecording() string {
 	s.liveMu.Lock()

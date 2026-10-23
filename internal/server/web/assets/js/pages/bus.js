@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t } from '../i18n.js';
-import { el, clear, toast, busy } from '../ui.js';
+import { el, clear, toast, busy, icon } from '../ui.js';
 import { store, subscribe } from '../app.js';
 
 export function render(view) {
@@ -27,8 +27,9 @@ export function render(view) {
         el('th', t('bus.count')), el('th', t('bus.period')), el('th', t('bus.pgn')))), tbody))));
 
   function paintBtn() {
-    startBtn.textContent = on ? '■ ' + t('common.stop') : '▶ ' + t('common.start');
-    startBtn.className = on ? 'danger' : 'primary';
+    startBtn.replaceChildren(icon(on ? 'stop' : 'play'), on ? t('common.stop') : t('common.start'));
+    startBtn.classList.toggle('danger', on);
+    startBtn.classList.toggle('primary', !on);
   }
   startBtn.onclick = () => busy(startBtn, async () => {
     await api.post(on ? '/api/monitor/stop' : '/api/monitor/start');

@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr, unitName, fill } from '../i18n.js';
-import { el, clear, busy, fmt, pageHeader, errText } from '../ui.js';
+import { el, clear, busy, fmt, pageHeader, errText, icon } from '../ui.js';
 import { currentECU } from '../app.js';
 import { ecuSelect, ecuPath, hasCap } from './common.js';
 
@@ -14,7 +14,7 @@ export function render(view) {
   const readyBox = el('div');
   const misBox = el('div');
   const resBox = el('div');
-  const readBtn = el('button.primary', t('mon.read'));
+  const readBtn = el('button.primary', { type: 'button' }, icon('refresh'), t('mon.read'));
   readBtn.onclick = () => busy(readBtn, readTests);
   view.append(
     pageHeader(t('mon.title'), t('mon.lead'), readBtn),

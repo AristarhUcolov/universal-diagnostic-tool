@@ -100,10 +100,17 @@ func TestCopyData(t *testing.T) {
 func TestSaveLoadInDataFolder(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "data")
 	t.Setenv("UDT_DATA", dir)
+	// Nothing saved yet: the first start, with the update check on.
+	if s := Load(); !s.Fresh() || !s.Updates {
+		t.Errorf("first start: fresh %v, updates %v", s.Fresh(), s.Updates)
+	}
 	s := Defaults()
 	s.Theme = "dark"
 	if err := s.Save(); err != nil {
 		t.Fatal(err)
+	}
+	if Load().Fresh() {
+		t.Error("a start with saved settings is taken for the first one")
 	}
 	if _, err := os.Stat(filepath.Join(dir, "settings.json")); err != nil {
 		t.Fatalf("settings not in the data folder: %v", err)

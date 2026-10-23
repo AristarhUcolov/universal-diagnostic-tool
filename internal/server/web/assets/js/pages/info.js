@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr } from '../i18n.js';
-import { el, clear, toast, statusBadge, copyText, errText } from '../ui.js';
+import { el, clear, toast, statusBadge, copyText, errText, icon } from '../ui.js';
 import { store, currentECU } from '../app.js';
 import { ecuSelect, ecuPath } from './common.js';
 
@@ -17,7 +17,7 @@ export function render(view) {
       clear(identBox).append(el('h2', t('info.ident')),
         el('div.kv', (r.items || []).map(it => [el('div', tr(it.name)), el('div', it.value)])),
         el('div.row', { style: { marginTop: '10px' } },
-          el('button.small', { onclick: () => copyText((r.items || []).map(i => tr(i.name) + ': ' + i.value).join('\n')) }, t('common.copy'))));
+          el('button.small', { type: 'button', onclick: () => copyText((r.items || []).map(i => tr(i.name) + ': ' + i.value).join('\n')) }, icon('copy'), t('common.copy'))));
       const d = r.desc;
       if (d.definition) {
         const defs = (await api.get('/api/definitions')).definitions || [];
@@ -46,5 +46,5 @@ function allUnits() {
   return el('div.card', el('h2', t('info.all')), el('table', el('tbody', ecus.map(e => el('tr',
     el('td.mono', e.id), el('td', el('b', e.desc.name)), el('td', e.desc.protocol), el('td.mono', e.desc.address || ''),
     el('td', statusBadge(e.desc.status)),
-    el('td', el('button.small', { onclick: () => { store.ecu = e.id; location.hash = '#/dashboard'; } }, '→')))))));
+    el('td', el('button.small', { type: 'button', title: t('nav.dashboard'), onclick: () => { store.ecu = e.id; location.hash = '#/dashboard'; } }, icon('arrow'))))))));
 }

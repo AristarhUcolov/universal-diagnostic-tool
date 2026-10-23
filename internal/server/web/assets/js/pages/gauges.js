@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr, unitName, fill } from '../i18n.js';
-import { el, clear, toast, busy, fmt, convert, pageHeader, errText } from '../ui.js';
+import { el, clear, toast, busy, fmt, convert, pageHeader, errText, icon } from '../ui.js';
 import { store, subscribe, currentECU, saveSettings } from '../app.js';
 import { ecuSelect, keyParams, limitsFor, groupName } from './common.js';
 
@@ -265,9 +265,9 @@ export function render(view) {
   let alive = true;
   const unsubs = [];
 
-  const fsBtn = el('button.small', { onclick: () => fullscreen(grid) }, '⛶ ' + t('gauges.fullscreen'));
+  const fsBtn = el('button.small', { type: 'button', onclick: () => fullscreen(grid) }, icon('external'), t('gauges.fullscreen'));
   const hudBtn = el('button.small', { onclick: () => openHUD() }, t('gauges.hud'));
-  const editBtn = el('button.small', { onclick: () => togglePicker() }, '⚙ ' + t('gauges.edit'));
+  const editBtn = el('button.small', { type: 'button', onclick: () => togglePicker() }, icon('settings'), t('gauges.edit'));
   view.append(
     pageHeader(t('gauges.title'), t('gauges.lead'), editBtn, hudBtn, fsBtn),
     ecuSelect(() => load()),
@@ -322,6 +322,8 @@ export function render(view) {
     const need = [...new Set([...selection, ...src, ...extra])];
     const missing = need.filter(id => !have.includes(id));
     if (!missing.length) return;
+    // Opening the gauges asks for live values, also after a manual stop.
+    store.liveStopped = false;
     try {
       await api.post('/api/live/start', { ecu: e.id, params: [...have, ...missing], intervalMs: (running && running.intervalMs) || 250 });
     } catch (err) {
@@ -417,7 +419,7 @@ export function render(view) {
     run.prev = null; run.zero = null; run.dist = 0; run.hz = [];
     // Poll only the speed (and engine speed), as fast as the line allows.
     const e = currentECU();
-    if (!store.recording && e) {
+    if (!store.status.recording && e) {
       run.saved = store.status.live ? { ...store.status.live } : null;
       const rpm = params.find(p => p.obd === '0C' && p.kind === 'num');
       try {
@@ -433,7 +435,7 @@ export function render(view) {
     run.saved = null;
     if (saved !== null && saved !== undefined) {
       try { await api.post('/api/live/start', saved); } catch (e) { /* the connection may be gone */ }
-    } else if (!store.recording && state !== 'done-keep') {
+    } else if (!store.status.recording && state !== 'done-keep') {
       await ensurePolling();
     }
     paintAccel();
@@ -556,8 +558,8 @@ export function render(view) {
       vals,
       el('div.hud-bar',
         el('button', { onclick: () => vals.classList.toggle('mirror') }, t('gauges.mirror')),
-        el('button', { onclick: () => fullscreen(hud) }, '⛶'),
-        el('button', { onclick: close }, '✕ ' + t('common.close'))));
+        el('button', { type: 'button', title: t('gauges.fullscreen'), onclick: () => fullscreen(hud) }, icon('external')),
+        el('button', { type: 'button', onclick: close }, icon('x'), t('common.close'))));
     const show = () => {
       const v = store.live[main.id];
       if (v && v.ok) {

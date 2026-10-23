@@ -1,0 +1,45 @@
+// Windows resources: the icon, the manifest (high DPI support) and the
+// version information. Compiled into ../rsrc_windows_amd64.syso and
+// ../rsrc_windows_386.syso - see README.md here.
+
+1 ICON "icon.ico"
+1 24 "app.manifest"
+
+1 VERSIONINFO
+FILEVERSION     0,3,0,0
+PRODUCTVERSION  0,3,0,0
+FILEOS          0x40004
+FILETYPE        0x1
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "041904B0"
+    BEGIN
+      VALUE "Comments",         "Бесплатная диагностика автомобилей, грузовиков и автобусов"
+      VALUE "CompanyName",      "Открытый проект"
+      VALUE "FileDescription",  "Universal Diagnostic Tool"
+      VALUE "FileVersion",      "0.3.0"
+      VALUE "InternalName",     "udt"
+      VALUE "LegalCopyright",   "AGPL-3.0"
+      VALUE "OriginalFilename", "udt.exe"
+      VALUE "ProductName",      "Universal Diagnostic Tool"
+      VALUE "ProductVersion",   "0.3.0"
+    END
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "Comments",         "Free diagnostics for cars, trucks and buses"
+      VALUE "CompanyName",      "Open project"
+      VALUE "FileDescription",  "Universal Diagnostic Tool"
+      VALUE "FileVersion",      "0.3.0"
+      VALUE "InternalName",     "udt"
+      VALUE "LegalCopyright",   "AGPL-3.0"
+      VALUE "OriginalFilename", "udt.exe"
+      VALUE "ProductName",      "Universal Diagnostic Tool"
+      VALUE "ProductVersion",   "0.3.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x419, 1200, 0x409, 1200
+  END
+END

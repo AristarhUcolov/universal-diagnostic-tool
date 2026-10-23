@@ -1,6 +1,6 @@
 import { api, token } from '../api.js';
 import { t } from '../i18n.js';
-import { el, clear, toast } from '../ui.js';
+import { el, clear, toast, icon, button } from '../ui.js';
 import { subscribe } from '../app.js';
 
 const kindClass = { tx: 'k-tx', rx: 'k-rx', warn: 'k-warn', error: 'k-error', info: '' };
@@ -8,8 +8,8 @@ const kindClass = { tx: 'k-tx', rx: 'k-rx', warn: 'k-warn', error: 'k-error', in
 export function render(view) {
   const tbody = el('tbody');
   const kind = el('select', ['', 'tx', 'rx', 'info', 'warn', 'error'].map(k => el('option', { value: k }, k || t('journal.all'))));
-  const search = el('input', { placeholder: t('common.search'), size: 18 });
-  const pauseBtn = el('button', t('journal.pause'));
+  const search = el('input', { type: 'search', placeholder: t('common.search'), size: 18 });
+  const pauseBtn = el('button', { type: 'button' });
   const fileInfo = el('span.mono.small');
   let paused = false;
   let entries = [];
@@ -17,14 +17,16 @@ export function render(view) {
 
   view.append(el('h1', t('journal.title')), el('p.secondary', t('journal.lead'), ' ', fileInfo),
     el('div.card', el('div.row', kind, search, pauseBtn,
-      el('button', { onclick: () => window.open('/api/journal/export.csv?t=' + encodeURIComponent(token), '_blank') }, t('common.export')),
-      el('button', { onclick: async () => { await api.post('/api/journal/clear'); entries = []; paint(); } }, t('journal.clear')),
-      el('button', { onclick: () => api.post('/api/open-folder', { kind: 'logs' }).catch(e => toast(e.message, 'bad')) }, t('journal.folder'))),
+      button('download', t('common.export'), () => window.open('/api/journal/export.csv?t=' + encodeURIComponent(token), '_blank')),
+      button('trash', t('journal.clear'), async () => { await api.post('/api/journal/clear'); entries = []; paint(); }),
+      button('folder', t('journal.folder'), () => api.post('/api/open-folder', { kind: 'logs' }).catch(e => toast(e.message, 'bad')))),
     el('div.table-wrap', { style: { maxHeight: '68vh', overflow: 'auto', marginTop: '10px' } },
       el('table.journal-table', el('thead', el('tr', el('th', t('journal.time')), el('th', t('journal.kind')), el('th', t('journal.layer')),
         el('th', t('journal.addr')), el('th', t('journal.data')), el('th', t('journal.text')))), tbody))));
 
-  pauseBtn.onclick = () => { paused = !paused; pauseBtn.textContent = paused ? t('journal.resume') : t('journal.pause'); if (!paused) paint(); };
+  const paintPause = () => pauseBtn.replaceChildren(icon(paused ? 'play' : 'stop'), paused ? t('journal.resume') : t('journal.pause'));
+  paintPause();
+  pauseBtn.onclick = () => { paused = !paused; paintPause(); if (!paused) paint(); };
   kind.onchange = paint;
   search.oninput = paint;
 

@@ -87,7 +87,9 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
 современная машина с OBD-II и UDS по CAN, машина 2021 года с UDS по CAN FD,
 VW Passat B6 (TP 2.0), грузовик J1939 и автомобиль с диагностикой по Ethernet
 (DoIP). У симулятора есть кнопки «Ехать», «Разгон 0–100», «Перегрев» и
-«Добавить ошибку», чтобы попробовать все разделы.
+«Добавить ошибку», чтобы попробовать все разделы. На каждой странице, которой
+нужно подключение, есть кнопка **«Попробовать на симуляторе»**: современная
+машина подключается одним нажатием, а ваше обычное подключение не меняется.
 
 ## Что умеет
 
@@ -102,9 +104,12 @@ VW Passat B6 (TP 2.0), грузовик J1939 и автомобиль с диа�
 - **Параметры в реальном времени** — таблица с минимумом и максимумом,
   графики (у каждого параметра своя ось), готовые наборы («Основные»,
   «Холостой ход», «Смесь и топливо»), запись в CSV и «сырые записи» с
-  подсветкой меняющихся байтов — чтобы изучать новые блоки.
-- **Обзор** — главные значения плитками с цветом по порогам, готовность
-  мониторов OBD-II, напряжение бортсети, быстрые действия.
+  подсветкой меняющихся байтов — чтобы изучать новые блоки. Опрос
+  начинается сам, а галочки, отмеченные или снятые во время опроса,
+  применяются сразу — без «Стоп» и «Старт».
+- **Обзор** — главные значения плитками с цветом по порогам и ошибки
+  появляются сами сразу после подключения; готовность мониторов OBD-II,
+  напряжение бортсети, быстрые действия.
 - **Приборы** — стрелочные приборы для выбранных значений, режим HUD для
   лобового стекла, бортовой компьютер (мгновенный и средний расход, пробег,
   время, средняя и максимальная скорость) и замер разгона 0–60, 0–100,
@@ -137,7 +142,12 @@ VW Passat B6 (TP 2.0), грузовик J1939 и автомобиль с диа�
   устройства в той же сети.
 - **Командная строка** — `udt scan`, `udt dtc`, `udt live`, `udt raw`,
   `udt reset`, `udt bridge`, `udt lookup` для скриптов и слабых ноутбуков.
-- **RU / EN**, тёмная и светлая тема, метрические и имперские единицы.
+- **Удобство** — палитра команд **Ctrl+K**: раздел, действие, параметр или
+  код неисправности по нескольким буквам; в верхней строке видно, сколько
+  значений опрашивается и как часто, идёт ли запись и какое напряжение
+  бортсети; окно со своим значком запоминает размер и положение; «Что
+  нового» после обновления и проверка новой версии; русский и английский
+  язык, тёмная и светлая тема, метрические и имперские единицы.
 
 ![Приборы, бортовой компьютер и замер разгона](docs/img/gauges.png)
 
@@ -236,11 +246,18 @@ OBD-II из его параметров и кодов.
   через шлюз по CAN или Ethernet (DoIP), а это программа умеет. Bluetooth LE
   работает в Windows и Linux, но на настоящих адаптерах ещё не проверялся; в
   сборке для macOS его нет. CAN FD проверен на симуляторе.
+- **В интернет программа обращается только за номером новой версии:** при
+  запуске она один раз спрашивает его у github.com, а скачивать новую версию
+  или нет, решаете вы. Проверка выключается в
+  настройках. Данные машины, журналы и записи никуда не отправляются.
 
 ## Устройство программы
 
 ```
 cmd/udt/              точка входа: окно, сервер интерфейса, командная строка
+cmd/udt/winres/       значок, манифест и сведения о версии для Windows
+internal/desktop      окно программы (WebView2): значок, размер и положение
+internal/update       проверка новой версии на GitHub
 internal/serial       COM-порты (Windows, Linux, macOS), поиск адаптеров по USB VID:PID
 internal/kline        K-Line: эхо, быстрая и 5-бодовая инициализация, точные тайминги
 internal/kwp2000      ISO 14230 (KWP2000) на K-Line
@@ -405,7 +422,9 @@ European car with OBD-II on K-Line, VW Golf IV (KW1281), a modern car with
 OBD-II and UDS on CAN, a 2021 car with UDS on CAN FD, VW Passat B6 (TP 2.0), a
 J1939 truck and a car with Ethernet diagnostics (DoIP). The simulator has
 "Drive", "Launch 0–100", "Overheat" and "Inject a fault" buttons to try every
-page.
+page. Every page that needs a connection has a **"Try the simulator"**
+button: a modern car connects with one click, and your usual connection stays
+as it is.
 
 ## What it does
 
@@ -420,8 +439,10 @@ page.
 - **Live data** — a table with minimum and maximum, charts (one axis per
   parameter), ready-made sets ("Key values", "Idle", "Mixture and fuel"), CSV
   recording and "raw records" that highlight changing bytes — for exploring
-  new control units.
-- **Overview** — key values as tiles coloured by thresholds, OBD-II monitor
+  new control units. Polling starts by itself, and values ticked or unticked
+  while polling take effect at once — without Stop and Start.
+- **Overview** — key values as tiles coloured by thresholds and the trouble
+  codes appear by themselves right after connecting; OBD-II monitor
   readiness, battery voltage, quick actions.
 - **Gauges** — dials for the values you choose, a HUD mode for the
   windscreen, a trip computer (current and average consumption, distance,
@@ -454,7 +475,12 @@ page.
   device on the same network.
 - **Command line** — `udt scan`, `udt dtc`, `udt live`, `udt raw`,
   `udt reset`, `udt bridge`, `udt lookup` for scripts and slow laptops.
-- **EN / RU**, dark and light theme, metric and imperial units.
+- **Convenience** — a command palette, **Ctrl+K**: any page, action, value
+  or trouble code from a few letters; the top bar shows how many values are
+  polled and how often, whether a recording runs and the supply voltage; the
+  window has its own icon and remembers its size and place; "What's new"
+  after an update and a check for a new version; English and Russian, dark
+  and light theme, metric and imperial units.
 
 ![Gauges, trip computer and acceleration timing](docs/img/gauges-en.png)
 
@@ -553,11 +579,19 @@ appear on a CAN bus without a hardware gateway. Details:
   CAN or Ethernet (DoIP), which the program does. Bluetooth LE works on
   Windows and Linux but has not been tried on real adapters yet; the macOS
   build has none. CAN FD is tested against the simulator.
+- **The only thing the program asks the internet for is the number of the
+  latest version:** at start it asks github.com once, and you decide whether
+  to download the new version. The check can be
+  switched off in the settings. Vehicle data, journals and recordings are
+  never sent anywhere.
 
 ## Program structure
 
 ```
 cmd/udt/              entry point: window, interface server, command line
+cmd/udt/winres/       icon, manifest and version information for Windows
+internal/desktop      the program window (WebView2): icon, size and place
+internal/update       the check for a new version on GitHub
 internal/serial       serial ports (Windows, Linux, macOS), adapters by USB VID:PID
 internal/kline        K-Line: echo, fast and 5-baud init, precise timing
 internal/kwp2000      ISO 14230 (KWP2000) on K-Line

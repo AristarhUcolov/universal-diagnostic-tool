@@ -87,7 +87,11 @@ go vet ./...
 - Без cgo: драйверы адаптеров (J2534, RP1210, PCAN, Kvaser) подгружаются при
   запуске, чтобы программа оставалась одним файлом.
 - Интерфейс — обычные JS-модули без сборки в `internal/server/web`; весь
-  текст в `i18n.js` на двух языках.
+  текст в `i18n.js` на двух языках. Значки — SVG-спрайт в `index.html`
+  (`icon('play')` в коде), список изменений для окна «Что нового» —
+  `changelog.js`: запись новой версии добавляется туда до выпуска.
+- Значок программы, манифест и сведения о версии для Windows — в
+  `cmd/udt/winres` (как пересобрать — README там же).
 - Интерфейс доступен только с этого компьютера и защищён ключом сеанса —
   пусть так и остаётся.
 
@@ -204,7 +208,12 @@ Worth knowing about the structure:
 - No cgo: adapter drivers (J2534, RP1210, PCAN, Kvaser) are loaded at run
   time so the program stays a single file.
 - The interface is plain JS modules without a build step in
-  `internal/server/web`; all text lives in `i18n.js` in both languages.
+  `internal/server/web`; all text lives in `i18n.js` in both languages. Icons
+  are an SVG sprite in `index.html` (`icon('play')` in the code); the list of
+  changes for "What's new" is `changelog.js`: the entry of a new version goes
+  there before the release.
+- The program icon, manifest and version information for Windows are in
+  `cmd/udt/winres` (how to rebuild them — the README there).
 - The interface is reachable only from this computer and protected by a
   session key — keep it that way.
 

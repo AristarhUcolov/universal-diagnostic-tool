@@ -205,6 +205,65 @@ func TestServiceEndpoints(t *testing.T) {
 	}
 }
 
+// TestTryAndUpdates covers the parts of the interface for first steps:
+// trying the simulator keeps the user's own last connection, the update
+// check stays off the network when it is switched off, and the status
+// tells about a running recording.
+func TestTryAndUpdates(t *testing.T) {
+	s, base := newTestServer(t)
+	tok := s.Token
+	s.settings.Last.Adapter, s.settings.Last.Port = "kkl", "COM3"
+	s.settings.Updates = false
+	s.updates.API = "http://127.0.0.1:1/releases/latest" // nothing listens there
+
+	var u struct {
+		Current   string `json:"current"`
+		Available bool   `json:"available"`
+		Error     string `json:"error"`
+	}
+	code, body := do(t, "GET", base+"/api/update", "", tok, "")
+	if code != http.StatusOK || json.Unmarshal([]byte(body), &u) != nil || u.Current == "" || u.Error != "" || u.Available {
+		t.Fatalf("update check switched off: %d %s", code, body)
+	}
+	// The button in the settings asks even then, and a failure is told,
+	// not hidden behind "no update".
+	code, body = do(t, "GET", base+"/api/update?force=1", "", tok, "")
+	if code != http.StatusOK || json.Unmarshal([]byte(body), &u) != nil || u.Error == "" || u.Available {
+		t.Fatalf("forced check without a server: %d %s", code, body)
+	}
+
+	if code, body := do(t, "POST", base+"/api/connect?try=1", "", tok, `{"adapter":"sim","profile":"auto","simVariant":"can"}`); code != http.StatusOK {
+		t.Fatalf("try the simulator: %d %s", code, body)
+	}
+	if s.settings.Last.Adapter != "kkl" || s.settings.Last.Port != "COM3" {
+		t.Fatalf("trying the simulator replaced the last connection: %+v", s.settings.Last)
+	}
+	deadline := time.Now().Add(40 * time.Second)
+	for {
+		_, body := do(t, "GET", base+"/api/status", "", tok, "")
+		if strings.Contains(body, `"state":"connected"`) {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("not connected: %s", body)
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+
+	if code, body := do(t, "POST", base+"/api/record/start", "", tok, `{}`); code != http.StatusOK {
+		t.Fatalf("record: %d %s", code, body)
+	}
+	if _, body := do(t, "GET", base+"/api/status", "", tok, ""); !strings.Contains(body, `"recording":`) {
+		t.Fatalf("status during a recording: %s", body)
+	}
+	if code, body := do(t, "POST", base+"/api/record/stop", "", tok, `{}`); code != http.StatusOK || !strings.Contains(body, ".csv") {
+		t.Fatalf("stop recording: %d %s", code, body)
+	}
+	if _, body := do(t, "GET", base+"/api/status", "", tok, ""); strings.Contains(body, `"recording":`) {
+		t.Fatalf("status after the recording: %s", body)
+	}
+}
+
 // TestSimulatedSession drives the API like the interface does: connect to
 // the simulated GAZ-3110 (Микас-7.1), read the trouble codes, poll values
 // and build the report.

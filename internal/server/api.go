@@ -29,6 +29,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/settings"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/sim"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/socketcan"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/update"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/vehicle"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/version"
 )
@@ -45,7 +46,7 @@ func (s *Server) apiInfo(w http.ResponseWriter, r *http.Request) {
 		"name": version.Name, "version": version.Version, "os": runtime.GOOS, "arch": runtime.GOARCH,
 		"configDir": settings.Dir(), "data": settings.Current(), "logFile": s.journal.FilePath(), "systemLanguage": desktop.SystemLanguage(),
 		"definitions": len(ecu.Builtin().All()), "definitionErrors": ecu.Builtin().Errors(),
-		"dtcFamilies": fams, "lanUrl": s.LANURL(),
+		"dtcFamilies": fams, "lanUrl": s.LANURL(), "firstRun": s.firstRun,
 	})
 }
 
@@ -109,8 +110,11 @@ func (s *Server) apiConnect(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, errors.New("choose an adapter"))
 		return
 	}
-	s.settings.Last = cfg
-	_ = s.settings.Save()
+	// "Try the simulator" keeps the user's own last connection.
+	if r.URL.Query().Get("try") != "1" {
+		s.settings.Last = cfg
+		_ = s.settings.Save()
+	}
 	s.mgr.connect(cfg, func(sess *vehicle.Session) { go s.pumpSession(sess) })
 	writeJSON(w, map[string]string{"state": StateConnecting})
 }
@@ -144,6 +148,9 @@ func (s *Server) statusView() map[string]any {
 		out["simulator"] = sess.World() != nil
 		if live, on := sess.LiveRunning(); on {
 			out["live"] = live
+		}
+		if f := sess.Recording(); f != "" {
+			out["recording"] = f
 		}
 	}
 	s.bridgeMu.Lock()
@@ -579,6 +586,7 @@ func (s *Server) apiRecordStart(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, err)
 		return
 	}
+	s.notifyStatus()
 	writeJSON(w, map[string]string{"file": path})
 }
 
@@ -587,6 +595,7 @@ func (s *Server) apiRecordStop(w http.ResponseWriter, r *http.Request) {
 	if sess := s.mgr.session(); sess != nil {
 		path = sess.StopRecording()
 	}
+	s.notifyStatus()
 	writeJSON(w, map[string]string{"file": path})
 }
 
@@ -803,6 +812,18 @@ func (s *Server) apiOpenURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, map[string]bool{"ok": true})
+}
+
+// apiUpdate tells whether a newer release is out. With the check switched
+// off in the settings it asks GitHub only when the user presses the
+// button (force=1).
+func (s *Server) apiUpdate(w http.ResponseWriter, r *http.Request) {
+	force := r.URL.Query().Get("force") == "1"
+	if !force && !s.settings.Updates {
+		writeJSON(w, update.Result{Current: version.Version})
+		return
+	}
+	writeJSON(w, s.updates.Check(r.Context(), force))
 }
 
 // apiEvents streams status changes, live values, bus monitor snapshots

@@ -1,7 +1,9 @@
 import { api, token } from '../api.js';
 import { t, tr, lang, count, unitName } from '../i18n.js';
-import { el, clear, toast, busy, confirmBox, fmt, errText } from '../ui.js';
+import { el, clear, toast, busy, confirmBox, fmt, errText, icon, button, pageHeader } from '../ui.js';
 import { ecuSelect, ecuPath, hasCap, repairHints, hintCard, sevBadge } from './common.js';
+import { rememberCodes } from './dashboard.js';
+import { currentECU } from '../app.js';
 
 const flagStyle = {
   active: 'bad', mil: 'bad', testFailed: 'bad', pending: 'warn', intermittent: 'warn',
@@ -9,20 +11,20 @@ const flagStyle = {
 };
 const flagIcon = { active: '●', mil: '⚠', pending: '◐', intermittent: '◐', permanent: '■', history: '○', confirmed: '✓' };
 
-export function render(view) {
+export function render(view, { query } = {}) {
   const result = el('div');
   const freeze = el('div');
   let flagNames = {};
-  const readBtn = el('button.primary', t('dtc.read'));
-  const clearBtn = el('button.danger', t('dtc.clear'));
-  const reportBtn = el('button', t('dtc.report'));
+  const readBtn = button('refresh', t('dtc.read'), null, 'primary');
+  const clearBtn = button('trash', t('dtc.clear'), null, 'danger');
+  const reportBtn = button('printer', t('dtc.report'), null);
 
   view.append(
-    el('h1', t('dtc.title')),
+    pageHeader(t('dtc.title'), t('dtc.lead')),
     ecuSelect(() => read()),
     el('div.card', el('div.row', readBtn, clearBtn, reportBtn), result),
     freeze,
-    lookupCard());
+    lookupCard(query && query.get('q')));
 
   readBtn.onclick = () => busy(readBtn, read);
   clearBtn.onclick = async () => {
@@ -38,6 +40,7 @@ export function render(view) {
   async function read() {
     clear(result).append(el('p.muted', '…'));
     const r = await api.get(ecuPath('dtc'));
+    if (currentECU()) rememberCodes(currentECU().id, r.codes || []);
     flagNames = r.flagNames || {};
     await paint(r.codes || []);
     if (hasCap('freeze') && r.codes && r.codes.length) loadFreeze();
@@ -52,7 +55,7 @@ export function render(view) {
   async function paint(codes) {
     clear(result);
     if (!codes.length) {
-      result.append(el('div.empty', el('span.status-line.good', '✓ ' + t('dtc.none'))));
+      result.append(el('div.dtc-none', icon('check-circle', 'xl'), el('b.status-line.good', t('dtc.none')), el('span.muted.small', t('dtc.noneHint'))));
       return;
     }
     let hints = {};
@@ -63,10 +66,11 @@ export function render(view) {
       const h = hints[d.hint] || hints.generic;
       if (h) bySev[h.severity] = (bySev[h.severity] || 0) + 1;
       const detail = el('tr.hint-row.hidden', el('td', { colSpan: 5 }, h ? hintCard(h) : null));
-      const toggle = el('button.small', t('dtc.howFix') + ' ▾');
+      const toggle = el('button.small', { type: 'button', 'aria-expanded': 'false' }, t('dtc.howFix') + ' ▾');
       toggle.onclick = () => {
         const open = !detail.classList.toggle('hidden');
         toggle.textContent = t('dtc.howFix') + (open ? ' ▴' : ' ▾');
+        toggle.setAttribute('aria-expanded', String(open));
       };
       tbody.append(el('tr',
         el('td', el('span.code', d.code), d.extra && d.extra.sae ? el('div.muted.small', d.extra.sae) : null),
@@ -104,9 +108,11 @@ export function render(view) {
   read().catch(e => { clear(result).append(el('p', { style: { color: 'var(--critical-ink)' } }, errText(e))); });
 }
 
-export function lookupCard() {
+// lookupCard searches the offline database of trouble codes; initial is
+// a code or a word to look up at once (from the command palette).
+export function lookupCard(initial) {
   const out = el('div');
-  const inp = el('input', { placeholder: t('dtc.lookupPh'), size: 32 });
+  const inp = el('input', { type: 'search', placeholder: t('dtc.lookupPh'), size: 32, value: initial || '' });
   let timer;
   inp.oninput = () => {
     clearTimeout(timer);
@@ -123,5 +129,6 @@ export function lookupCard() {
       } catch (e) { toast(e.message, 'bad'); }
     }, 250);
   };
-  return el('div.card', el('h2', t('dtc.lookup')), inp, out);
+  if (initial) setTimeout(() => { inp.oninput(); inp.focus(); }, 0);
+  return el('div.card', el('h2', t('dtc.lookup')), el('div.row', icon('search'), inp), out);
 }

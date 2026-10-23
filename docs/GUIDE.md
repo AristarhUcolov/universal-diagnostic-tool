@@ -4,7 +4,7 @@
 
 # Руководство
 
-**Разделы:** [Запуск](#запуск) · [Подключение](#подключение) ·
+**Разделы:** [Запуск](#запуск) · [Интерфейс](#интерфейс) · [Подключение](#подключение) ·
 [Обзор](#обзор) · [Ошибки](#ошибки) · [Мониторы](#мониторы) ·
 [Параметры](#параметры) · [Приборы](#приборы) ·
 [Предупреждения](#предупреждения) ·
@@ -41,6 +41,32 @@
 настройки и журналы прежних версий из `%APPDATA%\udt` копируются в
 `udt-data` сами. Где лежат данные, видно в **Настройках → Папки**.
 
+## Интерфейс
+
+- **Окно** при первом запуске открывается во весь экран, а потом — там и
+  такого размера, как вы его оставили (файл `window.json` в `udt-data`). В
+  заголовке окна — открытый раздел.
+- **Меню разделов** слева; на узком экране (телефон, планшет) оно прячется
+  за кнопкой ☰.
+- **Верхняя строка:** подключение (нажмите — откроется страница
+  подключения); **опрос** — сколько значений опрашивается и сколько раз в
+  секунду, нажатие открывает «Параметры», крестик останавливает опрос;
+  **REC** — идёт запись CSV; красная метка предупреждения; напряжение
+  бортсети; **Команды**; язык и тема.
+- **Палитра команд — Ctrl+K** (или кнопка «Команды»): наберите несколько
+  букв — раздел («ошиб»), действие («запись», «тёмная тема»,
+  «отключиться»), параметр подключённого блока («темп») или код
+  неисправности («P0301», «035»). Стрелки — выбор, Enter — выполнить, Esc —
+  закрыть.
+- **Попробовать на симуляторе** — кнопка на каждой странице, которой нужно
+  подключение: подключает виртуальную современную машину и не меняет ваше
+  «как в прошлый раз».
+- **Что нового** — внизу меню, у номера версии. После обновления окно со
+  списком изменений открывается само один раз.
+- **Новая версия.** Если на GitHub вышла новая версия, внизу меню появится
+  «Вышла версия …»: там ссылка на страницу загрузки, «Позже» и «Пропустить
+  эту версию». Программа сама ничего не скачивает.
+
 ## Подключение
 
 1. Вставьте адаптер в разъём машины и включите зажигание (двигатель можно
@@ -59,7 +85,8 @@
 5. **Подключиться.** «Ход подключения» показывает каждую попытку.
 
 В следующий раз вверху страницы будет карточка **«Как в прошлый раз»**: тот
-же адаптер, порт и профиль одной кнопкой.
+же адаптер, порт и профиль одной кнопкой. При самом первом запуске на её месте
+— приветствие с кнопкой «Попробовать на симуляторе».
 
 **Дополнительные настройки:** адрес блока (hex; `10` — двигатель KWP2000,
 `01` — двигатель VW), инициализация K-Line (быстрая или 5 бод), скорость CAN,
@@ -72,10 +99,11 @@
 
 Блок, протокол, статус описания и адаптер; число ошибок с первыми кодами;
 основные значения плитками с мини-графиком и шкалой (жёлтый и красный цвет —
-выход за пороги, например перегрев или низкое напряжение). Если значения не
-опрашиваются, кнопка запустит опрос. Для OBD-II — готовность мониторов и
-лампа MIL. Для симулятора — кнопки управления двигателем и «добавить
-неисправность».
+выход за пороги, например перегрев или низкое напряжение). Значения и ошибки
+появляются сами сразу после подключения; ошибки перечитывает кнопка
+«Прочитать ошибки». Если вы остановили опрос вручную, плитки ждут кнопки
+«Показать основные параметры». Для OBD-II — готовность мониторов и лампа MIL.
+Для симулятора — кнопки управления двигателем и «добавить неисправность».
 
 ## Ошибки
 
@@ -119,8 +147,14 @@
 ## Параметры
 
 Отметьте параметры слева (по группам, с фильтром) или нажмите готовый
-набор — «Основные», «Холостой ход», «Смесь и топливо» — и нажмите
-**Старт**. Частота: максимально быстро, 4 раза в секунду или раз в секунду.
+набор — «Основные», «Холостой ход», «Смесь и топливо». Опрос начинается сам
+при открытии страницы — с тем набором, что вы выбирали для этого блока в
+прошлый раз (в первый раз — основные параметры). Галочки, отмеченные или
+снятые во время опроса, применяются сразу: новые значения появляются через
+мгновение, без «Стоп» и «Старт». Так же сразу меняется частота: максимально
+быстро, 4 раза в секунду или раз в секунду. **Стоп** останавливает опрос, и
+другие страницы не запускают его сами, пока вы не нажмёте **Старт** (кроме
+«Приборов»: они открываются ради живых значений).
 
 - **Таблица** — значение, единица, минимум и максимум за сеанс.
 - **Графики** — последняя минута; у каждого параметра своя ось. Наведите
@@ -240,9 +274,10 @@
 
 Язык, тема, единицы (метрические или имперские), режим эксперта, запись
 журнала в файл, открытие в окне, предупреждения об опасных значениях и их
-звук; мост ELM327; доступ из сети; **папки** — где лежат данные (рядом с
-программой или в профиле), кнопки открыть журналы, записи, отчёты и
-описания блоков; версия, база кодов и лицензия.
+звук, проверка новой версии при запуске; мост ELM327; доступ из сети;
+**папки** — где лежат данные (рядом с программой или в профиле), кнопки
+открыть журналы, записи, отчёты и описания блоков; **о программе** —
+«Что нового», «Проверить обновления», версия, база кодов и лицензия.
 
 ## Мост ELM327
 
@@ -377,6 +412,31 @@ choose any folder. On the first start the settings and journals of earlier
 versions in `%APPDATA%\udt` are copied into `udt-data`. **Settings →
 Folders** shows where the data is.
 
+## The interface
+
+- **The window** opens full screen the first time, and after that where and
+  as large as you left it (the `window.json` file in `udt-data`). The title
+  bar names the open page.
+- **The menu** of pages is on the left; on a narrow screen (a phone, a
+  tablet) it hides behind the ☰ button.
+- **The top bar:** the connection (click it for the connection page);
+  **polling** — how many values are polled and how many times a second, a
+  click opens Live data and the × stops polling; **REC** — a CSV recording
+  runs; a red alert mark; the supply voltage; **Commands**; language and
+  theme.
+- **The command palette — Ctrl+K** (or the "Commands" button): type a few
+  letters — a page ("trouble"), an action ("record", "dark theme",
+  "disconnect"), a value of the connected unit ("temp") or a trouble code
+  ("P0301", "035"). Arrows choose, Enter runs, Esc closes.
+- **Try the simulator** — a button on every page that needs a connection: it
+  connects a virtual modern car and leaves your "like last time" as it is.
+- **What's new** — at the bottom of the menu, next to the version. After an
+  update the list of changes opens by itself once.
+- **A new version.** When a new version is out on GitHub, "Version … is out"
+  appears at the bottom of the menu, with a link to the download page,
+  "Later" and "Skip this version". The program never downloads anything by
+  itself.
+
 ## Connecting
 
 1. Plug the adapter into the car and switch the ignition on (the engine may
@@ -395,7 +455,8 @@ Folders** shows where the data is.
 5. **Connect.** The progress list shows every attempt.
 
 Next time a **"Connect like last time"** card at the top of the page offers
-the same adapter, port and profile with one button.
+the same adapter, port and profile with one button. On the very first start a
+welcome with a "Try the simulator" button stands in its place.
 
 **Advanced:** control unit address (hex; `10` — KWP2000 engine, `01` — VW
 engine), K-Line initialisation (fast or 5 baud), CAN bit rate, UDS
@@ -408,9 +469,11 @@ method, DTR and RTS levels, adapter port speed.
 
 Control unit, protocol, description status and adapter; the number of codes
 with the first few; key values as tiles with a sparkline and a gauge (yellow
-and red mean beyond thresholds — overheating, low voltage). If values are not
-being polled, a button starts polling. For OBD-II: monitor readiness and the
-MIL. For the simulator: engine controls and "inject a fault".
+and red mean beyond thresholds — overheating, low voltage). The values and
+the codes appear by themselves right after connecting; "Read codes" reads
+the codes again. After you stopped polling by hand, the tiles wait for "Show
+key values". For OBD-II: monitor readiness and the MIL. For the simulator:
+engine controls and "inject a fault".
 
 ## Trouble codes
 
@@ -455,8 +518,13 @@ program does not show them as numbers.
 ## Live data
 
 Tick parameters on the left (grouped, with a filter) or pick a ready set —
-"Key values", "Idle", "Mixture and fuel" — and press **Start**. Rate: as
-fast as possible, 4 times a second or once a second.
+"Key values", "Idle", "Mixture and fuel". Polling starts by itself when the
+page opens, with the set you chose for this control unit last time (the key
+values the first time). Values ticked or unticked while polling take effect
+at once: new values show up a moment later, without Stop and Start. The rate
+changes at once too: as fast as possible, 4 times a second or once a second.
+**Stop** stops polling, and other pages do not start it by themselves until
+you press **Start** (except Gauges, which are opened for live values).
 
 - **Table** — value, unit, session minimum and maximum.
 - **Charts** — the last minute; one axis per parameter. Hover to read any
@@ -572,10 +640,11 @@ folder; the latest 50 are kept.
 ## Settings
 
 Language, theme, units (metric or imperial), expert mode, journal file,
-window mode, alerts about dangerous values and their sound; the ELM327
-bridge; network access; **folders** — where the data is (next to the program
-or in the profile) and buttons that open journals, recordings, reports and
-control unit descriptions; version, code database and licence.
+window mode, alerts about dangerous values and their sound, the check for a
+new version at start; the ELM327 bridge; network access; **folders** — where
+the data is (next to the program or in the profile) and buttons that open
+journals, recordings, reports and control unit descriptions; **about** —
+"What's new", "Check for updates", version, code database and licence.
 
 ## ELM327 bridge
 

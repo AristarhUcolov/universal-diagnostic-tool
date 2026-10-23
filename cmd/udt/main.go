@@ -88,7 +88,7 @@ func runGUI(args []string) int {
 			// The console window is only hidden once the program's own
 			// window is open, so a failing WebView2 never leaves a
 			// server running invisibly.
-			if desktop.RunWindow(url, version.Name, filepath.Join(settings.Dir(), "webview"), desktop.HideOwnConsole) {
+			if desktop.RunWindow(url, version.Name, settings.Dir(), desktop.HideOwnConsole) {
 				return 0 // the window was closed
 			}
 			fmt.Println("WebView2 is not available; opening the browser.")

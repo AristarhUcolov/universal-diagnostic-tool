@@ -23,6 +23,7 @@ import (
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ecu"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/settings"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/update"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/vehicle"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/version"
 )
@@ -46,6 +47,9 @@ type Server struct {
 
 	bridgeMu sync.Mutex
 	bridge   *bridge.Server
+
+	updates  *update.Checker
+	firstRun bool // the program starts for the first time
 }
 
 // New creates the server.
@@ -54,7 +58,8 @@ func New(st *settings.Settings, j *journal.Journal) (*Server, error) {
 	if _, err := rand.Read(tok); err != nil {
 		return nil, err
 	}
-	s := &Server{Token: hex.EncodeToString(tok), settings: st, journal: j, statusSubs: map[chan struct{}]bool{}}
+	s := &Server{Token: hex.EncodeToString(tok), settings: st, journal: j, statusSubs: map[chan struct{}]bool{},
+		updates: &update.Checker{Current: version.Version}, firstRun: st.Fresh()}
 	s.mgr = newManager(j, s.notifyStatus)
 	idx, err := fs.ReadFile(webFS, "web/index.html")
 	if err != nil {
@@ -227,6 +232,7 @@ func (s *Server) routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/sim/control", s.apiSimControl)
 	mux.HandleFunc("POST /api/open-folder", s.apiOpenFolder)
 	mux.HandleFunc("POST /api/open-url", s.apiOpenURL)
+	mux.HandleFunc("GET /api/update", s.apiUpdate)
 }
 
 func noCache(h http.Handler) http.Handler {

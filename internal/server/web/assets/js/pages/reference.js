@@ -28,14 +28,14 @@ const truckPins = {
   ru: '9-контактный Deutsch (J1939, грузовики/автобусы)\n  A  масса АКБ        B  + АКБ (12/24 В)\n  C  J1939 CAN high   D  J1939 CAN low\n  E  экран CAN        F  J1708 +   G  J1708 −\n  H/J  CAN производителя (часто вторая сеть J1939)\n  Чёрный разъём: 250 кбит/с, зелёный: 500 кбит/с\n\n6-контактный Deutsch (J1708 / J1587, старые грузовики)\n  A  J1708 +   B  J1708 −   C  + АКБ   E  масса',
 };
 
-export function render(view) {
+export function render(view, { query } = {}) {
   const l = lang();
   const adapters = el('div', el('p.muted', '…'));
   const defs = el('div', el('p.muted', '…'));
   const advice = el('div', el('p.muted', '…'));
   view.append(
     el('h1', t('ref.title')),
-    lookupCard(),
+    lookupCard(query && query.get('q')),
     el('div.card', el('h2', t('ref.repair')), el('p.secondary', t('ref.repairLead')), advice),
     el('div.card', el('h2', t('ref.adapters')), adapters),
     el('div.card', el('h2', t('ref.connectors')),

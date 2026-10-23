@@ -1,7 +1,7 @@
 import { api } from '../api.js';
 import { t, setLang, count, fill } from '../i18n.js';
-import { el, clear, toast, busy, copyText } from '../ui.js';
-import { store, saveSettings, subscribe } from '../app.js';
+import { el, clear, toast, busy, copyText, button, icon } from '../ui.js';
+import { store, saveSettings, subscribe, checkUpdates, showNews, openLink } from '../app.js';
 
 export function render(view) {
   const s = store.settings;
@@ -26,7 +26,7 @@ export function render(view) {
       el('label.field', t('set.theme'), select(s.theme || 'auto', [['auto', t('set.themeAuto')], ['dark', t('set.themeDark')], ['light', t('set.themeLight')]], v => save({ theme: v }))),
       el('label.field', t('set.units'), select(s.units || 'metric', [['metric', t('set.metric')], ['imperial', t('set.imperial')]], v => save({ units: v })))),
       el('div.checks', check('expert', t('set.expert')), check('logToFile', t('set.logToFile')), check('window', t('set.window')),
-        check('alerts', t('set.alerts')), check('alertSound', t('set.alertSound')))),
+        check('alerts', t('set.alerts')), check('alertSound', t('set.alertSound')), check('updates', t('set.updates')))),
     el('div.card', el('h2', t('set.bridge')), el('p.secondary', t('set.bridgeLead')), bridgeBox),
     lanCard(),
     dataCard(),
@@ -63,26 +63,41 @@ function dataCard() {
   const mode = { portable: 'Portable', profile: 'Profile', custom: 'Custom' }[d.mode] || 'Profile';
   return el('div.card', el('h2', t('set.folders')),
     el('div.row.data-dir', el('span.badge' + (d.mode === 'portable' ? '.good' : '.info'), t('set.data' + mode)),
-      el('code.data-path', d.dir), el('button.small', { onclick: () => copyText(d.dir) }, t('common.copy'))),
+      el('code.data-path', d.dir), el('button.small', { type: 'button', onclick: () => copyText(d.dir) }, icon('copy'), t('common.copy'))),
     el('p.secondary', t('set.dataLead' + mode)),
     d.note ? el('p.muted.small', d.note) : null,
     d.copied ? el('p.secondary', fill(t('set.dataCopied'), { dir: d.copied })) : null,
     el('div.row',
       [['logs', 'Logs'], ['recordings', 'Recordings'], ['reports', 'Reports'], ['definitions', 'Definitions'], ['', 'Config']].map(([k, label]) => el('button', {
-        onclick: () => api.post('/api/open-folder', { kind: k }).catch(e => toast(e.message, 'bad')),
-      }, t('set.folder' + label)))));
+        type: 'button', onclick: () => api.post('/api/open-folder', { kind: k }).catch(e => toast(e.message, 'bad')),
+      }, icon('folder'), t('set.folder' + label)))));
 }
 
 function lanCard() {
   const url = store.info.lanUrl;
   return el('div.card', el('h2', t('set.lan')),
-    url ? el('div.row', el('code', url), el('button.small', { onclick: () => copyText(url) }, t('common.copy')))
+    url ? el('div.row', el('code', url), el('button.small', { type: 'button', onclick: () => copyText(url) }, icon('copy'), t('common.copy')))
       : el('p.secondary', t('set.lanHint'), ' ', el('code', 'http://<IP>:8080/#t=…')));
 }
 
 function aboutCard() {
   const i = store.info;
-  return el('div.card', el('h2', t('set.about')), el('div.kv',
+  const state = el('span.muted.small');
+  const paint = u => {
+    clear(state);
+    if (!u) return;
+    if (u.error) state.append(fill(t('upd.failed'), { e: u.error }));
+    else if (u.available) {
+      state.append(el('b', fill(t('upd.title'), { v: u.latest })), ' ',
+        el('a', { href: '#', onclick: e => { e.preventDefault(); openLink(u.url); } }, t('upd.download')));
+    } else if (u.latest) state.append(icon('check', 'sm'), ' ', fill(t('upd.none'), { v: u.current }));
+  };
+  paint(store.update);
+  const check = button('refresh', t('upd.check'), null, 'small');
+  check.onclick = () => busy(check, async () => paint(await checkUpdates(true)));
+  return el('div.card', el('h2', t('set.about')),
+    el('div.row', { style: { marginBottom: '14px' } }, button('sparkle', t('news.title'), () => showNews(false), 'small'), check, state),
+    el('div.kv',
     el('div', t('about.version')), el('div', i.version),
     el('div', t('about.system')), el('div', `${i.os}/${i.arch}`),
     el('div', t('about.config')), el('div.mono', i.configDir),

@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr, unitName } from '../i18n.js';
-import { el, clear, toast, busy, confirmBox, fmt, pageHeader, errText } from '../ui.js';
+import { el, clear, toast, busy, confirmBox, fmt, pageHeader, errText, icon } from '../ui.js';
 import { currentECU } from '../app.js';
 import { ecuSelect, ecuPath, hasCap } from './common.js';
 
@@ -47,7 +47,7 @@ export function render(view) {
     pageHeader(t('svc.title'), t('svc.lead')),
     ecuSelect(() => load()),
     el('div.card.safety',
-      el('div.safety-head', '⚠ ', t('svc.safetyTitle')),
+      el('div.safety-head', icon('alert'), t('svc.safetyTitle')),
       el('ul', ['svc.safety1', 'svc.safety2', 'svc.safety3'].map(k => el('li', t(k))))),
     liveBox, resetBox, actsBox);
 
@@ -116,7 +116,7 @@ export function render(view) {
   function paintReset() {
     clear(resetBox);
     if (!hasCap('reset')) return;
-    const b = el('button', '⟳ ' + t('svc.reset'));
+    const b = el('button', { type: 'button' }, icon('refresh'), t('svc.reset'));
     b.onclick = async () => {
       if (!await confirmBox(t('svc.resetTitle'), t('svc.resetConfirm'), t('svc.reset'), false)) return;
       await busy(b, async () => {

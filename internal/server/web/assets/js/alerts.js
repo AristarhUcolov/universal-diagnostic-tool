@@ -55,7 +55,7 @@ async function check(ev) {
     if (lvl === 'bad') {
       if (!cur) {
         active[v.id] = { p, v: v.v, text: message(p, v.v, lim) };
-        toast('⚠ ' + active[v.id].text, 'bad');
+        toast(active[v.id].text, 'bad');
         if (store.settings.alertSound !== false) beep();
       } else {
         cur.v = v.v;

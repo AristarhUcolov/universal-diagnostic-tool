@@ -49,11 +49,60 @@ export function clear(node) {
   return node;
 }
 
+// icon is a picture from the sprite in index.html: icon('play').
+export function icon(name, cls) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', 'ic' + (cls ? ' ' + cls : ''));
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(ns, 'use');
+  use.setAttribute('href', '#i-' + name);
+  svg.appendChild(use);
+  return svg;
+}
+
+const toastIcons = { bad: 'alert', good: 'check-circle' };
+
 export function toast(msg, kind = '') {
   const box = document.getElementById('toasts');
-  const n = el('div.toast' + (kind ? '.' + kind : ''), msg);
+  const close = el('button.x', { type: 'button', title: t('common.close'), 'aria-label': t('common.close') }, icon('x', 'sm'));
+  const n = el('div.toast' + (kind ? '.' + kind : ''), { role: kind === 'bad' ? 'alert' : 'status' },
+    icon(toastIcons[kind] || 'info'), el('div.msg', msg), close);
+  close.onclick = () => n.remove();
   box.appendChild(n);
-  setTimeout(() => n.remove(), kind === 'bad' ? 9000 : 4000);
+  while (box.children.length > 4) box.firstChild.remove();
+  setTimeout(() => n.remove(), kind === 'bad' ? 9000 : 4500);
+}
+
+// showDialog opens a window over the page: a title, content and buttons
+// [{label, kind, value, onclick}]. It resolves to the value of the button
+// pressed (undefined when closed with Esc).
+export function showDialog({ title, body, actions = [], wide = false }) {
+  const dlg = el('dialog' + (wide ? '.wide' : ''));
+  const menu = el('menu');
+  return new Promise(resolve => {
+    let result;
+    for (const a of actions) {
+      menu.append(el('button' + (a.kind ? '.' + a.kind : ''), {
+        type: 'button',
+        onclick: async () => {
+          if (a.onclick && await a.onclick() === false) return;
+          result = a.value;
+          dlg.close();
+        },
+      }, a.icon ? icon(a.icon) : null, a.label));
+    }
+    dlg.append(el('h3', title), el('div.dlg-body', body), actions.length ? menu : null);
+    dlg.addEventListener('close', () => { dlg.remove(); resolve(result); });
+    document.body.appendChild(dlg);
+    dlg.showModal();
+  });
+}
+
+// emptyState explains why a place is empty and what to do about it.
+export function emptyState(iconName, title, text, ...actions) {
+  return el('div.card.empty-state', icon(iconName, 'xl'), el('h2', title), text ? el('p', text) : null,
+    actions.length ? el('div.row', actions) : null);
 }
 
 // confirmBox shows a modal question and resolves to true or false.
@@ -89,11 +138,12 @@ export function pageHeader(title, lead, ...actions) {
     actions.length ? el('div.row.page-actions', actions) : null);
 }
 
-// busy disables a button while an async action runs.
+// busy disables a button while an async action runs and shows a
+// spinner on it; the button keeps its label and icon.
 export async function busy(btn, fn) {
-  const old = btn.textContent;
   btn.disabled = true;
-  btn.textContent = old + ' …';
+  btn.classList.add('busy');
+  btn.setAttribute('aria-busy', 'true');
   try {
     return await fn();
   } catch (e) {
@@ -101,7 +151,8 @@ export async function busy(btn, fn) {
     return undefined;
   } finally {
     btn.disabled = false;
-    btn.textContent = old;
+    btn.classList.remove('busy');
+    btn.removeAttribute('aria-busy');
   }
 }
 
@@ -134,4 +185,9 @@ export function statusBadge(status) {
 
 export function copyText(text) {
   if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast(t('common.copied'), 'good'));
+}
+
+// button builds a button with an icon: button('play', t('live.start'), fn, 'primary').
+export function button(iconName, label, onclick, kind = '') {
+  return el('button' + (kind ? '.' + kind.split(' ').join('.') : ''), { type: 'button', onclick }, iconName ? icon(iconName) : null, label);
 }

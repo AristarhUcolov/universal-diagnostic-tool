@@ -17,18 +17,23 @@ import (
 
 // Settings are the persisted preferences.
 type Settings struct {
-	Language   string              `json:"language"`   // "" = system, en, ru
-	Theme      string              `json:"theme"`      // auto, dark, light
-	Units      string              `json:"units"`      // metric, imperial
-	Expert     bool                `json:"expert"`     // show raw/flash tools
-	LogToFile  bool                `json:"logToFile"`  // journal to a file in logs/
-	BridgeAddr string              `json:"bridgeAddr"` // ELM327 bridge listen address
-	Last       vehicle.Config      `json:"last"`       // last connection
-	LiveParams map[string][]string `json:"liveParams"` // selected parameters per control unit description
-	Gauges     map[string][]string `json:"gauges"`     // parameters on the gauges page per control unit description
-	Window     bool                `json:"window"`     // open a desktop window (Windows) instead of the browser
-	Alerts     bool                `json:"alerts"`     // warn about dangerous live values
-	AlertSound bool                `json:"alertSound"` // with a sound
+	Language    string              `json:"language"`    // "" = system, en, ru
+	Theme       string              `json:"theme"`       // auto, dark, light
+	Units       string              `json:"units"`       // metric, imperial
+	Expert      bool                `json:"expert"`      // show raw/flash tools
+	LogToFile   bool                `json:"logToFile"`   // journal to a file in logs/
+	BridgeAddr  string              `json:"bridgeAddr"`  // ELM327 bridge listen address
+	Last        vehicle.Config      `json:"last"`        // last connection
+	LiveParams  map[string][]string `json:"liveParams"`  // selected parameters per control unit description
+	Gauges      map[string][]string `json:"gauges"`      // parameters on the gauges page per control unit description
+	Window      bool                `json:"window"`      // open a desktop window (Windows) instead of the browser
+	Alerts      bool                `json:"alerts"`      // warn about dangerous live values
+	AlertSound  bool                `json:"alertSound"`  // with a sound
+	Updates     bool                `json:"updates"`     // ask GitHub for a newer release at start
+	SeenVersion string              `json:"seenVersion"` // the release whose news were shown
+	SkipVersion string              `json:"skipVersion"` // a release the user chose not to be told about
+
+	fresh bool // no settings file existed: the first start
 }
 
 var mu sync.Mutex
@@ -36,7 +41,7 @@ var mu sync.Mutex
 // Defaults returns the initial settings.
 func Defaults() *Settings {
 	return &Settings{Theme: "auto", Units: "metric", LogToFile: true, BridgeAddr: "0.0.0.0:35000", Window: true,
-		Alerts: true, AlertSound: true,
+		Alerts: true, AlertSound: true, Updates: true,
 		Last: vehicle.Config{Adapter: vehicle.AdapterSim, Profile: vehicle.ProfileRuAuto}, LiveParams: map[string][]string{},
 		Gauges: map[string][]string{}}
 }
@@ -49,6 +54,8 @@ func Load() *Settings {
 	data, err := os.ReadFile(filepath.Join(Dir(), "settings.json"))
 	if err == nil {
 		_ = json.Unmarshal(data, s)
+	} else {
+		s.fresh = os.IsNotExist(err)
 	}
 	if s.LiveParams == nil {
 		s.LiveParams = map[string][]string{}
@@ -58,6 +65,10 @@ func Load() *Settings {
 	}
 	return s
 }
+
+// Fresh reports the first start of the program: there were no settings
+// to read.
+func (s *Settings) Fresh() bool { return s.fresh }
 
 // Save writes the settings atomically.
 func (s *Settings) Save() error {

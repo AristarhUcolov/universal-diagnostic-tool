@@ -1,7 +1,7 @@
 import { api } from '../api.js';
 import { t, tr } from '../i18n.js';
-import { el, clear, toast, busy, statusBadge, errText } from '../ui.js';
-import { store, subscribe, connected } from '../app.js';
+import { el, clear, toast, busy, statusBadge, errText, icon, button } from '../ui.js';
+import { store, subscribe, connected, trySimulator } from '../app.js';
 
 const portKinds = { kkl: 'serial', elm327: 'serial', slcan: 'serial' };
 
@@ -12,17 +12,19 @@ export function render(view) {
   let defs = [];
 
   const statusBox = el('div');
+  const welcomeBox = el('div');
   const quickBox = el('div');
   const adaptersBox = el('div.adapters');
   const portBox = el('div');
   const profileBox = el('div');
   const advBox = el('div.fields');
-  const goBtn = el('button.primary.big', t('connect.go'));
+  const goBtn = el('button.primary.big', { type: 'button' }, icon('plug'), t('connect.go'));
 
   view.append(
     el('h1', t('connect.title')),
     el('p.secondary', t('connect.lead')),
     statusBox,
+    welcomeBox,
     quickBox,
     el('div.card.steps',
       el('div.step-title', t('connect.adapter')), adaptersBox,
@@ -45,24 +47,36 @@ export function render(view) {
     if (s.state === 'connected') {
       const ecus = s.ecus || [];
       statusBox.append(el('div.card',
-        el('div.row', el('span.status-line.good', '✓ ' + t('connect.connected')), el('span.secondary', s.adapter || '')),
+        el('div.row', el('span.status-line.good', icon('check-circle'), t('connect.connected')), el('span.secondary', s.adapter || '')),
         el('h3', t('connect.foundUnits')),
         el('ul', ecus.map(e => el('li', el('b', e.desc.name), ' — ', e.desc.protocol, ' ', statusBadge(e.desc.status)))),
-        el('div.row', el('button.primary', { onclick: () => { location.hash = '#/dashboard'; } }, t('nav.dashboard') + ' →'),
-          el('button', { onclick: () => api.post('/api/disconnect').catch(e => toast(e.message, 'bad')) }, t('connect.disconnect')))));
+        el('div.row', el('button.primary', { type: 'button', onclick: () => { location.hash = '#/dashboard'; } }, icon('dashboard'), t('nav.dashboard')),
+          button('unplug', t('connect.disconnect'), () => api.post('/api/disconnect').catch(e => toast(e.message, 'bad'))))));
     } else if (s.state === 'connecting' || s.state === 'error') {
       const log = el('div.progress-log', (s.progress || []).map(p => el('div', p)));
       statusBox.append(el('div.card',
         el('div.row', s.state === 'connecting'
-          ? el('span.status-line', '⏳ ' + t('conn.connecting'))
-          : el('span.status-line.bad', '✕ ' + t('conn.error')),
+          ? el('span.status-line', icon('refresh'), t('conn.connecting'))
+          : el('span.status-line.bad', icon('alert'), t('conn.error')),
         s.state === 'connecting' ? el('button.small', { onclick: () => api.post('/api/disconnect') }, t('common.cancel')) : null),
         s.error ? el('p', { style: { color: 'var(--critical-ink)' } }, errText({ message: s.error, code: s.errorCode })) : null,
         el('h3', t('connect.progress')), log));
       log.scrollTop = log.scrollHeight;
     }
     goBtn.disabled = s.state === 'connecting';
+    paintWelcome();
     paintQuick();
+  }
+
+  // paintWelcome greets a first start and offers a look around on the
+  // simulator before the real adapter is set up.
+  function paintWelcome() {
+    clear(welcomeBox);
+    if (!store.info.firstRun || ['connected', 'connecting'].includes(store.status.state)) return;
+    const b = button('flask', t('common.trySim'), null, 'primary');
+    b.onclick = () => busy(b, trySimulator);
+    welcomeBox.append(el('div.card.quick',
+      el('div', el('b', t('connect.welcome')), el('div.secondary.small', t('connect.welcomeText'))), b));
   }
 
   // paintQuick offers the last connection with one button, so a regular
@@ -70,12 +84,14 @@ export function render(view) {
   function paintQuick() {
     clear(quickBox);
     const last = store.settings.last;
-    if (!data || !last || !last.adapter || ['connected', 'connecting'].includes(store.status.state)) return;
+    // On the first start there was no last time: the default is shown as a
+    // welcome instead.
+    if (!data || !last || !last.adapter || store.info.firstRun || ['connected', 'connecting'].includes(store.status.state)) return;
     const a = data.adapters.find(x => x.id === last.adapter);
     if (!a) return;
     const p = (data.profiles || []).find(x => x.id === last.profile);
     const parts = [tr(a.name), last.port || '', p ? tr(p.name) : '', last.simVariant || ''].filter(Boolean);
-    const b = el('button.primary', '▶ ' + t('connect.go'));
+    const b = el('button.primary', { type: 'button' }, icon('play'), t('connect.go'));
     b.onclick = () => busy(b, () => api.post('/api/connect',
       Object.fromEntries(Object.entries(last).filter(([, v]) => v !== '' && v !== null && v !== undefined))));
     quickBox.append(el('div.card.quick',
@@ -120,7 +136,7 @@ export function render(view) {
     } else if (kind === 'ble') {
       const inp = el('input', { value: cfg.port || '', placeholder: 'AA:BB:CC:DD:EE:FF', size: 22, oninput: e => set(e.target.value.trim()) });
       const list = el('div');
-      const find = el('button.small', '⌕ ' + t('connect.bleFind'));
+      const find = el('button.small', { type: 'button' }, icon('search'), t('connect.bleFind'));
       find.onclick = () => busy(find, async () => {
         clear(list).append(el('p.muted.small', t('connect.bleScanning')));
         let devs = [];
