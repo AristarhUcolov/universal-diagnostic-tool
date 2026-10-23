@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ble"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/bridge"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/desktop"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/diag"
@@ -42,7 +43,7 @@ func (s *Server) apiInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, map[string]any{
 		"name": version.Name, "version": version.Version, "os": runtime.GOOS, "arch": runtime.GOARCH,
-		"configDir": settings.Dir(), "logFile": s.journal.FilePath(), "systemLanguage": desktop.SystemLanguage(),
+		"configDir": settings.Dir(), "data": settings.Current(), "logFile": s.journal.FilePath(), "systemLanguage": desktop.SystemLanguage(),
 		"definitions": len(ecu.Builtin().All()), "definitionErrors": ecu.Builtin().Errors(),
 		"dtcFamilies": fams, "lanUrl": s.LANURL(),
 	})
@@ -87,6 +88,9 @@ func (s *Server) apiSetSettings(w http.ResponseWriter, r *http.Request) {
 	if in.LiveParams == nil {
 		in.LiveParams = s.settings.LiveParams
 	}
+	if in.Gauges == nil {
+		in.Gauges = s.settings.Gauges
+	}
 	*s.settings = in
 	if err := s.settings.Save(); err != nil {
 		writeError(w, http.StatusInternalServerError, err)
@@ -124,8 +128,8 @@ type ecuView struct {
 }
 
 func (s *Server) statusView() map[string]any {
-	state, errText, progress := s.mgr.status()
-	out := map[string]any{"state": state, "error": errText, "progress": progress, "version": version.Version}
+	state, errText, errCode, progress := s.mgr.status()
+	out := map[string]any{"state": state, "error": errText, "errorCode": errCode, "progress": progress, "version": version.Version}
 	if sess := s.mgr.session(); sess != nil {
 		var ecus []ecuView
 		for _, e := range sess.ECUs() {
@@ -280,6 +284,48 @@ func (s *Server) apiReadiness(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, map[string]any{"supported": true, "mil": mil, "count": n, "monitors": mons})
+}
+
+// apiBLEScan lists the Bluetooth LE devices advertising nearby, OBD
+// adapters first.
+func (s *Server) apiBLEScan(w http.ResponseWriter, r *http.Request) {
+	sec, _ := strconv.Atoi(r.URL.Query().Get("seconds"))
+	if sec <= 0 || sec > 20 {
+		sec = 6
+	}
+	ctx, cancel := ctxFor(r, time.Duration(sec+5)*time.Second)
+	defer cancel()
+	devs, err := ble.Scan(ctx, time.Duration(sec)*time.Second)
+	if err != nil {
+		writeError(w, http.StatusServiceUnavailable, err)
+		return
+	}
+	if devs == nil {
+		devs = []ble.Device{}
+	}
+	writeJSON(w, map[string]any{"devices": devs})
+}
+
+// apiTests returns the on-board monitoring test results (OBD-II
+// service $06).
+func (s *Server) apiTests(w http.ResponseWriter, r *http.Request) {
+	h, _, ok := s.handler(w, r)
+	if !ok {
+		return
+	}
+	tr, isTR := h.(ecu.TestReader)
+	if !isTR {
+		writeJSON(w, map[string]any{"supported": false})
+		return
+	}
+	ctx, cancel := ctxFor(r, 90*time.Second)
+	defer cancel()
+	res, err := tr.TestResults(ctx)
+	if err != nil {
+		writeError(w, http.StatusBadGateway, err)
+		return
+	}
+	writeJSON(w, map[string]any{"supported": true, "results": res})
 }
 
 func (s *Server) apiParams(w http.ResponseWriter, r *http.Request) {
@@ -676,6 +722,12 @@ func (s *Server) apiSimControl(w http.ResponseWriter, r *http.Request) {
 		e.SetDriving(true)
 	case "park":
 		e.SetDriving(false)
+	case "launch":
+		e.Launch()
+	case "overheat":
+		e.SetOverheat(true)
+	case "cool":
+		e.SetOverheat(false)
 	case "fault":
 		code := in.Code
 		if code == "" {

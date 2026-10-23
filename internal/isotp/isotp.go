@@ -422,6 +422,9 @@ func (c *Conn) Info() diag.ChannelInfo {
 			bits = "29-bit"
 		}
 		name = fmt.Sprintf("ISO 15765 CAN %s", bits)
+		if c.cfg.FD {
+			name = fmt.Sprintf("ISO 15765 CAN FD %s", bits)
+		}
 		if c.cfg.Bitrate > 0 {
 			name += fmt.Sprintf(", %d kbit/s", c.cfg.Bitrate/1000)
 		}

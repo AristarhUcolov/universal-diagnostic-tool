@@ -61,11 +61,22 @@ func (c *Client) Query(ctx context.Context, req []byte) ([]diag.Message, error) 
 // Supported returns the supported mode 01 PIDs of every answering
 // control unit.
 func (c *Client) Supported(ctx context.Context) (map[uint32][]byte, error) {
+	out, err := c.supported(ctx, 0x01)
+	if err == nil && len(out) == 0 {
+		err = fmt.Errorf("obd: no control unit reported supported PIDs")
+	}
+	return out, err
+}
+
+// supported reads the support masks of a service (01: PIDs, 06:
+// monitors) of every answering unit: each mask (00, 20, 40…) flags the
+// next 32 identifiers, its last bit tells whether another mask follows.
+func (c *Client) supported(ctx context.Context, mode byte) (map[uint32][]byte, error) {
 	out := map[uint32][]byte{}
 	base := byte(0x00)
 	active := map[uint32]bool{}
 	for {
-		msgs, err := c.Query(ctx, []byte{0x01, base})
+		msgs, err := c.Query(ctx, []byte{mode, base})
 		if err != nil {
 			if base == 0 {
 				return nil, err
@@ -77,7 +88,7 @@ func (c *Client) Supported(ctx context.Context) (map[uint32][]byte, error) {
 			if base != 0 && !active[m.Src] {
 				continue
 			}
-			if len(m.Data) < 6 || m.Data[1] != base {
+			if len(m.Data) < 6 || m.Data[0] != mode+0x40 || m.Data[1] != base {
 				continue
 			}
 			active[m.Src] = false
@@ -99,9 +110,6 @@ func (c *Client) Supported(ctx context.Context) (map[uint32][]byte, error) {
 			break
 		}
 		base += 0x20
-	}
-	if len(out) == 0 {
-		return nil, fmt.Errorf("obd: no control unit reported supported PIDs")
 	}
 	return out, nil
 }

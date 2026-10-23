@@ -16,8 +16,10 @@ type CANBus struct {
 	endpoints map[int]*CANEndpoint
 	next      int
 	Bitrate   int
-	done      chan struct{}
-	closed    bool
+	// FD makes the control units talk ISO-TP over CAN FD frames.
+	FD     bool
+	done   chan struct{}
+	closed bool
 }
 
 // NewCANBus creates a bus.
@@ -94,7 +96,7 @@ func (e *CANEndpoint) Recv(ctx context.Context, timeout time.Duration) (can.Fram
 }
 
 func (e *CANEndpoint) Info() can.BusInfo {
-	return can.BusInfo{Name: "simulator CAN (" + e.name + ")", Bitrate: e.bus.Bitrate}
+	return can.BusInfo{Name: "simulator CAN (" + e.name + ")", Bitrate: e.bus.Bitrate, FD: e.bus.FD}
 }
 
 func (e *CANEndpoint) Close() error {
@@ -113,7 +115,7 @@ func (b *CANBus) AttachISOTP(name string, tx, rx, functional uint32, ext bool, a
 	ep := b.Endpoint(name)
 	mux := can.NewMux(ep, nil)
 	cfg := isotp.DefaultConfig(tx, rx)
-	cfg.Ext = ext
+	cfg.Ext, cfg.FD = ext, b.FD
 	cfg.RxIDs = []uint32{rx}
 	if functional != 0 {
 		cfg.RxIDs = append(cfg.RxIDs, functional)

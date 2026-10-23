@@ -10,10 +10,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ble"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/can"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ecu"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/journal"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/kline"
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/obd"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/sim"
 )
 
@@ -47,6 +49,20 @@ func ErrorCode(err error) string {
 		return ce.Code()
 	case errors.Is(err, kline.ErrNoEcho):
 		return "no_echo"
+	case errors.Is(err, obd.ErrTestsNeedCAN):
+		return "tests_can"
+	case errors.Is(err, obd.ErrTestsUnsupported):
+		return "tests_none"
+	case errors.Is(err, ErrNoCANFD):
+		return "no_canfd"
+	case errors.Is(err, ble.ErrOff):
+		return "ble_off"
+	case errors.Is(err, ble.ErrNotFound):
+		return "ble_notfound"
+	case errors.Is(err, ble.ErrNoSerial):
+		return "ble_noserial"
+	case errors.Is(err, ble.ErrUnsupported):
+		return "ble_unsupported"
 	}
 	return ""
 }
@@ -303,6 +319,9 @@ type recorder struct {
 	n    int
 }
 
+// write adds one row. The columns are the values polled when the
+// recording started; values are matched to them by id, so a change of
+// the polled set (another page adding its values) never shifts a column.
 func (r *recorder) write(vals []ecu.Value) {
 	if r.ids == nil {
 		r.ids = []string{"time"}
@@ -311,10 +330,15 @@ func (r *recorder) write(vals []ecu.Value) {
 		}
 		_ = r.w.Write(r.ids)
 	}
-	rec := []string{time.Now().Format("2006-01-02 15:04:05.000")}
+	byID := make(map[string]ecu.Value, len(vals))
 	for _, v := range vals {
+		byID[v.ID] = v
+	}
+	rec := []string{time.Now().Format("2006-01-02 15:04:05.000")}
+	for _, id := range r.ids[1:] {
+		v, ok := byID[id]
 		switch {
-		case !v.OK:
+		case !ok || !v.OK:
 			rec = append(rec, "")
 		case v.Text != "":
 			rec = append(rec, v.Text)

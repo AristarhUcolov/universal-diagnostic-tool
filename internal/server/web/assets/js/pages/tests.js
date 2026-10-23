@@ -1,10 +1,31 @@
 import { api } from '../api.js';
 import { t, tr, unitName } from '../i18n.js';
-import { el, clear, toast, busy, confirmBox, fmt, pageHeader } from '../ui.js';
+import { el, clear, toast, busy, confirmBox, fmt, pageHeader, errText } from '../ui.js';
 import { currentECU } from '../app.js';
 import { ecuSelect, ecuPath, hasCap } from './common.js';
 
 let confirmed = false;
+let confirming = null;
+
+// confirmOnce asks once per program run whether output tests may be
+// used; requests made while the question is open share its answer.
+function confirmOnce() {
+  if (confirmed) return Promise.resolve(true);
+  if (!confirming) {
+    confirming = confirmBox(t('svc.title'), t('tests.confirm'), t('common.yes'), true).then(ok => {
+      confirmed = ok;
+      confirming = null;
+      return ok;
+    });
+  }
+  return confirming;
+}
+
+function css(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+const chartWindow = 60000; // ms shown on an adjustment's chart
 
 // The service page: output tests, idle adjustments and the control unit
 // restart, with the values that show their effect next to them.
@@ -49,11 +70,12 @@ export function render(view) {
     }
   }
 
-  // current returns the measured value an adjustment acts on.
-  function current(a) {
+  // measured returns the value an adjustment acts on: the engine speed
+  // for an idle speed, the current position for an idle air valve.
+  function measured(a) {
     const p = a.unit === 'rpm' ? watch.find(x => x.obd === '0C')
       : watch.find(x => x.unit === a.unit && /current|текущ/i.test(tr(x.name))) || watch.find(x => x.unit === a.unit);
-    return p && tiles[p.id] && tiles[p.id].v !== null ? fmt(tiles[p.id].v, p.digits) + ' ' + unitName(p.unit) : '';
+    return p && tiles[p.id] && tiles[p.id].v !== null ? { p, v: tiles[p.id].v } : null;
   }
 
   async function poll() {
@@ -73,8 +95,13 @@ export function render(view) {
       syncAt = Date.now() + 5000;
       try { mergeActive((await api.get(ecuPath('actuators'))).actuators || []); } catch (e) { /* ignore */ }
     }
-    for (const id of Object.keys(cards)) paintState(id);
-    if (alive) timer = setTimeout(poll, 800);
+    const now = Date.now();
+    for (const c of Object.values(cards)) {
+      paintState(c.a.id);
+      if (c.canvas) record(c, now);
+    }
+    // While an adjustment is held, follow the engine more closely.
+    if (alive) timer = setTimeout(poll, Object.keys(held).length ? 400 : 800);
   }
 
   // mergeActive follows the server: outputs it handed back on time or
@@ -104,10 +131,7 @@ export function render(view) {
   }
 
   async function act(a, action, value, btn) {
-    if (!confirmed) {
-      if (!await confirmBox(t('svc.title'), t('tests.confirm'), t('common.yes'), true)) return;
-      confirmed = true;
-    }
+    if (!await confirmOnce()) return;
     await busy(btn, async () => {
       await api.post(ecuPath('actuate'), { id: a.id, action, value });
       if (action === 'on' || action === 'set') held[a.id] = Date.now() + (a.timeoutS || 60) * 1000;
@@ -128,48 +152,167 @@ export function render(view) {
       c.state.textContent = `● ${t('svc.held')} · ${t('svc.returns')} ${left} ${t('chart.sec')}`;
     } else {
       c.state.textContent = '';
+      c.target = null;
     }
-    if (c.now) c.now.textContent = current(c.a) ? t('svc.now') + ': ' + current(c.a) : '';
+    if (c.now) {
+      const m = measured(c.a);
+      const u = ' ' + unitName(c.a.unit);
+      c.now.textContent = [
+        c.target !== null ? t('svc.target') + ': ' + fmt(c.target, 0) + u : '',
+        m ? t('svc.now') + ': ' + fmt(m.v, m.p.digits) + ' ' + unitName(m.p.unit) : '',
+      ].filter(Boolean).join(' · ');
+    }
+  }
+
+  // valueControls builds an adjustment that follows the hand in real
+  // time: a slider, steps and a number, applied at once when asked, with
+  // the target and the measured value on a chart.
+  function valueControls(a, c) {
+    // A zero minimum is left out of the server's answer.
+    const lo = a.min || 0, hi = a.max || 255;
+    const step = a.unit === 'rpm' ? 10 : 1;
+    const clamp = v => Math.min(hi, Math.max(lo, Math.round(v / step) * step));
+    const start = clamp((lo + hi) / 2);
+    const num = el('input', { type: 'number', min: lo, max: hi, step, value: start, style: { width: '96px' } });
+    const range = el('input.svc-range', { type: 'range', min: lo, max: hi, step, value: start });
+    const live = el('input', { type: 'checkbox' });
+    const show = v => { num.value = v; range.value = v; };
+    c.show = v => { if (!c.touched) show(clamp(v)); };
+
+    // apply sends the newest value; values given while a request is on
+    // its way replace each other, so the unit is never flooded.
+    c.apply = async (v, btn) => {
+      c.touched = true;
+      if (!await confirmOnce()) return;
+      c.pending = v;
+      if (c.sending) return;
+      c.sending = true;
+      if (btn) btn.disabled = true;
+      try {
+        while (c.pending !== null) {
+          const x = c.pending;
+          c.pending = null;
+          await api.post(ecuPath('actuate'), { id: a.id, action: 'set', value: x });
+          c.target = x;
+          held[a.id] = Date.now() + (a.timeoutS || 60) * 1000;
+          paintState(a.id);
+        }
+      } catch (e) {
+        c.pending = null;
+        toast(`${tr(a.name)}: ${errText(e)}`, 'bad');
+      } finally {
+        c.sending = false;
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    range.oninput = () => { c.touched = true; num.value = range.value; if (live.checked) c.apply(+range.value); };
+    num.onchange = () => { c.touched = true; const v = clamp(+num.value); show(v); if (live.checked) c.apply(v); };
+    const nudges = (a.unit === 'rpm' ? [-50, -10, 10, 50] : [-5, -1, 1, 5]).map(d => el('button.small.nudge', {
+      onclick: () => { const v = clamp(+num.value + d); show(v); c.apply(v); },
+    }, (d > 0 ? '+' : '−') + Math.abs(d)));
+    const set = el('button.primary', t('tests.set'));
+    const rel = el('button', t('tests.release'));
+    set.onclick = () => c.apply(clamp(+num.value), set);
+    rel.onclick = () => act(a, 'off', 0, rel).then(() => { c.target = null; c.touched = false; });
+
+    c.canvas = el('canvas.svc-chart', { role: 'img', 'aria-label': tr(a.name) });
+    c.hist = [];
+    return [
+      el('div.row.svc-controls', range, num, el('span.muted', unitName(a.unit))),
+      el('div.row.svc-controls', nudges, el('label.check.small', live, t('svc.liveApply'))),
+      el('div.row.svc-controls', set, rel),
+      c.canvas,
+      el('div.svc-legend.small', el('span.k.actual', t('svc.actual')), el('span.k.target', t('svc.target'))),
+    ];
+  }
+
+  // record adds the measured value and the target to an adjustment's
+  // chart and redraws it.
+  function record(c, now) {
+    const m = measured(c.a);
+    if (m && !c.touched) c.show(m.v);
+    c.hist.push([now, m ? m.v : null, held[c.a.id] ? c.target : null]);
+    while (c.hist.length && c.hist[0][0] < now - chartWindow - 2000) c.hist.shift();
+    drawChart(c);
+  }
+
+  // drawChart plots the measured value (solid) and the target (dashed)
+  // on one axis: both are in the same unit.
+  function drawChart(c) {
+    const cv = c.canvas;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    const pts = c.hist;
+    const vals = pts.flatMap(p => [p[1], p[2]]).filter(v => v !== null);
+    if (pts.length < 2 || !vals.length) return;
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    const pad = Math.max((hi - lo) * 0.15, c.a.unit === 'rpm' ? 50 : 2);
+    lo -= pad; hi += pad;
+    const t1 = pts[pts.length - 1][0], t0 = t1 - chartWindow;
+    const x = tm => 34 + (tm - t0) / chartWindow * (w - 38);
+    const y = v => 6 + (h - 12) * (1 - (v - lo) / (hi - lo));
+    g.font = '11px system-ui, sans-serif';
+    g.fillStyle = css('--text-muted');
+    g.textBaseline = 'middle';
+    g.fillText(fmt(hi, 0), 2, y(hi));
+    g.fillText(fmt(lo, 0), 2, y(lo));
+    g.strokeStyle = css('--border');
+    g.lineWidth = 1;
+    g.beginPath(); g.moveTo(34, y(hi)); g.lineTo(w - 4, y(hi)); g.moveTo(34, y(lo)); g.lineTo(w - 4, y(lo)); g.stroke();
+    const line = (pick, color, dash) => {
+      g.strokeStyle = color;
+      g.lineWidth = 2;
+      g.setLineDash(dash);
+      g.beginPath();
+      let on = false;
+      for (const p of pts) {
+        const v = pick(p);
+        if (v === null || p[0] < t0) { on = false; continue; }
+        if (on) g.lineTo(x(p[0]), y(v)); else g.moveTo(x(p[0]), y(v));
+        on = true;
+      }
+      g.stroke();
+      g.setLineDash([]);
+    };
+    line(p => p[2], css('--text-muted'), [6, 4]);
+    line(p => p[1], css('--series-1'), []);
   }
 
   function actCard(a) {
-    const controls = el('div.row.svc-controls');
+    const c = { a, target: null, pending: null, sending: false, touched: false };
     const state = el('div.svc-state.small');
-    let now = null;
+    let body;
     if (a.kind === 'toggle') {
       const on = el('button.primary', t('tests.on'));
       const off = el('button', t('tests.off'));
       on.onclick = () => act(a, 'on', 0, on);
       off.onclick = () => act(a, 'off', 0, off);
-      controls.append(on, off);
+      body = el('div.row.svc-controls', on, off);
     } else if (a.kind === 'pulse') {
       const p = el('button.primary', '⚡ ' + t('tests.pulse'));
       p.onclick = () => act(a, 'pulse', 0, p);
-      controls.append(p);
+      body = el('div.row.svc-controls', p);
     } else {
-      // A zero minimum is left out of the server's answer.
-      const lo = a.min || 0, hi = a.max || 255;
-      const start = Math.round((lo + hi) / 2 / 10) * 10;
-      const num = el('input', { type: 'number', min: lo, max: hi, value: start, style: { width: '100px' } });
-      const range = el('input.svc-range', { type: 'range', min: lo, max: hi, step: a.unit === 'rpm' ? 10 : 1, value: start });
-      range.oninput = () => { num.value = range.value; };
-      num.oninput = () => { range.value = num.value; };
-      const set = el('button.primary', t('tests.set'));
-      const rel = el('button', t('tests.release'));
-      set.onclick = () => act(a, 'set', +num.value, set);
-      rel.onclick = () => act(a, 'off', 0, rel);
-      now = el('span.muted.small');
-      controls.append(range, num, el('span.muted', unitName(a.unit)), set, rel);
+      c.now = el('div.svc-now.small');
+      body = [c.now, valueControls(a, c)];
     }
     const cond = a.condition
       ? el('span.badge' + (a.condition === 'engine_off' ? '.info' : '.warn'), a.condition === 'engine_off' ? t('svc.condOff') : t('svc.condRun'))
       : null;
-    const card = el('div.card.svc-act',
+    c.card = el('div.card.svc-act' + (a.kind === 'value' ? '.svc-value' : ''),
       el('div.svc-head', el('h3', tr(a.name)), cond),
       a.warning ? el('p.small.secondary', tr(a.warning)) : null,
-      controls, now, state);
-    cards[a.id] = { a, card, state, now };
-    return card;
+      body, state);
+    c.state = state;
+    cards[a.id] = c;
+    return c.card;
   }
 
   function paintActs() {
@@ -182,15 +325,15 @@ export function render(view) {
       return;
     }
     const groups = [
+      ['value', 'svc.gValue', 'svc.gValueLead'],
       ['pulse', 'svc.gPulse', 'svc.gPulseLead'],
       ['toggle', 'svc.gToggle', 'svc.gToggleLead'],
-      ['value', 'svc.gValue', 'svc.gValueLead'],
     ];
     for (const [kind, title, lead] of groups) {
       const list = acts.filter(a => a.kind === kind);
       if (!list.length) continue;
       actsBox.append(el('div.svc-group', el('h2', t(title)), el('p.secondary.small', t(lead)),
-        el('div.grid.svc-grid', list.map(actCard))));
+        el('div.grid.svc-grid' + (kind === 'value' ? '.wide' : ''), list.map(actCard))));
     }
     for (const id of Object.keys(cards)) paintState(id);
   }

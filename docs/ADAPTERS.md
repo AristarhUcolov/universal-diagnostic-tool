@@ -61,11 +61,12 @@
 | ELM327 USB (v1.5, v2.1) | ✓ | у многих клонов «v2.1» урезан набор команд; клоны v1.5 часто надёжнее |
 | ELM327 Bluetooth | ✓ | сопрягите в Windows и выберите исходящий COM-порт |
 | ELM327 Wi-Fi | ✓ | обычно 192.168.0.10:35000 |
+| ELM327 Bluetooth LE (BLE 4.0): Vgate iCar Pro BLE, Veepeak OBDCheck BLE, vLinker MC+ / FS BLE, KONNWEI KW902 | ~ | Windows и Linux: адаптер «ELM327 Bluetooth LE» → «Найти адаптеры»; на настоящих адаптерах ещё не проверялось; в сборке для macOS нет |
 | ELM323 | ~ | только OBD-II по K-Line; не проверено |
 | OBDLink SX, OBDLink S | ✓ | чип STN, совместим с ELM327 |
 | OBDLink LX, MX+ (Bluetooth) | ✓ | |
 | OBDLink EX | ✓ | |
-| OBDLink CX | ✕ | только Bluetooth LE — на компьютере пока не поддерживается |
+| OBDLink CX | ~ | только Bluetooth LE — адаптер «ELM327 Bluetooth LE»; ещё не проверялось |
 | Адаптеры на STN1110 / STN2120 | ✓ | |
 | Ford ELMConfig Adapter, FORScan Adapter | ~ | HS-CAN работает как ELM327; переключение на MS-CAN не поддерживается |
 
@@ -112,15 +113,16 @@ J1939 и монитор шины CAN.
 | Адаптер | Статус | Примечание |
 |---|---|---|
 | CANable (прошивка slcan), CANtact | ✓ | |
+| CANable 2.0 (прошивка slcan с CAN FD) | ✓ | в том числе CAN FD: данные 2 или 5 Мбит/с; прошивка не подтверждает команды — программа это учитывает |
 | CANable (прошивка candleLight) | ~ | на Linux — через SocketCAN ✓; на Windows прошейте slcan |
 | Lawicel CANUSB | ✓ | |
 | USB-CAN / CAN-USB с протоколом slcan | ✓ | |
 | дешёвые «USB-CAN Analyzer» (CH341, свой протокол) | ✕ | протокол не slcan |
-| PEAK PCAN-USB, PCAN-USB FD, PEAK PCAN | ✓ | драйвер PCAN-Basic; FD — в режиме классического CAN |
+| PEAK PCAN-USB, PCAN-USB FD, PEAK PCAN | ✓ | драйвер PCAN-Basic; PCAN-USB FD — также CAN FD (данные 1–8 Мбит/с) |
 | Kvaser Leaf, Kvaser USBcan | ✓ | драйвер CANlib |
 | Любой адаптер SocketCAN на Linux (в том числе MCP2515 на Raspberry Pi) | ✓ | |
 | Vector CANcaseXL, VN1610, VN1630, VN5610 | ✕ | XL Driver Library пока не поддерживается |
-| Адаптеры CAN FD | ~ | CAN FD не поддерживается; классический CAN — если адаптер есть выше |
+| Адаптеры CAN FD | ~ | UDS по CAN FD: PCAN-USB FD, CANable 2.0 и SocketCAN с FD (проверено на симуляторе); Kvaser и J2534 — только классический CAN |
 
 ## Ethernet
 
@@ -281,11 +283,12 @@ program, this one included, can use it.
 | ELM327 USB (v1.5, v2.1) | ✓ | many "v2.1" clones lack commands; v1.5 clones are often more reliable |
 | ELM327 Bluetooth | ✓ | pair it in Windows and pick the outgoing COM port |
 | ELM327 Wi-Fi | ✓ | usually 192.168.0.10:35000 |
+| ELM327 Bluetooth LE (BLE 4.0): Vgate iCar Pro BLE, Veepeak OBDCheck BLE, vLinker MC+ / FS BLE, KONNWEI KW902 | ~ | Windows and Linux: adapter "ELM327 Bluetooth LE" → "Find adapters"; not tried on real adapters yet; not in the macOS build |
 | ELM323 | ~ | OBD-II on K-Line only; untested |
 | OBDLink SX, OBDLink S | ✓ | STN chip, ELM327-compatible |
 | OBDLink LX, MX+ (Bluetooth) | ✓ | |
 | OBDLink EX | ✓ | |
-| OBDLink CX | ✕ | Bluetooth LE only — not supported on computers yet |
+| OBDLink CX | ~ | Bluetooth LE only — adapter "ELM327 Bluetooth LE"; untested |
 | STN1110 / STN2120 adapters | ✓ | |
 | Ford ELMConfig Adapter, FORScan Adapter | ~ | HS-CAN works as an ELM327; switching to MS-CAN is not supported |
 
@@ -332,15 +335,16 @@ and the CAN bus monitor.
 | Adapter | Status | Note |
 |---|---|---|
 | CANable (slcan firmware), CANtact | ✓ | |
+| CANable 2.0 (slcan firmware with CAN FD) | ✓ | also CAN FD: data phase 2 or 5 Mbit/s; the firmware does not acknowledge commands, which the program allows for |
 | CANable (candleLight firmware) | ~ | on Linux through SocketCAN ✓; on Windows flash slcan |
 | Lawicel CANUSB | ✓ | |
 | USB-CAN / CAN-USB speaking slcan | ✓ | |
 | cheap "USB-CAN Analyzer" (CH341, own protocol) | ✕ | not slcan |
-| PEAK PCAN-USB, PCAN-USB FD, PEAK PCAN | ✓ | PCAN-Basic driver; FD in classic CAN mode |
+| PEAK PCAN-USB, PCAN-USB FD, PEAK PCAN | ✓ | PCAN-Basic driver; the PCAN-USB FD also on CAN FD (data 1–8 Mbit/s) |
 | Kvaser Leaf, Kvaser USBcan | ✓ | CANlib driver |
 | Any SocketCAN adapter on Linux (including MCP2515 on a Raspberry Pi) | ✓ | |
 | Vector CANcaseXL, VN1610, VN1630, VN5610 | ✕ | the XL Driver Library is not supported yet |
-| CAN FD adapters | ~ | CAN FD is not supported; classic CAN if the adapter is listed above |
+| CAN FD adapters | ~ | UDS on CAN FD: PCAN-USB FD, CANable 2.0 and SocketCAN with FD (tested against the simulator); Kvaser and J2534 classic CAN only |
 
 ## Ethernet
 

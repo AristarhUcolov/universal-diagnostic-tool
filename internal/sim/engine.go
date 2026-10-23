@@ -33,6 +33,7 @@ type Engine struct {
 	revUntil time.Time
 	revLevel float64
 	driving  bool
+	launchAt time.Time // hard acceleration from standstill started (zero: none)
 	coolant0 float64
 	faults   []Fault
 	frozen   *State // freeze frame captured with the first fault
@@ -43,6 +44,15 @@ type Engine struct {
 	idleTarget float64   // idle speed set point, rpm (0: the unit decides)
 	iacTarget  float64   // idle air valve position, steps (0: the unit decides)
 	fanSince   time.Time // cooling fan forced on since (zero: off)
+	overheat   bool      // a failed cooling system, for trying the alerts
+}
+
+// SetOverheat makes the cooling system fail (the coolant climbs to about
+// 118 °C) or repairs it.
+func (e *Engine) SetOverheat(on bool) {
+	e.mu.Lock()
+	e.overheat = on
+	e.mu.Unlock()
 }
 
 // State is a snapshot of the simulated engine.
@@ -129,10 +139,22 @@ func (e *Engine) Rev(d time.Duration, level float64) {
 	e.revLevel = level
 }
 
-// SetDriving switches a gentle drive cycle on or off.
+// SetDriving switches a gentle drive cycle on or off; either way a
+// launch ends.
 func (e *Engine) SetDriving(on bool) {
 	e.mu.Lock()
 	e.driving = on
+	e.launchAt = time.Time{}
+	e.mu.Unlock()
+}
+
+// Launch starts a hard acceleration from standstill, for trying the
+// acceleration timer: about 6 s to 60 km/h and 12 s to 100 km/h, as a
+// VAZ-2110, then a steady 130 km/h until the car is parked.
+func (e *Engine) Launch() {
+	e.mu.Lock()
+	e.driving = false
+	e.launchAt = time.Now()
 	e.mu.Unlock()
 }
 
@@ -262,6 +284,9 @@ func (e *Engine) stateLocked() State {
 	s.CoolantC = 90 - (90-e.coolant0)*math.Exp(-t/120)
 	s.OilC = 90 - (90-e.coolant0)*math.Exp(-t/200)
 	s.IntakeC = s.AmbientC + 12*(1-math.Exp(-t/300))
+	if e.overheat {
+		s.CoolantC = 118 + noise(0.4)
+	}
 	if !e.fanSince.IsZero() {
 		// A forced fan pulls the temperature down by a few degrees.
 		s.CoolantC -= math.Min(6, now.Sub(e.fanSince).Seconds()*0.1)
@@ -280,13 +305,22 @@ func (e *Engine) stateLocked() State {
 		throttle = math.Max(throttle, 18+14*math.Sin(phase*2*math.Pi))
 		s.SpeedKmh = math.Max(0, 55+35*math.Sin(phase*2*math.Pi-1))
 	}
+	if !e.launchAt.IsZero() {
+		v := 180 * (1 - math.Exp(-now.Sub(e.launchAt).Seconds()/13.6))
+		s.SpeedKmh = math.Min(v, 130)
+		if v < 130 {
+			throttle = math.Max(throttle, 85)
+		} else {
+			throttle = math.Max(throttle, 25)
+		}
+	}
 	s.ThrottlePct = throttle
 	s.PedalPct = throttle
 	s.Idle = throttle < 1 && s.SpeedKmh < 1
 	rpm := s.DesiredIdleRPM + 12*math.Sin(t*2.7) + noise(6)
 	if !s.Idle {
 		rpm = 900 + throttle*75
-		if e.driving {
+		if e.driving || !e.launchAt.IsZero() {
 			rpm = 1300 + s.SpeedKmh*28 + throttle*15
 		}
 	}

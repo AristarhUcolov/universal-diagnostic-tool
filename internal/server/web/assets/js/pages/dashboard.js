@@ -127,6 +127,9 @@ export function render(view) {
         el('button', { onclick: () => act('stop') }, t('dash.engineStop')),
         el('button', { onclick: () => act('start') }, t('dash.engineStart')),
         el('button', { onclick: () => act('drive') }, t('dash.drive')),
+        el('button', { onclick: () => act('launch') }, t('dash.launch')),
+        el('button', { onclick: () => act('overheat') }, t('dash.overheat')),
+        el('button', { onclick: () => act('cool') }, t('dash.cool')),
         el('button', { onclick: () => act('park') }, t('dash.park')),
         el('button', { onclick: () => act('fault') }, t('dash.injectFault')))));
     }

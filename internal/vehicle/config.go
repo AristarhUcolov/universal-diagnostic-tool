@@ -15,14 +15,15 @@ const (
 	AdapterKKL       = "kkl"    // K-Line cable on a serial port (VAG KKL 409.1, K+DCAN in K mode)
 	AdapterELM       = "elm327" // ELM327 / STN / OBDLink on a serial or Bluetooth port
 	AdapterELMWiFi   = "elm327-wifi"
-	AdapterJ2534     = "j2534"     // any installed J2534 PassThru driver (Windows)
-	AdapterSLCAN     = "slcan"     // Lawicel / CANable / USB-CAN on a serial port
-	AdapterSocketCAN = "socketcan" // Linux can0
-	AdapterPCAN      = "pcan"      // PEAK PCAN-Basic (Windows)
-	AdapterKvaser    = "kvaser"    // Kvaser CANlib (Windows)
-	AdapterRP1210    = "rp1210"    // truck adapters (Windows)
-	AdapterDoIP      = "doip"      // Ethernet (ENET) cable, ISO 13400
-	AdapterHSFZ      = "hsfz"      // BMW ENET (HSFZ)
+	AdapterELMBLE    = "elm327-ble" // ELM327 over Bluetooth Low Energy
+	AdapterJ2534     = "j2534"      // any installed J2534 PassThru driver (Windows)
+	AdapterSLCAN     = "slcan"      // Lawicel / CANable / USB-CAN on a serial port
+	AdapterSocketCAN = "socketcan"  // Linux can0
+	AdapterPCAN      = "pcan"       // PEAK PCAN-Basic (Windows)
+	AdapterKvaser    = "kvaser"     // Kvaser CANlib (Windows)
+	AdapterRP1210    = "rp1210"     // truck adapters (Windows)
+	AdapterDoIP      = "doip"       // Ethernet (ENET) cable, ISO 13400
+	AdapterHSFZ      = "hsfz"       // BMW ENET (HSFZ)
 )
 
 // Vehicle profiles: what kind of control units to look for.
@@ -48,6 +49,12 @@ type Config struct {
 	Profile string `json:"profile"`           // see Profile* constants
 	ECU     string `json:"ecu,omitempty"`     // force a definition id
 	Bitrate int    `json:"bitrate,omitempty"` // CAN bit rate (0 = try 500k then 250k)
+	// CANFD runs UDS over CAN FD (frames up to 64 bytes), as many cars
+	// from about 2020 need; DataBitrate is the data phase bit rate
+	// (default 2 Mbit/s). Adapters: PCAN-USB FD, a SocketCAN FD
+	// interface, CANable 2.0 (slcan) and the simulator.
+	CANFD       bool `json:"canFd,omitempty"`
+	DataBitrate int  `json:"dataBitrate,omitempty"`
 	// Address is the control unit address for K-Line profiles (hex,
 	// 10 = engine) or the module for KW1281/TP 2.0 (01 = engine).
 	Address string `json:"address,omitempty"`

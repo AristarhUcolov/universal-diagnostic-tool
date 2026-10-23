@@ -3,6 +3,7 @@ package vehicle
 import (
 	"runtime"
 
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ble"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/i18n"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/j2534"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/kvaser"
@@ -35,6 +36,11 @@ func Adapters() []AdapterInfo {
 		{ID: AdapterELMWiFi, Name: i18n.T("ELM327 Wi-Fi", "ELM327 Wi-Fi"),
 			Examples: "ELM327 Wi-Fi (192.168.0.10:35000), OBDLink MX+ Wi-Fi",
 			Port:     "network", Profiles: []string{ProfileAuto, ProfileOBD, ProfileRuKWP, ProfileKWP, ProfileUDS}, Available: true},
+		{ID: AdapterELMBLE, Name: i18n.T("ELM327 Bluetooth LE (BLE 4.0)", "ELM327 Bluetooth LE (BLE 4.0)"),
+			Examples: "Vgate iCar Pro BLE, Veepeak OBDCheck BLE, vLinker MC+ / FS BLE, OBDLink CX, KONNWEI KW902",
+			Port:     "ble", Profiles: []string{ProfileAuto, ProfileOBD, ProfileRuKWP, ProfileKWP, ProfileUDS}, Available: ble.Available(),
+			Note: i18n.T("Adapters made for iPhone and \"BLE 4.0\" models never show up as a COM port: press Find and pick the adapter. Not yet tried on real adapters.",
+				"Адаптеры для iPhone и модели «BLE 4.0» не появляются как COM-порт: нажмите «Найти» и выберите адаптер. На настоящих адаптерах ещё не проверялось.")},
 		{ID: AdapterJ2534, Name: i18n.T("J2534 PassThru interface", "Интерфейс J2534 PassThru"),
 			Examples: "Tactrix OpenPort 2.0, Mini-VCI, VCM II, MDI, MVCI, VXDIAG, Scanmatik, Godiag GD101, MaxiFlash, RLink, Bosch MDI",
 			Port:     "j2534", Profiles: []string{ProfileAuto, ProfileOBD, ProfileRuKWP, ProfileKWP, ProfileUDS, ProfileTP20, ProfileJ1939, ProfileMonitor},

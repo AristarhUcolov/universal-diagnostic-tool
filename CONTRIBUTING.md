@@ -30,6 +30,12 @@
 Проверенные адаптеры и блоки отметим в документации — это поможет следующему
 владельцу такой же машины.
 
+Особенно нужны проверки того, что пока испытано только на симуляторе:
+адаптеры **ELM327 Bluetooth LE** (Vgate iCar Pro BLE, Veepeak BLE, vLinker
+BLE, OBDLink CX), **CAN FD** (PCAN-USB FD, CANable 2.0) на машинах примерно с
+2020 года, **результаты самопроверок (режим 06)** и **сервисные функции**
+на ВАЗ.
+
 ## Описания блоков и коды неисправностей
 
 Правила и формат: **[docs/ECU-DEFINITIONS.md](docs/ECU-DEFINITIONS.md)**.
@@ -139,6 +145,12 @@ sending if you do not want to publish it.
 
 Tested adapters and control units will be marked in the documentation — that
 helps the next owner of the same car.
+
+Most wanted are reports on what has only met the simulator so far:
+**ELM327 Bluetooth LE** adapters (Vgate iCar Pro BLE, Veepeak BLE, vLinker
+BLE, OBDLink CX), **CAN FD** (PCAN-USB FD, CANable 2.0) on cars from about
+2020, **on-board test results (service 06)** and the **service functions** on
+VAZ cars.
 
 ## Control unit descriptions and trouble codes
 

@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { t, setLang, count } from '../i18n.js';
+import { t, setLang, count, fill } from '../i18n.js';
 import { el, clear, toast, busy, copyText } from '../ui.js';
 import { store, saveSettings, subscribe } from '../app.js';
 
@@ -25,13 +25,11 @@ export function render(view) {
       })),
       el('label.field', t('set.theme'), select(s.theme || 'auto', [['auto', t('set.themeAuto')], ['dark', t('set.themeDark')], ['light', t('set.themeLight')]], v => save({ theme: v }))),
       el('label.field', t('set.units'), select(s.units || 'metric', [['metric', t('set.metric')], ['imperial', t('set.imperial')]], v => save({ units: v })))),
-      el('div.checks', check('expert', t('set.expert')), check('logToFile', t('set.logToFile')), check('window', t('set.window')))),
+      el('div.checks', check('expert', t('set.expert')), check('logToFile', t('set.logToFile')), check('window', t('set.window')),
+        check('alerts', t('set.alerts')), check('alertSound', t('set.alertSound')))),
     el('div.card', el('h2', t('set.bridge')), el('p.secondary', t('set.bridgeLead')), bridgeBox),
     lanCard(),
-    el('div.card', el('h2', t('set.folders')), el('div.row',
-      [['logs', 'Logs'], ['recordings', 'Recordings'], ['reports', 'Reports'], ['definitions', 'Definitions'], ['', 'Config']].map(([k, label]) => el('button', {
-        onclick: () => api.post('/api/open-folder', { kind: k }).catch(e => toast(e.message, 'bad')),
-      }, t('set.folder' + label))))),
+    dataCard(),
     aboutCard());
 
   function paintBridge() {
@@ -56,6 +54,23 @@ export function render(view) {
   }
   paintBridge();
   return subscribe('status', paintBridge);
+}
+
+// dataCard shows where settings, journals, recordings and reports are
+// kept and opens those folders.
+function dataCard() {
+  const d = store.info.data || { dir: store.info.configDir, mode: 'profile' };
+  const mode = { portable: 'Portable', profile: 'Profile', custom: 'Custom' }[d.mode] || 'Profile';
+  return el('div.card', el('h2', t('set.folders')),
+    el('div.row.data-dir', el('span.badge' + (d.mode === 'portable' ? '.good' : '.info'), t('set.data' + mode)),
+      el('code.data-path', d.dir), el('button.small', { onclick: () => copyText(d.dir) }, t('common.copy'))),
+    el('p.secondary', t('set.dataLead' + mode)),
+    d.note ? el('p.muted.small', d.note) : null,
+    d.copied ? el('p.secondary', fill(t('set.dataCopied'), { dir: d.copied })) : null,
+    el('div.row',
+      [['logs', 'Logs'], ['recordings', 'Recordings'], ['reports', 'Reports'], ['definitions', 'Definitions'], ['', 'Config']].map(([k, label]) => el('button', {
+        onclick: () => api.post('/api/open-folder', { kind: k }).catch(e => toast(e.message, 'bad')),
+      }, t('set.folder' + label)))));
 }
 
 function lanCard() {

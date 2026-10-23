@@ -34,12 +34,14 @@ func runGUI(args []string) int {
 	listen := fs.String("listen", "127.0.0.1:0", "address of the web interface; 0.0.0.0:8080 allows phones and tablets on the network")
 	noWindow := fs.Bool("no-window", false, "do not open a window or a browser (server only)")
 	browser := fs.Bool("browser", false, "open the interface in the browser instead of a window")
+	data := fs.String("data", "", "folder for settings, journals, recordings and reports (default: "+settings.PortableName+" next to the program)")
 	fs.Usage = func() {
 		fmt.Fprintf(os.Stderr, "%s %s\n\nUsage: udt [flags]   (graphical interface)\n       udt <command> [flags]   (run \"udt help\")\n\nFlags:\n", version.Name, version.Version)
 		fs.PrintDefaults()
 	}
 	_ = fs.Parse(args)
 
+	loc := settings.Init(*data)
 	st := settings.Load()
 	j := journal.New(20000)
 	if st.LogToFile {
@@ -50,6 +52,13 @@ func runGUI(args []string) int {
 		pruneLogs(settings.Sub("logs"), 50)
 	}
 	journal.Infof(j, "app", "%s %s started", version.Name, version.Version)
+	journal.Infof(j, "app", "data folder: %s (%s)", loc.Dir, loc.Mode)
+	if loc.Note != "" {
+		journal.Warnf(j, "app", "data folder in the user profile: %s", loc.Note)
+	}
+	if loc.Copied != "" {
+		journal.Infof(j, "app", "settings and journals copied from %s", loc.Copied)
+	}
 	srv, err := server.New(st, j)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
@@ -60,7 +69,7 @@ func runGUI(args []string) int {
 		fmt.Fprintln(os.Stderr, "cannot start the interface:", err)
 		return 1
 	}
-	fmt.Printf("%s %s\nInterface: %s\n", version.Name, version.Version, url)
+	fmt.Printf("%s %s\nInterface: %s\nData: %s\n", version.Name, version.Version, url, loc.Dir)
 	if lan := srv.LANURL(); lan != "" {
 		fmt.Printf("Other devices on the network: %s\n", lan)
 	}

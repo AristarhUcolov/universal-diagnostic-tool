@@ -278,6 +278,16 @@ func (a *OBDApp) Handle(req []byte, t Transport, functional bool) [][]byte {
 			return nil
 		}
 		return a.mode09(req[1], t)
+	case 0x06:
+		if len(req) == 2 && t == TransportCAN && !a.Minor {
+			if out := a.mode06(req[1]); out != nil {
+				return [][]byte{out}
+			}
+		}
+		if functional {
+			return nil
+		}
+		return nrc(0x06, 0x12)
 	}
 	if a.UDS && !functional && t == TransportCAN {
 		return a.uds(req, s)
@@ -549,4 +559,96 @@ func (a *OBDApp) readDTCInfo(req []byte) [][]byte {
 		return [][]byte{out}
 	}
 	return nrc(0x19, 0x12)
+}
+
+// mode06 answers on-board monitoring test results in the CAN format: the
+// oxygen sensors and their heaters, the catalyst (failing with P0420)
+// and misfire counts per cylinder that follow an injected misfire.
+func (a *OBDApp) mode06(mid byte) []byte {
+	masks := map[byte][4]byte{
+		0x00: {0xC0, 0x00, 0x00, 0x01}, // 01, 02
+		0x20: {0x80, 0x00, 0x00, 0x01}, // 21
+		0x40: {0xC0, 0x00, 0x00, 0x01}, // 41, 42
+		0x60: {0x00, 0x00, 0x00, 0x01},
+		0x80: {0x00, 0x00, 0x00, 0x01},
+		0xA0: {0xF8, 0x00, 0x00, 0x00}, // A1–A5
+	}
+	if mid%0x20 == 0 {
+		m, ok := masks[mid]
+		if !ok {
+			return nil
+		}
+		return []byte{0x46, mid, m[0], m[1], m[2], m[3]}
+	}
+	test := func(tid, id byte, v, lo, hi uint16) []byte {
+		return []byte{mid, tid, id, byte(v >> 8), byte(v), byte(lo >> 8), byte(lo), byte(hi >> 8), byte(hi)}
+	}
+	var recs [][]byte
+	switch mid {
+	case 0x01: // upstream sensor, switching between 0.1 and 0.8 V (0.122 mV per bit)
+		recs = [][]byte{
+			test(0x01, 0x0A, 3689, 3689, 3689), // rich to lean threshold 0.45 V
+			test(0x05, 0x10, 72, 0, 160),       // switch times, ms
+			test(0x06, 0x10, 81, 0, 160),
+			test(0x07, 0x0A, 656, 0, 3279),     // lowest 0.08 V, at most 0.4 V
+			test(0x08, 0x0A, 6721, 4918, 9836), // highest 0.82 V, 0.6–1.2 V
+		}
+	case 0x02: // downstream sensor, steady behind a working catalyst
+		recs = [][]byte{test(0x07, 0x0A, 4590, 0, 5738), test(0x08, 0x0A, 5984, 4918, 9836)}
+	case 0x21: // catalyst: rear to front switch ratio, at most 0.75
+		ratio := uint16(38)
+		if a.hasFault("P0420") {
+			ratio = 221
+		}
+		recs = [][]byte{test(0x81, 0x20, ratio, 0, 192)}
+	case 0x41, 0x42: // heater current, A
+		cur := uint16(940)
+		if mid == 0x42 {
+			cur = 710
+		}
+		recs = [][]byte{test(0x81, 0x0E, cur, 500, 2500)}
+	case 0xA1, 0xA2, 0xA3, 0xA4, 0xA5:
+		avg, now := a.misfires()
+		i := int(mid - 0xA1) // 0: all cylinders
+		recs = [][]byte{test(0x0B, 0x24, avg[i], 0, 0), test(0x0C, 0x24, now[i], 0, 0)}
+	default:
+		return nil
+	}
+	out := []byte{0x46}
+	for _, r := range recs {
+		out = append(out, r...)
+	}
+	return out
+}
+
+// misfires returns the misfire counts (average of the last ten drives and
+// the current drive) of all cylinders [0] and of cylinders 1–4: a random
+// misfire (P0300) hits cylinders 3 and 2, P0301–P0304 one cylinder.
+func (a *OBDApp) misfires() (avg, now [5]uint16) {
+	now = [5]uint16{0, 0, 1, 0, 0}
+	avg = [5]uint16{0, 0, 0, 0, 0}
+	for _, f := range a.Engine.Faults() {
+		switch {
+		case f.Code == "P0300":
+			now = [5]uint16{0, 3, 41, 118, 6}
+			avg = [5]uint16{0, 1, 12, 36, 2}
+		case len(f.Code) == 5 && f.Code[:4] == "P030" && f.Code[4] >= '1' && f.Code[4] <= '4':
+			c := int(f.Code[4] - '0')
+			now[c], avg[c] = 96, 29
+		}
+	}
+	for c := 1; c <= 4; c++ {
+		now[0] += now[c]
+		avg[0] += avg[c]
+	}
+	return avg, now
+}
+
+func (a *OBDApp) hasFault(code string) bool {
+	for _, f := range a.Engine.Faults() {
+		if f.Code == code {
+			return true
+		}
+	}
+	return false
 }

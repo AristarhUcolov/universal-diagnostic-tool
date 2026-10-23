@@ -14,9 +14,12 @@ import * as reference from './pages/reference.js';
 import * as settingsPage from './pages/settings.js';
 import * as support from './pages/support.js';
 import * as checks from './pages/checks.js';
+import * as gauges from './pages/gauges.js';
+import * as monitors from './pages/monitors.js';
+import { startAlerts } from './alerts.js';
 
-const pages = { connect, dashboard, dtc: dtcPage, live, info, tests, checks, terminal, bus, journal, reference, settings: settingsPage, support };
-const needsConnection = new Set(['dashboard', 'dtc', 'live', 'info', 'tests', 'checks', 'terminal']);
+const pages = { connect, dashboard, dtc: dtcPage, live, info, tests, checks, gauges, monitors, terminal, bus, journal, reference, settings: settingsPage, support };
+const needsConnection = new Set(['dashboard', 'dtc', 'live', 'info', 'tests', 'checks', 'gauges', 'monitors', 'terminal']);
 
 // store is the shared state of the interface.
 export const store = {
@@ -171,6 +174,7 @@ async function main() {
   if (store.status.ecus && store.status.ecus.length) store.ecu = store.status.ecus[0].id;
   updateHeader();
   route();
+  startAlerts(store, subscribe);
   voltageLoop();
   setTimeout(() => startEvents(), 400);
 }

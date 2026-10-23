@@ -21,10 +21,11 @@
 ## Где лежат файлы
 
 - Встроенные описания: [`internal/ecu/defs/`](../internal/ecu/defs/).
-- Свои описания: папка `definitions` в папке настроек — в Windows
-  `%APPDATA%\udt\definitions`, на Linux `~/.config/udt/definitions`
-  (быстро открыть: **Настройки → Папки → Описания блоков**). Описание с тем
-  же `id`, что у встроенного, заменяет встроенное.
+- Свои описания: папка `definitions` в папке данных — `udt-data\definitions`
+  рядом с программой (или `%APPDATA%\udt\definitions` в Windows и
+  `~/.config/udt/definitions` в Linux, если в папку программы нельзя
+  записывать). Быстро открыть: **Настройки → Папки → Описания блоков**.
+  Описание с тем же `id`, что у встроенного, заменяет встроенное.
 - Описания читаются при запуске программы. Ошибки в файле показывает
   `udt definitions`; такое описание не загружается.
 
@@ -240,10 +241,11 @@ needs no Go.
 ## Where the files are
 
 - Built-in descriptions: [`internal/ecu/defs/`](../internal/ecu/defs/).
-- Your own: the `definitions` folder in the settings folder —
-  `%APPDATA%\udt\definitions` on Windows, `~/.config/udt/definitions` on
-  Linux (**Settings → Folders → ECU definitions** opens it). A description
-  with the same `id` as a built-in one replaces it.
+- Your own: the `definitions` folder in the data folder —
+  `udt-data/definitions` next to the program (or `%APPDATA%\udt\definitions`
+  on Windows and `~/.config/udt/definitions` on Linux when the program's
+  folder cannot be written). **Settings → Folders → ECU definitions** opens
+  it. A description with the same `id` as a built-in one replaces it.
 - Descriptions are read at start-up. `udt definitions` shows errors; a file
   with errors is not loaded.
 

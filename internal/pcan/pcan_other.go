@@ -9,3 +9,6 @@ func Open(channel string, bitrate int) (can.Bus, error) { return nil, ErrUnsuppo
 
 // Available reports whether PCAN-Basic can be used.
 func Available() bool { return false }
+
+// OpenFD is unavailable outside Windows.
+func OpenFD(channel string, nominal, data int) (can.Bus, error) { return nil, ErrUnsupported }

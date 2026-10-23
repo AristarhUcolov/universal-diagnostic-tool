@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { t, tr, unitName } from '../i18n.js';
+import { t, tr, unitName, fill } from '../i18n.js';
 import { el, clear, fmt, pageHeader, errText } from '../ui.js';
 import { ecuPath } from './common.js';
 
@@ -11,10 +11,6 @@ import { ecuPath } from './common.js';
 // A verdict is { state: 'wait' | 'ok' | 'warn' | 'bad', text }.
 
 const RPM = '0C', COOLANT = '05', VOLTS = '42', O2 = '14', TPS = '11';
-
-function fill(s, vars) {
-  return s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : ''));
-}
 
 // Samples kept per value during a step.
 class Samples {

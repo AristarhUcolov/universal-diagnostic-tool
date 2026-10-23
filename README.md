@@ -63,6 +63,13 @@ Universal Diagnostic Tool — одна открытая программа дл�
 `udt-linux-armv7`, `udt-macos-arm64` — интерфейс откроется в браузере. На
 Linux добавьте пользователя в группу `dialout`, чтобы открыть COM-порт.
 
+**Всё хранится рядом с программой.** Настройки, журналы, записи и отчёты лежат
+в папке `udt-data` рядом с `udt.exe`: скопируйте программу вместе с этой
+папкой на флешку или другой компьютер — и всё переедет. Если в папку
+программы нельзя записывать (например, Program Files), данные хранятся в
+профиле пользователя. Настройки и журналы прежних версий из `%APPDATA%\udt`
+при первом запуске копируются в `udt-data` сами.
+
 **Из исходников** (нужен Go 1.26):
 
 ```bash
@@ -74,11 +81,13 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
 ```
 
 **Без машины** можно начать сразу: выберите адаптер «Симулятор». Внутри —
-модель двигателя и десять виртуальных автомобилей: ГАЗ-3110 с Микас-7.1,
-ВАЗ-2112 с Январь-7.2, ВАЗ-2110 с Bosch M1.5.4N, ВАЗ-21093 «Россия-83»,
-европейский автомобиль с OBD-II по K-Line, VW Golf IV (KW1281), современная
-машина с OBD-II и UDS по CAN, VW Passat B6 (TP 2.0), грузовик J1939 и
-автомобиль с диагностикой по Ethernet (DoIP).
+модель двигателя и одиннадцать виртуальных автомобилей: ГАЗ-3110 с
+Микас-7.1, ВАЗ-2112 с Январь-7.2, ВАЗ-2110 с Bosch M1.5.4N, ВАЗ-21093
+«Россия-83», европейский автомобиль с OBD-II по K-Line, VW Golf IV (KW1281),
+современная машина с OBD-II и UDS по CAN, машина 2021 года с UDS по CAN FD,
+VW Passat B6 (TP 2.0), грузовик J1939 и автомобиль с диагностикой по Ethernet
+(DoIP). У симулятора есть кнопки «Ехать», «Разгон 0–100», «Перегрев» и
+«Добавить ошибку», чтобы попробовать все разделы.
 
 ## Что умеет
 
@@ -96,11 +105,22 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
   подсветкой меняющихся байтов — чтобы изучать новые блоки.
 - **Обзор** — главные значения плитками с цветом по порогам, готовность
   мониторов OBD-II, напряжение бортсети, быстрые действия.
+- **Приборы** — стрелочные приборы для выбранных значений, режим HUD для
+  лобового стекла, бортовой компьютер (мгновенный и средний расход, пробег,
+  время, средняя и максимальная скорость) и замер разгона 0–60, 0–100,
+  60–100, 80–120 км/ч и 402 м.
+- **Мониторы** — готовность мониторов OBD-II и результаты самопроверок блока
+  (режим 06) с допусками: датчики кислорода, катализатор, пропуски
+  зажигания по каждому цилиндру. Деталь на грани допуска видна раньше, чем
+  появится код ошибки.
+- **Предупреждения** — перегрев, низкое или слишком высокое напряжение,
+  перекрут: сообщение, отметка в верхней строке и звук на любой странице.
 - **Сервис** — перезагрузка блока управления (связь восстанавливается
   сама); проверка форсунок, катушек, бензонасоса, вентилятора, клапанов;
-  регулировка оборотов холостого хода и положения РДВ с живыми оборотами
-  рядом. Программа не запустит тест, если двигатель не в нужном состоянии,
-  и сама вернёт блоку всё включённое по таймеру.
+  регулировка оборотов холостого хода и положения РДВ в реальном времени:
+  ползунок и кнопки шага сразу меняют обороты, а график показывает заданные
+  и фактические. Программа не запустит тест, если двигатель не в нужном
+  состоянии, и сама вернёт блоку всё включённое по таймеру.
 - **Проверки** — пошаговые проверки с оценкой «норма / не норма»:
   аккумулятор и генератор, прогрев и термостат, холостой ход, датчик
   кислорода, датчик положения дросселя.
@@ -119,6 +139,8 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
   `udt reset`, `udt bridge`, `udt lookup` для скриптов и слабых ноутбуков.
 - **RU / EN**, тёмная и светлая тема, метрические и имперские единицы.
 
+![Приборы, бортовой компьютер и замер разгона](docs/img/gauges.png)
+
 ![Ошибки с советами по ремонту](docs/img/dtc.png)
 
 ![Параметры в реальном времени](docs/img/live-charts.png)
@@ -129,8 +151,9 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # для 32-битных драй
 |---|---|---|
 | K-Line кабель: VAG KKL 409.1 (FTDI, CH340), K+DCAN в режиме K-Line, RS232 KKL, переходники ГАЗ/ВАЗ 12-pin | COM-порт | все протоколы K-Line: KWP2000, ISO 9141-2, Микас-5.4/7.1, Январь-4, VW KW1281 |
 | ELM327 USB / Bluetooth / Wi-Fi, OBDLink SX/LX/MX+/EX, STN1110/2120, vLinker | COM-порт, Wi-Fi | OBD-II (все пять протоколов), KWP2000 ВАЗ/ГАЗ/УАЗ, UDS |
+| ELM327 Bluetooth LE (BLE 4.0): Vgate iCar Pro BLE, Veepeak OBDCheck BLE, vLinker BLE, OBDLink CX | Bluetooth LE, кнопка «Найти» | то же, что ELM327 |
 | J2534 PassThru: Tactrix OpenPort 2.0, Scanmatik 2, Mini-VCI, VCM II, MDI, MVCI, VXDIAG, Godiag GD101, Autel MaxiFlash… | драйвер производителя | OBD-II, KWP2000, UDS, VW TP 2.0, J1939, монитор CAN |
-| USB-CAN: CANable, CANtact, Lawicel CANUSB (slcan); PEAK PCAN-USB; Kvaser; SocketCAN на Linux | COM-порт или драйвер | OBD-II, UDS, VW TP 2.0, J1939, монитор CAN |
+| USB-CAN: CANable / CANable 2.0, CANtact, Lawicel CANUSB (slcan); PEAK PCAN-USB (FD); Kvaser; SocketCAN на Linux | COM-порт или драйвер | OBD-II, UDS (также по CAN FD), VW TP 2.0, J1939, монитор CAN |
 | Грузовые RP1210: Nexiq USB-Link, Noregon DLA+, Dearborn DPA5, Cummins INLINE, CAT CA3, Jaltest Link… | драйвер производителя | SAE J1939 |
 | Ethernet: кабель OBD–RJ45 (DoIP), BMW ENET (HSFZ) | сеть | UDS, OBD-II по DoIP |
 
@@ -207,8 +230,12 @@ OBD-II из его параметров и кодов.
   Launch DBScar, многие дилерские VCI без драйвера J2534 — работают только со
   своими программами: их протокол зашифрован или привязан к серверу
   производителя.
-- **Пока не поддерживаются:** CAN FD, FlexRay, LIN, MOST, J1708/J1587, GM ALDL,
-  Chrysler SCI/CCD, D-PDU API (ISO 22900-2), Bluetooth LE адаптеры.
+- **Пока не поддерживаются:** J1708/J1587 (грузовики до 2007 года), GM ALDL,
+  Chrysler SCI/CCD, D-PDU API (ISO 22900-2). FlexRay, LIN и MOST к
+  диагностическому разъёму не выведены: блоки на этих шинах диагностируются
+  через шлюз по CAN или Ethernet (DoIP), а это программа умеет. Bluetooth LE
+  работает в Windows и Linux, но на настоящих адаптерах ещё не проверялся; в
+  сборке для macOS его нет. CAN FD проверен на симуляторе.
 
 ## Устройство программы
 
@@ -227,6 +254,7 @@ internal/tp20         VW TP 2.0
 internal/j1939        SAE J1939: адреса, BAM, DM1/DM2/DM3/DM11, SPN
 internal/doip         ISO 13400 (DoIP) и BMW HSFZ
 internal/elm327       драйвер ELM327/STN и эмулятор для моста
+internal/ble          адаптеры ELM327 по Bluetooth LE
 internal/slcan, pcan, kvaser, socketcan, j2534, rp1210   CAN-адаптеры и драйверы
 internal/ecu          описания блоков (JSON), формулы, обработчики
 internal/dtc          база кодов неисправностей
@@ -352,6 +380,14 @@ Mini-VCI, Scanmatik, Nexiq…) can only be loaded by a 32-bit program — use
 `udt-linux-armv7`, `udt-macos-arm64` — the interface opens in the browser. On
 Linux add your user to the `dialout` group to open serial ports.
 
+**Everything is kept next to the program.** Settings, journals, recordings
+and reports live in the `udt-data` folder next to `udt.exe`: copy the program
+together with that folder to a flash drive or another computer and everything
+moves with it. Where the program's folder cannot be written (Program Files,
+for example), the data is kept in the user profile. Settings and journals of
+earlier versions in `%APPDATA%\udt` are copied into `udt-data` on the first
+start.
+
 **From source** (Go 1.26):
 
 ```bash
@@ -363,11 +399,13 @@ GOARCH=386 go build -o udt-x86.exe ./cmd/udt   # for 32-bit J2534/RP1210 drivers
 ```
 
 **No car needed** to start: pick the "Simulator" adapter. It contains an
-engine model and ten virtual vehicles: GAZ-3110 with Микас-7.1, VAZ-2112 with
-Январь-7.2, VAZ-2110 with Bosch M1.5.4N, VAZ-21093 "Russia-83", a European car
-with OBD-II on K-Line, VW Golf IV (KW1281), a modern car with OBD-II and UDS
-on CAN, VW Passat B6 (TP 2.0), a J1939 truck and a car with Ethernet
-diagnostics (DoIP).
+engine model and eleven virtual vehicles: GAZ-3110 with Микас-7.1, VAZ-2112
+with Январь-7.2, VAZ-2110 with Bosch M1.5.4N, VAZ-21093 "Russia-83", a
+European car with OBD-II on K-Line, VW Golf IV (KW1281), a modern car with
+OBD-II and UDS on CAN, a 2021 car with UDS on CAN FD, VW Passat B6 (TP 2.0), a
+J1939 truck and a car with Ethernet diagnostics (DoIP). The simulator has
+"Drive", "Launch 0–100", "Overheat" and "Inject a fault" buttons to try every
+page.
 
 ## What it does
 
@@ -385,11 +423,22 @@ diagnostics (DoIP).
   new control units.
 - **Overview** — key values as tiles coloured by thresholds, OBD-II monitor
   readiness, battery voltage, quick actions.
+- **Gauges** — dials for the values you choose, a HUD mode for the
+  windscreen, a trip computer (current and average consumption, distance,
+  time, average and top speed) and acceleration timing: 0–60, 0–100, 60–100,
+  80–120 km/h and 402 m.
+- **Monitors** — OBD-II monitor readiness and the controller's own test
+  results (service 06) against their limits: oxygen sensors, catalyst,
+  misfires per cylinder. A part close to its limit shows up before any
+  trouble code.
+- **Alerts** — overheating, low or too high voltage, over-revving: a
+  message, a mark in the top bar and a sound, on any page.
 - **Service** — restart the control unit (communication comes back by
   itself); test injectors, coils, fuel pump, fan and valves; set the idle
-  speed and the idle air valve with the live engine speed next to it. A test
-  does not start unless the engine is in the state it needs, and anything
-  left on is handed back to the unit by a timer.
+  speed and the idle air valve in real time: the slider and step buttons
+  change the engine speed at once, and a chart shows the target and the
+  actual value. A test does not start unless the engine is in the state it
+  needs, and anything left on is handed back to the unit by a timer.
 - **Checks** — step-by-step checks with a pass or fail verdict: battery and
   charging, warm-up and thermostat, idle, oxygen sensor, throttle sensor.
 - **Terminal** — any request in hex and the raw answer: KWP2000, UDS, OBD-II,
@@ -407,6 +456,8 @@ diagnostics (DoIP).
   `udt reset`, `udt bridge`, `udt lookup` for scripts and slow laptops.
 - **EN / RU**, dark and light theme, metric and imperial units.
 
+![Gauges, trip computer and acceleration timing](docs/img/gauges-en.png)
+
 ![Trouble codes with repair advice](docs/img/dtc-en.png)
 
 ## Adapters
@@ -415,8 +466,9 @@ diagnostics (DoIP).
 |---|---|---|
 | K-Line cable: VAG KKL 409.1 (FTDI, CH340), K+DCAN in K-Line mode, RS232 KKL, GAZ/VAZ 12-pin adapters | serial port | every K-Line protocol: KWP2000, ISO 9141-2, Микас-5.4/7.1, Январь-4, VW KW1281 |
 | ELM327 USB / Bluetooth / Wi-Fi, OBDLink SX/LX/MX+/EX, STN1110/2120, vLinker | serial port, Wi-Fi | OBD-II (all five protocols), VAZ/GAZ/UAZ KWP2000, UDS |
+| ELM327 Bluetooth LE (BLE 4.0): Vgate iCar Pro BLE, Veepeak OBDCheck BLE, vLinker BLE, OBDLink CX | Bluetooth LE, "Find" button | the same as ELM327 |
 | J2534 PassThru: Tactrix OpenPort 2.0, Scanmatik 2, Mini-VCI, VCM II, MDI, MVCI, VXDIAG, Godiag GD101, Autel MaxiFlash… | manufacturer's driver | OBD-II, KWP2000, UDS, VW TP 2.0, J1939, CAN monitor |
-| USB-CAN: CANable, CANtact, Lawicel CANUSB (slcan); PEAK PCAN-USB; Kvaser; SocketCAN on Linux | serial port or driver | OBD-II, UDS, VW TP 2.0, J1939, CAN monitor |
+| USB-CAN: CANable / CANable 2.0, CANtact, Lawicel CANUSB (slcan); PEAK PCAN-USB (FD); Kvaser; SocketCAN on Linux | serial port or driver | OBD-II, UDS (also on CAN FD), VW TP 2.0, J1939, CAN monitor |
 | RP1210 truck adapters: Nexiq USB-Link, Noregon DLA+, Dearborn DPA5, Cummins INLINE, CAT CA3, Jaltest Link… | manufacturer's driver | SAE J1939 |
 | Ethernet: OBD–RJ45 cable (DoIP), BMW ENET (HSFZ) | network | UDS, OBD-II on DoIP |
 
@@ -495,8 +547,12 @@ appear on a CAN bus without a hardware gateway. Details:
   Launch DBScar, many dealer VCIs without a J2534 driver — work only with their
   own software: their protocol is encrypted or tied to the manufacturer's
   server.
-- **Not supported yet:** CAN FD, FlexRay, LIN, MOST, J1708/J1587, GM ALDL,
-  Chrysler SCI/CCD, D-PDU API (ISO 22900-2), Bluetooth LE adapters.
+- **Not supported yet:** J1708/J1587 (trucks before 2007), GM ALDL, Chrysler
+  SCI/CCD, D-PDU API (ISO 22900-2). FlexRay, LIN and MOST do not reach the
+  diagnostic socket: their control units are diagnosed through a gateway on
+  CAN or Ethernet (DoIP), which the program does. Bluetooth LE works on
+  Windows and Linux but has not been tried on real adapters yet; the macOS
+  build has none. CAN FD is tested against the simulator.
 
 ## Program structure
 
@@ -515,6 +571,7 @@ internal/tp20         VW TP 2.0
 internal/j1939        SAE J1939: addresses, BAM, DM1/DM2/DM3/DM11, SPNs
 internal/doip         ISO 13400 (DoIP) and BMW HSFZ
 internal/elm327       ELM327/STN driver and the emulator used by the bridge
+internal/ble          ELM327 adapters on Bluetooth LE
 internal/slcan, pcan, kvaser, socketcan, j2534, rp1210   CAN adapters and drivers
 internal/ecu          control unit descriptions (JSON), formulas, handlers
 internal/dtc          trouble code database

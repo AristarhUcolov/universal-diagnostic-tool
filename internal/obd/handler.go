@@ -88,7 +88,7 @@ func (h *Handler) Describe() ecu.Description {
 	return ecu.Description{
 		ID: "obd", Name: h.name, Protocol: info.Protocol,
 		Address: strings.Join(units, ", "), Family: dtc.FamilySAE, Status: "generic",
-		Capabilities: []string{ecu.CapDTC, ecu.CapClear, ecu.CapLive, ecu.CapRaw, ecu.CapFreeze, ecu.CapReadiness},
+		Capabilities: []string{ecu.CapDTC, ecu.CapClear, ecu.CapLive, ecu.CapRaw, ecu.CapFreeze, ecu.CapReadiness, ecu.CapTests},
 	}
 }
 

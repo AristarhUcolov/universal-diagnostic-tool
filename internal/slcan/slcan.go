@@ -34,10 +34,20 @@ var bitrateCodes = map[int]byte{
 	250000: '5', 500000: '6', 800000: '7', 1000000: '8',
 }
 
+// Data phase bit rate codes of the "Yn" command (CANable 2.0 firmware).
+var dataBitrateCodes = map[int]byte{2000000: '2', 5000000: '5'}
+
+// Errors of setup commands.
+var (
+	errNoAnswer = errors.New("slcan: no answer")
+	errRejected = errors.New("slcan: adapter answered with error (BEL)")
+)
+
 // Bus is an open slcan channel.
 type Bus struct {
 	port    Port
 	bitrate int
+	fd      bool
 	log     journal.Logger
 	wmu     sync.Mutex
 	rx      chan can.Frame
@@ -51,30 +61,64 @@ type Bus struct {
 // Open configures the bit rate and opens the CAN channel. listenOnly
 // opens it without acknowledging frames (safe sniffing).
 func Open(port Port, bitrate int, listenOnly bool, log journal.Logger) (*Bus, error) {
+	return open(port, bitrate, 0, listenOnly, log)
+}
+
+// OpenFD opens the channel for CAN FD (CANable 2.0 firmware): the data
+// phase runs at dataBitrate, 2 or 5 Mbit/s.
+func OpenFD(port Port, bitrate, dataBitrate int, listenOnly bool, log journal.Logger) (*Bus, error) {
+	if _, ok := dataBitrateCodes[dataBitrate]; !ok {
+		return nil, fmt.Errorf("slcan: CAN FD data bit rate %d is not supported (2 or 5 Mbit/s)", dataBitrate)
+	}
+	return open(port, bitrate, dataBitrate, listenOnly, log)
+}
+
+func open(port Port, bitrate, dataBitrate int, listenOnly bool, log journal.Logger) (*Bus, error) {
 	code, ok := bitrateCodes[bitrate]
 	if !ok {
 		return nil, fmt.Errorf("slcan: unsupported bit rate %d (use 10k..1M standard rates)", bitrate)
 	}
-	b := &Bus{port: port, bitrate: bitrate, log: journal.Or(log), rx: make(chan can.Frame, 4096), done: make(chan struct{})}
+	b := &Bus{port: port, bitrate: bitrate, fd: dataBitrate > 0, log: journal.Or(log), rx: make(chan can.Frame, 4096), done: make(chan struct{})}
 	// Clear pending input and close a channel left open.
 	_, _ = port.Write([]byte("\r\r\r"))
 	b.drain(300 * time.Millisecond)
 	_, _ = b.command("C", 300*time.Millisecond)
 	b.drain(100 * time.Millisecond)
+	present := false
 	if v, err := b.command("V", 500*time.Millisecond); err == nil {
 		b.Version = strings.TrimSpace(v)
+		present = true
 	}
-	if _, err := b.command("S"+string(code), 500*time.Millisecond); err != nil {
-		return nil, fmt.Errorf("slcan: adapter rejected bit rate %d: %w", bitrate, err)
+	// Some firmware (CANable 2.0) does not acknowledge settings at all:
+	// silence is accepted from an adapter that answered the version
+	// request, an error answer never is.
+	setup := func(c, what string) error {
+		_, err := b.command(c, 500*time.Millisecond)
+		if err == nil || (errors.Is(err, errNoAnswer) && present) {
+			return nil
+		}
+		return fmt.Errorf("slcan: %s: %w", what, err)
+	}
+	if err := setup("S"+string(code), fmt.Sprintf("adapter rejected bit rate %d", bitrate)); err != nil {
+		return nil, err
+	}
+	if b.fd {
+		if err := setup("Y"+string(dataBitrateCodes[dataBitrate]), fmt.Sprintf("adapter rejected CAN FD data bit rate %d", dataBitrate)); err != nil {
+			return nil, err
+		}
 	}
 	open := "O"
 	if listenOnly {
 		open = "L"
 	}
-	if _, err := b.command(open, 500*time.Millisecond); err != nil {
-		return nil, fmt.Errorf("slcan: cannot open the CAN channel: %w", err)
+	if err := setup(open, "cannot open the CAN channel"); err != nil {
+		return nil, err
 	}
-	journal.Infof(b.log, "slcan", "%s open at %d bit/s (version %s)", port.Name(), bitrate, b.Version)
+	if b.fd {
+		journal.Infof(b.log, "slcan", "%s open at %d bit/s, CAN FD data %d bit/s (version %s)", port.Name(), bitrate, dataBitrate, b.Version)
+	} else {
+		journal.Infof(b.log, "slcan", "%s open at %d bit/s (version %s)", port.Name(), bitrate, b.Version)
+	}
 	go b.reader()
 	return b, nil
 }
@@ -105,7 +149,7 @@ func (b *Bus) readLine(timeout time.Duration) (string, error) {
 			case '\r':
 				return string(line), nil
 			case 0x07:
-				return string(line), errors.New("slcan: adapter answered with error (BEL)")
+				return string(line), errRejected
 			default:
 				line = append(line, one[0])
 			}
@@ -115,7 +159,7 @@ func (b *Bus) readLine(timeout time.Duration) (string, error) {
 			return string(line), err
 		}
 	}
-	return string(line), errors.New("slcan: no answer")
+	return string(line), errNoAnswer
 }
 
 func (b *Bus) command(c string, timeout time.Duration) (string, error) {
@@ -281,7 +325,7 @@ func (b *Bus) Recv(ctx context.Context, timeout time.Duration) (can.Frame, error
 
 // Info implements can.Bus.
 func (b *Bus) Info() can.BusInfo {
-	return can.BusInfo{Name: "slcan " + b.port.Name(), Bitrate: b.bitrate}
+	return can.BusInfo{Name: "slcan " + b.port.Name(), Bitrate: b.bitrate, FD: b.fd}
 }
 
 // Close closes the CAN channel and the port.

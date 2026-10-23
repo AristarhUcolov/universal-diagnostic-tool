@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { t, tr } from '../i18n.js';
-import { el, clear, toast, busy, statusBadge } from '../ui.js';
+import { el, clear, toast, busy, statusBadge, errText } from '../ui.js';
 import { store, subscribe, connected } from '../app.js';
 
 const portKinds = { kkl: 'serial', elm327: 'serial', slcan: 'serial' };
@@ -57,7 +57,7 @@ export function render(view) {
           ? el('span.status-line', '⏳ ' + t('conn.connecting'))
           : el('span.status-line.bad', '✕ ' + t('conn.error')),
         s.state === 'connecting' ? el('button.small', { onclick: () => api.post('/api/disconnect') }, t('common.cancel')) : null),
-        s.error ? el('p', { style: { color: 'var(--critical-ink)' } }, s.error) : null,
+        s.error ? el('p', { style: { color: 'var(--critical-ink)' } }, errText({ message: s.error, code: s.errorCode })) : null,
         el('h3', t('connect.progress')), log));
       log.scrollTop = log.scrollHeight;
     }
@@ -117,6 +117,28 @@ export function render(view) {
       const ph = { 'elm327-wifi': '192.168.0.10:35000', doip: 'auto (UDP discovery) / 169.254.x.x', hsfz: '169.254.x.x' }[a.id] || '';
       const inp = el('input', { value: cfg.port || '', placeholder: ph, size: 30, oninput: e => set(e.target.value) });
       portBox.append(el('label.field', t('connect.network'), inp));
+    } else if (kind === 'ble') {
+      const inp = el('input', { value: cfg.port || '', placeholder: 'AA:BB:CC:DD:EE:FF', size: 22, oninput: e => set(e.target.value.trim()) });
+      const list = el('div');
+      const find = el('button.small', '⌕ ' + t('connect.bleFind'));
+      find.onclick = () => busy(find, async () => {
+        clear(list).append(el('p.muted.small', t('connect.bleScanning')));
+        let devs = [];
+        try {
+          devs = (await api.get('/api/ble/scan?seconds=6')).devices || [];
+        } finally {
+          clear(list);
+        }
+        if (!devs.length) {
+          list.append(el('p.muted.small', t('connect.bleNone')));
+          return;
+        }
+        list.append(el('div.table-wrap', el('table', el('tbody', devs.map(d => el('tr', {
+          style: { cursor: 'pointer' }, onclick: () => { inp.value = d.address; set(d.address); },
+        }, el('td', el('b', d.name || '—')), el('td.mono', d.address), el('td.muted', d.rssi + ' dBm'),
+        el('td', d.likely ? el('span.badge.good', 'OBD') : null)))))));
+      });
+      portBox.append(el('div.row', el('label.field', t('connect.bleAddr'), inp), find), list);
     } else if (kind === 'j2534') {
       if (!data.j2534 || !data.j2534.length) {
         portBox.append(el('p.muted', t('connect.noJ2534')));
@@ -186,6 +208,15 @@ export function render(view) {
     }
     if (cfg.profile === 'uds') {
       advBox.append(field(t('connect.txid'), text('txId', '7E0')), field(t('connect.rxid'), text('rxId', '7E8')));
+      // CAN FD: the data phase rates each adapter can do.
+      const rates = { slcan: [2000000, 5000000], pcan: [1000000, 2000000, 4000000, 5000000, 8000000], sim: [2000000] }[a];
+      if (rates || a === 'socketcan') {
+        const dr = rates ? el('select', { disabled: !cfg.canFd, onchange: e => { cfg.dataBitrate = +e.target.value; } },
+          rates.map(v => el('option', { value: v, selected: (cfg.dataBitrate || 2000000) === v }, (v / 1e6) + ' Mbit/s'))) : null;
+        advBox.append(
+          el('label.check', el('input', { type: 'checkbox', checked: !!cfg.canFd, onchange: e => { cfg.canFd = e.target.checked; if (dr) dr.disabled = !cfg.canFd; } }), t('connect.canFd')),
+          dr ? field(t('connect.dataBitrate'), dr, t('connect.canFdHint')) : el('span.muted.small', t('connect.canFdSocket')));
+      }
     }
     advBox.append(field(t('connect.ecu'), el('select', { onchange: e => { cfg.ecu = e.target.value; } },
       el('option', { value: '' }, t('connect.ecuAuto')),

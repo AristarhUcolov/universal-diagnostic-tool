@@ -23,6 +23,7 @@ type manager struct {
 	sess     *vehicle.Session
 	state    string
 	err      string
+	errCode  string // see vehicle.ErrorCode
 	progress []string
 	cancel   context.CancelFunc
 	log      *journal.Journal
@@ -50,7 +51,7 @@ func (m *manager) connect(cfg vehicle.Config, done func(*vehicle.Session)) {
 	m.disconnect()
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	m.mu.Lock()
-	m.state, m.err, m.progress, m.cancel = StateConnecting, "", nil, cancel
+	m.state, m.err, m.errCode, m.progress, m.cancel = StateConnecting, "", "", nil, cancel
 	m.mu.Unlock()
 	m.changed()
 	go func() {
@@ -73,7 +74,7 @@ func (m *manager) connect(cfg vehicle.Config, done func(*vehicle.Session)) {
 			return
 		}
 		if err != nil {
-			m.state, m.err = StateError, err.Error()
+			m.state, m.err, m.errCode = StateError, err.Error(), vehicle.ErrorCode(err)
 		} else {
 			m.state, m.sess = StateConnected, s
 		}
@@ -91,7 +92,7 @@ func (m *manager) disconnect() {
 	m.mu.Lock()
 	s, cancel := m.sess, m.cancel
 	m.sess, m.cancel = nil, nil
-	m.state, m.err = StateIdle, ""
+	m.state, m.err, m.errCode = StateIdle, "", ""
 	m.mu.Unlock()
 	if cancel != nil {
 		cancel()
@@ -102,8 +103,8 @@ func (m *manager) disconnect() {
 	m.changed()
 }
 
-func (m *manager) status() (string, string, []string) {
+func (m *manager) status() (state, err, code string, progress []string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.state, m.err, append([]string(nil), m.progress...)
+	return m.state, m.err, m.errCode, append([]string(nil), m.progress...)
 }

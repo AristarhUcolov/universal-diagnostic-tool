@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/ble"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/can"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/diag"
 	"github.com/AristarhUcolov/universal-diagnostic-tool/internal/doip"
@@ -36,10 +37,28 @@ import (
 // Progress receives human-readable steps while connecting.
 type Progress func(step string)
 
+// ErrNoCANFD: the adapter cannot send CAN FD frames.
+var ErrNoCANFD = errors.New("this adapter has no CAN FD: use a PCAN-USB FD, a SocketCAN FD interface or a CANable 2.0, or switch CAN FD off")
+
+// dataBitrate is the CAN FD data phase bit rate asked for.
+func (c Config) dataBitrate() int {
+	if c.DataBitrate > 0 {
+		return c.DataBitrate
+	}
+	return 2000000
+}
+
 // Connect opens the adapter and finds the control units.
 func Connect(ctx context.Context, cfg Config, log journal.Logger, progress Progress) (*Session, error) {
 	if cfg.Profile == "" {
 		cfg.Profile = ProfileAuto
+	}
+	if cfg.CANFD {
+		switch cfg.Adapter {
+		case AdapterSim, AdapterSLCAN, AdapterSocketCAN, AdapterPCAN:
+		default:
+			return nil, ErrNoCANFD
+		}
 	}
 	if progress == nil {
 		progress = func(string) {}
@@ -56,7 +75,7 @@ func Connect(ctx context.Context, cfg Config, log journal.Logger, progress Progr
 		err = s.connectSim(ctx, step)
 	case AdapterKKL:
 		err = s.connectKKL(ctx, step)
-	case AdapterELM, AdapterELMWiFi:
+	case AdapterELM, AdapterELMWiFi, AdapterELMBLE:
 		err = s.connectELM(ctx, step)
 	case AdapterJ2534:
 		err = s.connectJ2534(ctx, step)
@@ -283,6 +302,16 @@ func (s *Session) connectELM(ctx context.Context, step stepFunc) error {
 		}
 		step("connecting to Wi-Fi adapter %s", addr)
 		p, err := elm327.DialTCP(addr, 5*time.Second)
+		if err != nil {
+			return err
+		}
+		if dev, err = elm327.Open(ctx, p, s.log); err != nil {
+			p.Close()
+			return err
+		}
+	} else if s.Config.Adapter == AdapterELMBLE {
+		step("connecting to Bluetooth LE adapter %s", s.Config.Port)
+		p, err := ble.Open(ctx, s.Config.Port)
 		if err != nil {
 			return err
 		}
@@ -523,18 +552,32 @@ func (s *Session) openCANBus(br int) (can.Bus, error) {
 		if err != nil {
 			return nil, err
 		}
-		b, err := slcan.Open(p, br, s.Config.Profile == ProfileMonitor, s.log)
+		listen := s.Config.Profile == ProfileMonitor
+		var b *slcan.Bus
+		if s.Config.CANFD {
+			b, err = slcan.OpenFD(p, br, s.Config.dataBitrate(), listen, s.log)
+		} else {
+			b, err = slcan.Open(p, br, listen, s.log)
+		}
 		if err != nil {
 			p.Close()
 			return nil, err
 		}
 		return b, nil
 	case AdapterSocketCAN:
-		return socketcan.Open(s.Config.Port)
+		b, err := socketcan.Open(s.Config.Port)
+		if err == nil && s.Config.CANFD && !b.Info().FD {
+			b.Close()
+			return nil, fmt.Errorf("%s is not set up for CAN FD: ip link set %s type can bitrate %d dbitrate %d fd on", s.Config.Port, s.Config.Port, br, s.Config.dataBitrate())
+		}
+		return b, err
 	case AdapterPCAN:
 		ch := s.Config.Port
 		if ch == "" {
 			ch = "PCAN_USBBUS1"
+		}
+		if s.Config.CANFD {
+			return pcan.OpenFD(ch, br, s.Config.dataBitrate())
 		}
 		return pcan.Open(ch, br)
 	case AdapterKvaser:
@@ -623,8 +666,12 @@ func (s *Session) canProfiles(ctx context.Context, mux *can.Mux, br int, step st
 	case ProfileUDS:
 		tx, rx := hexValue(cfg.TxID, 0x7E0), hexValue(cfg.RxID, 0x7E8)
 		c := isotp.DefaultConfig(tx, rx)
-		c.Ext, c.Bitrate = tx > 0x7FF, br
-		step("UDS %X/%X", tx, rx)
+		c.Ext, c.Bitrate, c.FD = tx > 0x7FF, br, cfg.CANFD
+		if c.FD {
+			step("UDS %X/%X on CAN FD", tx, rx)
+		} else {
+			step("UDS %X/%X", tx, rx)
+		}
 		return s.addUDS(ctx, isotp.New(mux, c, s.log), step)
 	case ProfileTP20:
 		module := byte(hexValue(cfg.Address, 0x01))
@@ -763,8 +810,13 @@ func (s *Session) connectSim(ctx context.Context, step stepFunc) error {
 		}
 		return s.klineProfiles(ctx, w.KLine, step)
 	case w.CAN != nil:
+		if variant == "can-fd" {
+			s.Config.CANFD = true
+		}
 		if s.Config.Profile == ProfileAuto {
 			switch variant {
+			case "can-fd":
+				s.Config.Profile = ProfileUDS
 			case "vag-can":
 				s.Config.Profile = ProfileTP20
 			case "truck":

@@ -198,6 +198,8 @@ func (s *Server) routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/ecu/{id}/dtc/clear", s.apiClearDTC)
 	mux.HandleFunc("GET /api/ecu/{id}/freeze", s.apiFreeze)
 	mux.HandleFunc("GET /api/ecu/{id}/readiness", s.apiReadiness)
+	mux.HandleFunc("GET /api/ecu/{id}/tests", s.apiTests)
+	mux.HandleFunc("GET /api/ble/scan", s.apiBLEScan)
 	mux.HandleFunc("GET /api/ecu/{id}/params", s.apiParams)
 	mux.HandleFunc("POST /api/ecu/{id}/read", s.apiRead)
 	mux.HandleFunc("GET /api/ecu/{id}/actuators", s.apiActuators)

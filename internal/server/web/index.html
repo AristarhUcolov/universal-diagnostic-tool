@@ -22,7 +22,9 @@
       <div class="nav-section" data-i18n="navsec.diag">Diagnostics</div>
       <a href="#/dashboard" data-page="dashboard"><span class="ico">◉</span><span data-i18n="nav.dashboard">Overview</span></a>
       <a href="#/dtc" data-page="dtc"><span class="ico">⚠</span><span data-i18n="nav.dtc">Trouble codes</span></a>
+      <a href="#/monitors" data-page="monitors"><span class="ico">◎</span><span data-i18n="nav.monitors">Monitors</span></a>
       <a href="#/live" data-page="live"><span class="ico">∿</span><span data-i18n="nav.live">Live data</span></a>
+      <a href="#/gauges" data-page="gauges"><span class="ico">◔</span><span data-i18n="nav.gauges">Gauges</span></a>
       <a href="#/info" data-page="info"><span class="ico">ⓘ</span><span data-i18n="nav.info">Control unit</span></a>
       <div class="nav-section" data-i18n="navsec.service">Service</div>
       <a href="#/tests" data-page="tests"><span class="ico">⚙</span><span data-i18n="nav.tests">Service functions</span></a>
@@ -41,6 +43,7 @@
     <header class="top">
       <div id="conn-pill" class="pill"><span class="dot"></span><span id="conn-text"></span></div>
       <div class="top-right">
+        <button id="alert-pill" class="pill alert hidden" type="button"></button>
         <span id="volt" class="pill hidden"></span>
         <button id="lang-btn" class="ghost small" title="Language / Язык">RU</button>
         <button id="theme-btn" class="ghost small" title="Theme">◐</button>

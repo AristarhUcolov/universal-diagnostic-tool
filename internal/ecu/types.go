@@ -91,7 +91,35 @@ const (
 	CapReadiness = "readiness"
 	CapBlocks    = "blocks"
 	CapReset     = "reset"
+	CapTests     = "tests" // on-board monitoring test results (OBD-II service $06)
 )
+
+// TestResult is one on-board monitoring test (OBD-II service $06): a
+// value the control unit measured for one of its monitors (oxygen sensor,
+// catalyst, misfire per cylinder…) and the limits it judges it by.
+type TestResult struct {
+	Source  string    `json:"source"` // answering control unit (7E8…)
+	MID     byte      `json:"mid"`
+	TID     byte      `json:"tid"`
+	Monitor i18n.Text `json:"monitor"`
+	Test    i18n.Text `json:"test,omitempty"` // standard tests only; manufacturer tests (TID 80–FF) have no name
+	Value   float64   `json:"value"`
+	Min     float64   `json:"min"`
+	Max     float64   `json:"max"`
+	// Limits is false when the unit reports none (both zero), as for
+	// misfire counts: then there is no verdict.
+	Limits bool   `json:"limits"`
+	Pass   bool   `json:"pass"`
+	Unit   string `json:"unit,omitempty"`
+	Digits int    `json:"digits"`
+	Raw    string `json:"raw"`
+}
+
+// TestReader is implemented by handlers that read on-board monitoring
+// test results.
+type TestReader interface {
+	TestResults(ctx context.Context) ([]TestResult, error)
+}
 
 // Resetter is implemented by handlers that can restart their control
 // unit (ecuReset) and restore communication afterwards.

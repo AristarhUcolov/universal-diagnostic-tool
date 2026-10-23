@@ -79,7 +79,9 @@ export function keyParams(params) {
 export function limitsFor(p) {
   const name = tr(p.name).toLowerCase();
   if (p.obd === '05' || p.id === 'j1939.spn110' || /coolant|охлажд/.test(name)) return { warn: 105, bad: 115 };
-  if (p.obd === '42' || p.id === 'j1939.spn168' || /voltage|напряж/.test(name)) {
+  // Supply voltage only: a sensor's voltage (oxygen sensor, 0–1 V) has
+  // nothing to do with the battery's limits.
+  if (p.obd === '42' || p.id === 'j1939.spn168' || (p.unit === 'V' && /battery|supply|бортсет|бортов|аккумул|питани/.test(name))) {
     return p.max > 20 ? { warnBelow: 24, badBelow: 23, warn: 29.5, bad: 30.5 } : { warnBelow: 12.0, badBelow: 11.5, warn: 14.8, bad: 15.2 };
   }
   if (p.obd === '0C' || p.id === 'j1939.spn190') return { warn: 5500, bad: 6500 };

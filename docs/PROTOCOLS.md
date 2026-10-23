@@ -53,7 +53,8 @@
 | ISO 13400 (DoIP) | машины с диагностикой по Ethernet | ✓ (проверено на симуляторе) | кабель OBD–RJ45 |
 | BMW HSFZ | BMW серий F, G, I | ✓ (проверено на симуляторе) | ENET-кабель |
 | L-Line | инициализация на части старых машин | ✓ | кабели K+L (через RTS) |
-| CAN FD | новые машины | ✕ | — |
+| CAN FD (ISO 11898-1:2015, ISO-TP до 64 байт в кадре) | новые машины, примерно с 2020 года | ✓ UDS (проверено на симуляторе) | PCAN-USB FD, CANable 2.0, SocketCAN с FD |
+| SAE J1979 режим 06 (результаты самопроверок) | машины с OBD-II на CAN | ✓ | все, что умеют OBD-II по CAN |
 | SAE J1708 / J1587 | старые грузовики | ✕ | — |
 | GM ALDL (160 и 8192 бод) | GM до 1996 | ✕ | — |
 | Chrysler SCI, CCD | Chrysler до ~2004 | ✕ | — |
@@ -174,7 +175,8 @@ works through a KKL cable, an ELM327 and a J2534 interface unchanged.
 | ISO 13400 (DoIP) | cars with Ethernet diagnostics | ✓ (simulator-tested) | OBD–RJ45 cable |
 | BMW HSFZ | BMW F, G, I series | ✓ (simulator-tested) | ENET cable |
 | L-Line | initialisation on some older cars | ✓ | K+L cables (through RTS) |
-| CAN FD | new cars | ✕ | — |
+| CAN FD (ISO 11898-1:2015, ISO-TP with up to 64 bytes per frame) | new cars, from about 2020 | ✓ UDS (simulator-tested) | PCAN-USB FD, CANable 2.0, SocketCAN with FD |
+| SAE J1979 service 06 (on-board test results) | OBD-II cars on CAN | ✓ | every adapter that does OBD-II on CAN |
 | SAE J1708 / J1587 | older trucks | ✕ | — |
 | GM ALDL (160 and 8192 baud) | GM before 1996 | ✕ | — |
 | Chrysler SCI, CCD | Chrysler until ~2004 | ✕ | — |

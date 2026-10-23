@@ -5,7 +5,9 @@
 # Руководство
 
 **Разделы:** [Запуск](#запуск) · [Подключение](#подключение) ·
-[Обзор](#обзор) · [Ошибки](#ошибки) · [Параметры](#параметры) ·
+[Обзор](#обзор) · [Ошибки](#ошибки) · [Мониторы](#мониторы) ·
+[Параметры](#параметры) · [Приборы](#приборы) ·
+[Предупреждения](#предупреждения) ·
 [Блок управления](#блок-управления) · [Сервис](#сервис) ·
 [Проверки](#проверки) · [Терминал](#терминал) · [Монитор CAN](#монитор-can) · [Журнал](#журнал) ·
 [Настройки](#настройки) · [Мост ELM327](#мост-elm327) ·
@@ -30,8 +32,14 @@
   только сервер, `-listen 0.0.0.0:8080` — доступ из сети (см.
   [ниже](#с-телефона-или-планшета)).
 
-Настройки, журналы, записи и отчёты лежат в папке `%APPDATA%\udt` (Windows)
-или `~/.config/udt` (Linux); открыть их можно из **Настроек → Папки**.
+Настройки, журналы, записи и отчёты лежат в папке `udt-data` рядом с
+программой: перенесите программу вместе с этой папкой — на флешку или другой
+компьютер, — и всё переедет с ней. Если в папку программы нельзя записывать
+(например, Program Files), данные хранятся в профиле пользователя:
+`%APPDATA%\udt` (Windows) или `~/.config/udt` (Linux). Ключ `-data папка`
+или переменная окружения `UDT_DATA` задают любую папку. При первом запуске
+настройки и журналы прежних версий из `%APPDATA%\udt` копируются в
+`udt-data` сами. Где лежат данные, видно в **Настройках → Папки**.
 
 ## Подключение
 
@@ -42,7 +50,10 @@
 3. **Порт.** Для COM-адаптеров программа показывает найденные порты и
    подписывает микросхему: FTDI, CH340, CP210x, PL2303, Bluetooth. Для Wi-Fi
    ELM327 укажите адрес (обычно `192.168.0.10:35000`), для J2534 — драйвер,
-   для DoIP — IP машины (или оставьте пустым — программа поищет сама).
+   для DoIP — IP машины (или оставьте пустым — программа поищет сама). Для
+   **ELM327 Bluetooth LE** нажмите **«Найти адаптеры»** и выберите адаптер
+   из списка (OBD-адаптеры помечены и стоят первыми): такие адаптеры не
+   появляются как COM-порт.
 4. **Автомобиль / блок управления** — профиль. Не уверены — «Автоматически»;
    для ВАЗ/ГАЗ/УАЗ — «ВАЗ / ГАЗ / УАЗ — автоматически».
 5. **Подключиться.** «Ход подключения» показывает каждую попытку.
@@ -52,9 +63,10 @@
 
 **Дополнительные настройки:** адрес блока (hex; `10` — двигатель KWP2000,
 `01` — двигатель VW), инициализация K-Line (быстрая или 5 бод), скорость CAN,
-идентификаторы UDS (по умолчанию `7E0` / `7E8`), принудительное описание
-блока, эхо адаптера, способ быстрой инициализации, уровни DTR и RTS,
-скорость порта адаптера.
+идентификаторы UDS (по умолчанию `7E0` / `7E8`), **CAN FD** для UDS (машины
+примерно с 2020 года; адаптеры PCAN-USB FD, CANable 2.0, SocketCAN с FD) и
+скорость данных CAN FD, принудительное описание блока, эхо адаптера, способ
+быстрой инициализации, уровни DTR и RTS, скорость порта адаптера.
 
 ## Обзор
 
@@ -83,6 +95,27 @@
   разделе «Справочник» он работает и без подключения. Там же —
   **«Справочник по ремонту»**: все советы по узлам без подключения к машине.
 
+## Мониторы
+
+Для машин с OBD-II (EOBD).
+
+- **Готовность мониторов** — какие самопроверки (катализатор, датчики
+  кислорода, система улавливания паров…) блок уже завершил и горит ли лампа
+  Check Engine. После стирания ошибок или отключения аккумулятора мониторы
+  незавершены, пока машина не поездит в нужных им условиях.
+- **Пропуски зажигания по цилиндрам** — счётчики за текущую или последнюю
+  поездку (полоса) и среднее за 10 поездок (отметка). Цилиндр с пропусками
+  видно раньше, чем блок запишет код.
+- **Результаты самопроверок (режим 06)** — **Прочитать результаты**: каждое
+  значение, его допуск и итог «в норме / вне допуска», с отметкой положения
+  в допуске. Значение у края допуска — повод проверить деталь, пока она не
+  отказала. Тесты с номерами 80–FF — тесты производителя: у них нет
+  стандартного названия.
+
+Результаты в стандартных единицах есть у машин с CAN (обычно с 2008 года).
+У старых протоколов (K-Line, J1850) режим 06 выдаёт значения в единицах
+производителя, поэтому программа их числами не показывает.
+
 ## Параметры
 
 Отметьте параметры слева (по группам, с фильтром) или нажмите готовый
@@ -98,6 +131,38 @@
   открывается в Excel или LibreOffice.
 
 Знак «?» у параметра — формула не сверена с реальным блоком.
+
+## Приборы
+
+Стрелочные приборы для выбранных значений, бортовой компьютер и замер
+разгона. Программа сама добавляет нужные значения к опросу.
+
+- **Выбрать значения** — до 12 приборов; выбор запоминается для каждого
+  блока. Зелёная и красная зоны на шкале — те же пороги, что на «Обзоре».
+- **HUD** — крупные цифры скорости и оборотов на чёрном фоне; кнопка
+  «Зеркально» отражает их для проекции на лобовое стекло.
+- **Во весь экран** — приборы без меню.
+- **Бортовой компьютер** — мгновенный и средний расход, израсходованное
+  топливо, пробег, время в пути, средняя и максимальная скорость. Расход
+  берётся из часового расхода топлива, а без него оценивается по расходу
+  воздуха (для бензинового двигателя при λ = 1). Считает с первого открытия
+  раздела до выхода из программы; «Сбросить» начинает заново.
+- **Замер разгона** — 0–60, 0–100, 60–100, 80–120 км/ч и 402 м (с
+  имперскими единицами — 0–30, 0–60, 30–70 миль/ч и ¼ мили). Выберите
+  замер, нажмите **Начать**, остановитесь (или сбросьте скорость) и
+  трогайтесь. На время замера программа опрашивает только скорость и
+  обороты как можно чаще; время между двумя замерами скорости
+  интерполируется. Лучший результат отмечен звёздочкой. Замеряйте только на
+  закрытой площадке.
+
+## Предупреждения
+
+Пока идёт опрос параметров, программа следит за опасными значениями на любой
+странице: перегрев (от 115 °C), низкое напряжение бортсети (до 11,5 В) или
+слишком высокое (от 15,2 В), обороты выше 6500. Появляются сообщение с
+советом, красная отметка в верхней строке (нажмите — откроются «Приборы») и
+короткий звук. Предупреждение снимается, когда значение вернётся в норму.
+Выключаются они в **Настройках**.
 
 ## Блок управления
 
@@ -119,8 +184,11 @@
 - **Реле и клапаны** — бензонасос, вентилятор, кондиционер, лампа
   неисправности, клапан адсорбера. Включённое вернётся блоку само — через
   60 секунд, бензонасос через 30; обратный отсчёт виден на карточке.
-- **Регулировки холостого хода** — задайте обороты ХХ или положение РДВ и
-  смотрите на обороты рядом. «Вернуть ЭБУ» отдаёт управление блоку.
+- **Регулировки холостого хода** — в реальном времени: ползунок, кнопки
+  шага (±10 и ±50 об/мин) или число. С галочкой **«Применять сразу»**
+  значение уходит в блок, пока вы двигаете ползунок; график под ним
+  показывает заданное значение и фактическое. «Вернуть ЭБУ» отдаёт
+  управление блоку.
 
 У каждого теста указано условие — «двигатель заглушен» или «двигатель
 работает». Программа проверяет его по оборотам и не запустит тест, если
@@ -171,8 +239,10 @@
 ## Настройки
 
 Язык, тема, единицы (метрические или имперские), режим эксперта, запись
-журнала в файл, открытие в окне; мост ELM327; доступ из сети; папки; версия,
-база кодов и лицензия.
+журнала в файл, открытие в окне, предупреждения об опасных значениях и их
+звук; мост ELM327; доступ из сети; **папки** — где лежат данные (рядом с
+программой или в профиле), кнопки открыть журналы, записи, отчёты и
+описания блоков; версия, база кодов и лицензия.
 
 ## Мост ELM327
 
@@ -237,6 +307,12 @@ udt live -adapter sim -sim gaz-mikas -params twat,freq,uacc
 - **ELM327:** Bluetooth — сопрягите адаптер в системе и выберите
   **исходящий** COM-порт; скорость порта программа подбирает сама; дешёвые
   клоны «v2.1» часто не умеют часть команд.
+- **ELM327 Bluetooth LE:** Bluetooth компьютера включён; адаптер вставлен в
+  машину, зажигание включено, а к адаптеру не подключён телефон (BLE-адаптер
+  работает только с одним устройством). Сопрягать в системе не нужно.
+- **CAN FD:** нужен адаптер с FD — PCAN-USB FD, CANable 2.0 или интерфейс
+  SocketCAN, включённый командой `ip link set can0 type can bitrate 500000
+  dbitrate 2000000 fd on`. У CANable 2.0 скорость данных — 2 или 5 Мбит/с.
 - **J2534 / RP1210:** нет в списке — не установлен драйвер производителя;
   ошибка разрядности — запустите `udt-x86.exe`.
 - **CAN:** правильная скорость (легковые — 500 кбит/с, грузовики — 250 или
@@ -291,8 +367,15 @@ DonationAlerts и способы помочь без денег — провер
   runs only the server, `-listen 0.0.0.0:8080` allows network access (see
   [below](#from-a-phone-or-tablet)).
 
-Settings, journals, recordings and reports live in `%APPDATA%\udt` (Windows)
-or `~/.config/udt` (Linux); **Settings → Folders** opens them.
+Settings, journals, recordings and reports live in the `udt-data` folder
+next to the program: move the program together with that folder — to a flash
+drive or another computer — and everything moves with it. Where the
+program's folder cannot be written (Program Files, for example), the data is
+kept in the user profile: `%APPDATA%\udt` (Windows) or `~/.config/udt`
+(Linux). The `-data folder` flag or the `UDT_DATA` environment variable
+choose any folder. On the first start the settings and journals of earlier
+versions in `%APPDATA%\udt` are copied into `udt-data`. **Settings →
+Folders** shows where the data is.
 
 ## Connecting
 
@@ -303,7 +386,10 @@ or `~/.config/udt` (Linux); **Settings → Folders** opens them.
 3. **Port.** For serial adapters the program lists the ports it found and
    names the chip: FTDI, CH340, CP210x, PL2303, Bluetooth. For a Wi-Fi ELM327
    enter the address (usually `192.168.0.10:35000`), for J2534 the driver,
-   for DoIP the car's IP (or leave it empty — the program searches).
+   for DoIP the car's IP (or leave it empty — the program searches). For an
+   **ELM327 Bluetooth LE** press **"Find adapters"** and pick the adapter
+   from the list (OBD adapters are marked and listed first): such adapters
+   never show up as a serial port.
 4. **Vehicle / control unit** — the profile. Not sure — "Automatic"; for
    VAZ/GAZ/UAZ — "VAZ / GAZ / UAZ — automatic".
 5. **Connect.** The progress list shows every attempt.
@@ -313,8 +399,10 @@ the same adapter, port and profile with one button.
 
 **Advanced:** control unit address (hex; `10` — KWP2000 engine, `01` — VW
 engine), K-Line initialisation (fast or 5 baud), CAN bit rate, UDS
-identifiers (`7E0` / `7E8` by default), a forced control unit description,
-adapter echo, fast-init method, DTR and RTS levels, adapter port speed.
+identifiers (`7E0` / `7E8` by default), **CAN FD** for UDS (many cars from
+about 2020; PCAN-USB FD, CANable 2.0 or a SocketCAN FD interface) and the CAN
+FD data rate, a forced control unit description, adapter echo, fast-init
+method, DTR and RTS levels, adapter port speed.
 
 ## Overview
 
@@ -342,6 +430,28 @@ MIL. For the simulator: engine controls and "inject a fault".
   "Reference" section it works without a connection too, next to the
   **repair advice** for every part.
 
+## Monitors
+
+For OBD-II (EOBD) vehicles.
+
+- **Monitor readiness** — which self-tests (catalyst, oxygen sensors,
+  evaporative system…) the controller has completed, and whether the
+  check-engine lamp is on. After clearing codes or disconnecting the battery
+  the monitors stay incomplete until the car has run in the conditions they
+  need.
+- **Misfires per cylinder** — the counts of the current or last drive (bar)
+  and the average of the last 10 drives (mark). A misfiring cylinder shows
+  up before the controller stores a code.
+- **Test results (service 06)** — **Read test results**: every value, its
+  limits and a "within / out of limits" verdict, with a mark showing where
+  it lies between them. A value near a limit is a reason to check the part
+  before it fails. Tests 80–FF belong to the manufacturer and have no
+  standard name.
+
+Results in standard units exist on CAN vehicles (usually from 2008). Older
+protocols (K-Line, J1850) report service 06 in manufacturer units, so the
+program does not show them as numbers.
+
 ## Live data
 
 Tick parameters on the left (grouped, with a filter) or pick a ready set —
@@ -358,6 +468,36 @@ fast as possible, 4 times a second or once a second.
 
 A "?" next to a value means its formula has not been checked against a real
 unit.
+
+## Gauges
+
+Dials for the values you choose, a trip computer and acceleration timing.
+The program adds the values it needs to the polling by itself.
+
+- **Choose values** — up to 12 dials, remembered for each control unit. The
+  yellow and red zones are the thresholds of the Overview.
+- **HUD** — big digits of speed and engine speed on black; "Mirror" flips
+  them for a reflection in the windscreen.
+- **Full screen** — the dials without the menu.
+- **Trip computer** — current and average consumption, fuel used,
+  distance, time, average and top speed. Consumption comes from the fuel
+  rate or, without it, is estimated from the air flow (petrol engine at
+  λ = 1). It counts from the first visit of the page until the program is
+  closed; "Reset" starts again.
+- **Acceleration timing** — 0–60, 0–100, 60–100, 80–120 km/h and 402 m (with
+  imperial units 0–30, 0–60, 30–70 mph and ¼ mile). Choose a run, press
+  **Start**, stop (or slow down) and go. During the run the program polls
+  only the speed and engine speed, as fast as the line allows, and
+  interpolates between two speed readings. The best time is starred. Only
+  on a closed track.
+
+## Alerts
+
+While values are polled, the program watches for dangerous ones on any page:
+overheating (from 115 °C), low supply voltage (11.5 V and below) or too high
+(from 15.2 V), engine speed above 6500 rpm. A message with advice, a red mark
+in the top bar (click it to open the Gauges) and a short sound appear; the
+alert ends when the value is back to normal. **Settings** switch alerts off.
 
 ## Control unit
 
@@ -379,9 +519,10 @@ engine responds.
 - **Relays and valves** — fuel pump, fan, A/C, check-engine lamp, canister
   purge. Anything left on returns to the control unit by itself after 60
   seconds (the fuel pump after 30); the card counts down.
-- **Idle adjustments** — set the idle speed or the idle air valve position
-  and watch the engine speed next to it. "Hand back" returns control to the
-  unit.
+- **Idle adjustments** — in real time: a slider, step buttons (±10 and ±50
+  rpm) or a number. With **"Apply at once"** the value goes to the unit
+  while you move the slider; the chart below shows the target and the
+  actual value. "Hand back" returns control to the unit.
 
 Each test states its condition — "engine stopped" or "engine running". The
 program checks it against the engine speed and does not start the test when
@@ -431,8 +572,10 @@ folder; the latest 50 are kept.
 ## Settings
 
 Language, theme, units (metric or imperial), expert mode, journal file,
-window mode; the ELM327 bridge; network access; folders; version, code
-database and licence.
+window mode, alerts about dangerous values and their sound; the ELM327
+bridge; network access; **folders** — where the data is (next to the program
+or in the profile) and buttons that open journals, recordings, reports and
+control unit descriptions; version, code database and licence.
 
 ## ELM327 bridge
 
@@ -495,6 +638,13 @@ shows whether requests go out (`tx`) and answers come back (`rx`).
 - **ELM327:** Bluetooth — pair the adapter in the OS and choose the
   **outgoing** COM port; the program finds the port speed itself; cheap
   "v2.1" clones often lack commands.
+- **ELM327 Bluetooth LE:** the computer's Bluetooth is on; the adapter is in
+  the car with the ignition on, and no phone is connected to it (a BLE
+  adapter talks to one device at a time). No pairing in the OS is needed.
+- **CAN FD:** it needs an FD adapter — PCAN-USB FD, CANable 2.0, or a
+  SocketCAN interface set up with `ip link set can0 type can bitrate 500000
+  dbitrate 2000000 fd on`. A CANable 2.0 runs the data phase at 2 or 5
+  Mbit/s.
 - **J2534 / RP1210:** not listed — the maker's driver is not installed; a
   bitness error — run `udt-x86.exe`.
 - **CAN:** the right bit rate (cars 500 kbit/s, trucks 250 or 500); on a

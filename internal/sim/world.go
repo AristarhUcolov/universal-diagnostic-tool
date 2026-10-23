@@ -22,6 +22,7 @@ var Variants = []Variant{
 	{"obd-kline", i18n.T("European car 2002, OBD-II on ISO 9141-2", "Европейский автомобиль 2002, OBD-II по ISO 9141-2"), "kline"},
 	{"vag-kline", i18n.T("VW Golf IV 1.8T, KW1281", "VW Golf IV 1.8T, KW1281"), "kline"},
 	{"can", i18n.T("Modern car, OBD-II + UDS on CAN 500k", "Современный автомобиль, OBD-II + UDS по CAN 500k"), "can"},
+	{"can-fd", i18n.T("Car from 2021, UDS on CAN FD 500k / 2M", "Автомобиль 2021 года, UDS по CAN FD 500k / 2M"), "can"},
 	{"vag-can", i18n.T("VW Passat B6, TP 2.0 on CAN", "VW Passat B6, TP 2.0 по CAN"), "can"},
 	{"truck", i18n.T("Truck, SAE J1939 on CAN 250k", "Грузовик, SAE J1939 по CAN 250k"), "can"},
 	{"doip", i18n.T("Car with Ethernet diagnostics (DoIP)", "Автомобиль с диагностикой по Ethernet (DoIP)"), "doip"},
@@ -70,6 +71,12 @@ func NewWorld(variant string) (*World, error) {
 		tcm.Minor = true
 		w.CAN.AttachISOTP("ecm", 0x7E8, 0x7E0, 0x7DF, false, eng)
 		w.CAN.AttachISOTP("tcm", 0x7E9, 0x7E1, 0x7DF, false, tcm)
+	case "can-fd":
+		w.CAN = NewCANBus(500000)
+		w.CAN.FD = true
+		eng := NewOBDApp(e, "ECM-EngineControl-FD")
+		eng.UDS = true
+		w.CAN.AttachISOTP("ecm", 0x7E8, 0x7E0, 0x7DF, false, eng)
 	case "vag-can":
 		w.CAN = NewCANBus(500000)
 		w.CAN.AttachTP20(0x01, &VAGApp{Engine: e})
